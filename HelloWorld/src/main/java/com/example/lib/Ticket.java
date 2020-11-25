@@ -31,11 +31,11 @@ public class Ticket {
         this.sitz = sitz;
     }
     
-    public Object getVorstellung() {
+    public Vorstellung getVorstellung() {
         return this.vorstellung;
     }
 
-    public void setVorstellung(Object vorstellung) {
+    public void setVorstellung(Vorstellung vorstellung) {
         this.vorstellung = vorstellung;
     };
     
@@ -62,6 +62,14 @@ public class Ticket {
     public void setBezahlt(boolean bezahlt) {
         this.bezahlt = bezahlt;
     }
+
+	public boolean getIstValide() {
+		return this.istValide;
+	}
+
+	public void setIstValide(boolean istValide) {
+		this.istValide = istValide;
+	}
 
     public SimpleDateFormat getKaufdatum() {
         return this.kaufdatum;
