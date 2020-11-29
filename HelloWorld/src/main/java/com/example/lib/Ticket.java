@@ -89,7 +89,7 @@ public class Ticket {
     }
 
     public void inDenWarenkorb(){
-        this.kaeufer.getWarenkorb.getTickets.append(this);
+        this.kaeufer.getWarenkorb.getTicket.append(this);
     }
     //TODO Preisberechnungen anpassen und aktivieren
     /*

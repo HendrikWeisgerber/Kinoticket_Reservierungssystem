@@ -1,19 +1,50 @@
 package com.example.lib;
 
 public class Bestellung {
-    private String vorname;
-    private String nachname;
-    private String username;
-    private int id;
-    private int alter;
-    private String email;
-    private String passwortHash;
-    //private Rechte rechte;
-    private Boolean newsletter;
-    //private Preiskategorie preiskategorie;
-    private Film wunschliste;
-    //private Zahlungsmethode zahlungsmethode;
-    //private Zone lieblingszone;
-    private Warenkorb warenkorb;
+private Ticket[] ticket;
+private Benutzer benutzer;
+//private Zahlungsmethode zahlungsmethode;
+
+public Bestellung(Ticket[] ticket, Benutzer benutzer) { //,Zahlungsmethode zahlungsmethode
+    this.ticket = ticket;
+    this.benutzer = benutzer;
+    //this.zahlungsmethode = zahlungsmethode;
+}
+
+public Ticket[] getTicket() {
+    return ticket;
+}
+
+public void setTicket(Ticket[] ticket) {
+    this.ticket = ticket;
+}
+
+public Benutzer getBenutzer() {
+    return benutzer;
+}
+
+public void setBenutzer(Benutzer benutzer) {
+    this.benutzer = benutzer;
+}
+
+//public Zahlungsmethode getZahlungsmethode() {
+//    return zahlungsmethode;
+//}
+
+//public void setZahlungsmethode(Zahlungsmethode zahlungsmethode) {
+//    this.zahlungsmethode = zahlungsmethode;
+//}
+
+
+public void reservierungStornieren(){
+    ticket=null;
+}
+
+public void reservierungBezahlen(){
+
+}
+public void rechnungSenden(){
+    
+}
 
 }
