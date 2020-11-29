@@ -97,13 +97,13 @@ public class Benutzer {
         this.warenkorb = warenkorb;
     }
 
-    public Film getWunschliste() {
-        return this.wunschliste;
-    }
+    //public Film getWunschliste() {
+    //    return this.wunschliste;
+    //}
 
-    public void setWunschliste(Film wunschliste) {
-        this.wunschliste = wunschliste;
-    }
+    //public void setWunschliste(Film wunschliste) {
+    //    this.wunschliste = wunschliste;
+    //}
 
     public Boolean getNewsletter() {
         return this.newsletter;
@@ -116,6 +116,6 @@ public class Benutzer {
 
 
 
-    
+
 
 }
