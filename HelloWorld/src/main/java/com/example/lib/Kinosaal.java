@@ -5,17 +5,17 @@ import java.util.ArrayList;
 
 public class Kinosaal {
     private int anzahlSitze;
-    private int spalte;
-    private int reihe;
+    private int anzahlSpalte;
+    private int anzahlReihe;
     private int id;
     private ArrayList<Sitz> meineSitze;
     private ArrayList<Film> meineFilme;
     private ArrayList<Vorstellung> meineVorstellungen;
 
-    public Kinosaal(int anzahlSitze, int spalte, int reihe, int id, ArrayList<Sitz> meineSitze, ArrayList<Film> meineFilme, ArrayList<Vorstellung> meineVorstellungen) {
+    public Kinosaal(int anzahlSitze, int anzahlSpalte, int anzahlReihe, int id, ArrayList<Sitz> meineSitze, ArrayList<Film> meineFilme, ArrayList<Vorstellung> meineVorstellungen) {
         this.anzahlSitze = anzahlSitze;
-        this.spalte = spalte;
-        this.reihe = reihe;
+        this.anzahlSpalte = anzahlSpalte;
+        this.anzahlReihe = anzahlReihe;
         this.id = id;
         this.meineSitze = meineSitze;
         this.meineFilme = meineFilme;
@@ -30,20 +30,20 @@ public class Kinosaal {
         this.anzahlSitze = anzahlSitze;
     }
 
-    public int getSpalte() {
-        return spalte;
+    public int getAnzahlSpalte() {
+        return anzahlSpalte;
     }
 
-    public void setSpalte(int spalte) {
-        this.spalte = spalte;
+    public void setAnzahlSpalte(int anzahlSpalte) {
+        this.anzahlSpalte = anzahlSpalte;
     }
 
-    public int getReihe() {
-        return reihe;
+    public int getAnzahlReihe() {
+        return anzahlReihe;
     }
 
-    public void setReihe(int reihe) {
-        this.reihe = reihe;
+    public void setAnzahlReihe(int anzahlReihe) {
+        this.anzahlReihe = anzahlReihe;
     }
 
     public int getId() {

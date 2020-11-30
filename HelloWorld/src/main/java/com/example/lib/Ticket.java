@@ -9,7 +9,6 @@ public class Ticket {
     private Vorstellung vorstellung;
     private Benutzer gast;
     private Benutzer kaeufer;
-    private boolean bezahlt;
     private boolean istValide;
     private SimpleDateFormat kaufdatum;
 
@@ -55,14 +54,6 @@ public class Ticket {
         this.kaeufer = kaeufer;
     }
 
-    public boolean isBezahlt() {
-        return this.bezahlt;
-    }
-
-    public void setBezahlt(boolean bezahlt) {
-        this.bezahlt = bezahlt;
-    }
-
 	public boolean getIstValide() {
 		return this.istValide;
 	}
@@ -79,12 +70,11 @@ public class Ticket {
         this.kaufdatum = kaufdatum;
     }
 
-    public Ticket(int id, Sitz sitz, Benutzer gast, Benutzer kaeufer, boolean bezahlt, SimpleDateFormat kaufdatum) {
+    public Ticket(int id, Sitz sitz, Benutzer gast, Benutzer kaeufer, SimpleDateFormat kaufdatum) {
         this.id = id;
         this.sitz = sitz;
         this.gast = gast;
         this.kaeufer = kaeufer;
-        this.bezahlt = bezahlt;
         this.kaufdatum = kaufdatum;
     }
 

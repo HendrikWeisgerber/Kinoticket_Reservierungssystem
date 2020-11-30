@@ -1,5 +1,6 @@
 package com.example.lib;
 
+import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.ArrayList;
@@ -97,11 +98,11 @@ public class Film {
         //TODO
     }
     
-    public ArrayList<SimpleDateFormat> zeigeVorstellungszeiten() {
-        ArrayList<SimpleDateFormat> vorstellungszeiten = new ArrayList<SimpleDateFormat>();
-        for(int i=0; i < this.getVorstellung().startZeit; i++) {
-            vorstellungszeiten.add(this.getVorstellung().startZeit);
-        }
+    public ArrayList<Date> zeigeVorstellungszeiten() {
+        //TODO 
+        //Datenbankabfrage nach allen Vorstellungen mit dem entsprechenden Film
+        //Jeweils Anfangszetipunkt in Arrayliste abspeichern
+        ArrayList<Date> vorstellungszeiten = new ArrayList<Date>();
         return vorstellungszeiten;
     }
     
