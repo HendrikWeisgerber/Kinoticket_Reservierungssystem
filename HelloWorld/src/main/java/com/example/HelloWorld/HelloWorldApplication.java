@@ -11,7 +11,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.example.lib.Movie;
+import com.example.lib.Film;
 
 @SpringBootApplication
 @RestController
@@ -19,12 +19,12 @@ public class HelloWorldApplication {
 
 	@RequestMapping(value = "/", produces = "application/json")
 	public ResponseEntity<Object> home(){
-		Movie starWars = new Movie("Star Wars", "the picture is here", "Its cool", 10, 140, 12, true);
-		Movie starWars2 = new Movie("Star Wars2", "the picture is here", "Its cool", 10, 140, 12, true);
-		final Map<String, Movie> movies = new HashMap<>();
+		Film starWars = new Film("Star Wars", "the picture is here", "Its cool", 10, 140, 12, true);
+		Film starWars2 = new Film("Star Wars2", "the picture is here", "Its cool", 10, 140, 12, true);
+		final Map<String, Film> films = new HashMap<>();
 		
-		movies.put("a",starWars);
-		movies.put("b",starWars2);
+		films.put("a",starWars);
+		films.put("b",starWars2);
 		return new ResponseEntity<>(starWars, HttpStatus.OK);
 	}
 	public static void main(String[] args) {
