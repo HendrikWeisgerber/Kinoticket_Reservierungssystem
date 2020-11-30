@@ -6,7 +6,7 @@ import java.text.SimpleDateFormat;
 public class Ticket {
     private int id;
     private Sitz sitz;
-    private Vorstellung vorstellung
+    private Vorstellung vorstellung;
     private Benutzer gast;
     private Benutzer kaeufer;
     private boolean bezahlt;
