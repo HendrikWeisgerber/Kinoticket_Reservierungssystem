@@ -9,7 +9,7 @@ public class Benutzer {
     private String email;
     private String passwortHash;
     private Warenkorb warenkorb;
-    private Film wunschliste;
+    private Film[] wunschliste;
     private Boolean newsletter;
     //private Rechte rechte;
     //private Preiskategorie preiskategorie;
@@ -19,7 +19,7 @@ public class Benutzer {
 
 
     public Benutzer(String vorname, String nachname, String username, int id, int alter, String email,
-            String passwortHash, Warenkorb warenkorb, Boolean newsletter) {
+            String passwortHash, Warenkorb warenkorb,Film[] wunschliste, Boolean newsletter) {
         this.vorname = vorname;
         this.nachname = nachname;
         this.username = username;
@@ -28,8 +28,21 @@ public class Benutzer {
         this.email = email;
         this.passwortHash = passwortHash;
         this.warenkorb = warenkorb;
+        this.wunschliste= wunschliste;
         this.newsletter = newsletter;
     }
+    public Benutzer(String vorname, String nachname, String username, int id, int alter, String email,
+    String passwortHash, Warenkorb warenkorb, Boolean newsletter) {
+    this.vorname = vorname;
+    this.nachname = nachname;
+    this.username = username;
+    this.id = id;
+    this.alter = alter;
+    this.email = email;
+    this.passwortHash = passwortHash;
+    this.warenkorb = warenkorb;
+    this.newsletter = newsletter;
+}
 
 
     
@@ -97,13 +110,23 @@ public class Benutzer {
         this.warenkorb = warenkorb;
     }
 
-    //public Film getWunschliste() {
-    //    return this.wunschliste;
-    //}
+    public Film[] getWunschliste() {
+        return this.wunschliste;
+    }
 
-    //public void setWunschliste(Film wunschliste) {
-    //    this.wunschliste = wunschliste;
-    //}
+    public void setWunschliste(Film[] wunschliste) {
+       this.wunschliste = wunschliste;
+    }
+
+    public void derWunschlisteHinzufuegen(Film film){
+        Film[] neueWunschListe = new Film[this.wunschliste.length+1];
+        int i =0;
+        for (Film alterWunschFilm: this.wunschliste){
+            neueWunschListe[i] =alterWunschFilm;
+            i++;
+        }
+        neueWunschListe[i]=film;
+    }
 
     public Boolean getNewsletter() {
         return this.newsletter;
@@ -112,6 +135,8 @@ public class Benutzer {
     public void setNewsletter(Boolean newsletter) {
         this.newsletter = newsletter;
     }
+//TODO Preiskategorien bestimmen und Rechte 
+
 
 
 

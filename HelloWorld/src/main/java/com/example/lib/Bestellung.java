@@ -3,11 +3,13 @@ package com.example.lib;
 public class Bestellung {
 private Ticket[] ticket;
 private Benutzer benutzer;
+private boolean bezahlt;
 //private Zahlungsmethode zahlungsmethode;
 
-public Bestellung(Ticket[] ticket, Benutzer benutzer) { //,Zahlungsmethode zahlungsmethode
+public Bestellung(Ticket[] ticket, Benutzer benutzer, boolean bezahlt) { //,Zahlungsmethode zahlungsmethode
     this.ticket = ticket;
     this.benutzer = benutzer;
+    this.bezahlt=bezahlt;
     //this.zahlungsmethode = zahlungsmethode;
 }
 
@@ -41,10 +43,18 @@ public void reservierungStornieren(){
 }
 
 public void reservierungBezahlen(){
-
+    this.bezahlt= true; //TODO bezahl möglichkeiten müssen implementiert werden
 }
 public void rechnungSenden(){
-    
+    System.out.println(this.benutzer.getEmail()); //TODO implementieren der echten email versendung
+}
+
+public boolean isBezahlt() {
+	return bezahlt;
+}
+
+public void setBezahlt(boolean bezahlt) {
+	this.bezahlt = bezahlt;
 }
 
 }
