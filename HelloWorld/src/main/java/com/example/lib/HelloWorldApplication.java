@@ -28,6 +28,9 @@ public class HelloWorldApplication {
 	@Autowired
   	private SitzRepository sitzRepository;
 
+	@Autowired
+	private TicketRepository ticketRepository;
+
 	@RequestMapping(value = "/", produces = "application/json")
 	public ResponseEntity<Object> home(){
 		Film starWars = new Film("Star Wars", "hier ist das Bild", "das passiert", 10, 200, 12, true, "Sci-Fi");
@@ -42,6 +45,20 @@ public class HelloWorldApplication {
 		
 		return new ResponseEntity<>(sitzRepository.findAll(), HttpStatus.OK);
 	}
+
+	@RequestMapping(value = "/crud/ticket/all", produces = "application/json")
+	public ResponseEntity<Object> getallTickets(){
+
+		Ticket testT = new Ticket();
+		//testT.setSitz(new Sitz(1,3,5,true,new BigDecimal(2)), new Vorstellung());
+
+		// Sitz ersterSitz = new Sitz(1,3,5,true,new BigDecimal(2));
+		// sitzRepository.save(ersterSitz);
+
+		return new ResponseEntity<>(ticketRepository.findAll(), HttpStatus.OK);
+	}
+
+
 	public static void main(String[] args) {
 		//SpringApplication.run(HelloWorldApplication.class, args);
 		SpringApplication app =new SpringApplication(HelloWorldApplication.class);

@@ -18,7 +18,6 @@ public class Kinosaal {
         this.reihe = reihe;
         this.id = id;
     }
-
     public int getAnzahlSitze() {
         return anzahlSitze;
     }

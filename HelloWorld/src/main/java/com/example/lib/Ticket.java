@@ -1,9 +1,18 @@
 package com.example.lib;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 
+@Entity
 public class Ticket {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
     private Sitz sitz;
     private Vorstellung vorstellung;
@@ -14,7 +23,11 @@ public class Ticket {
     private SimpleDateFormat kaufdatum;
 
     //TODO: implementiere Essen und trinken funktionen
-    
+
+    @Autowired
+    public Ticket() {
+    }
+
     public int getId() {
         return this.id;
     }
