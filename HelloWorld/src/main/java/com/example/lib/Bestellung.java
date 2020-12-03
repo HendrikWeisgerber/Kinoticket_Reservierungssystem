@@ -1,60 +1,85 @@
 package com.example.lib;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+@Entity
 public class Bestellung {
-private Ticket[] ticket;
-private Benutzer benutzer;
-private boolean bezahlt;
-//private Zahlungsmethode zahlungsmethode;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private int id;
+    private Ticket[] ticket;
+    private Benutzer benutzer;
+    private boolean bezahlt;
+    //private Zahlungsmethode zahlungsmethode;
 
-public Bestellung(Ticket[] ticket, Benutzer benutzer, boolean bezahlt) { //,Zahlungsmethode zahlungsmethode
-    this.ticket = ticket;
-    this.benutzer = benutzer;
-    this.bezahlt=bezahlt;
-    //this.zahlungsmethode = zahlungsmethode;
-}
+    @Autowired
+    public Bestellung(Ticket[] ticket, Benutzer benutzer, boolean bezahlt) { //,Zahlungsmethode zahlungsmethode
+        this.ticket = ticket;
+        this.benutzer = benutzer;
+        this.bezahlt=bezahlt;
+        //this.zahlungsmethode = zahlungsmethode;
+    }
 
-public Ticket[] getTicket() {
-    return ticket;
-}
+    @Autowired
+    public Bestellung() {
+        
+    }
 
-public void setTicket(Ticket[] ticket) {
-    this.ticket = ticket;
-}
+    public int getId(){
+        return this.id;
+    }
 
-public Benutzer getBenutzer() {
-    return benutzer;
-}
+    public void setId(int id){
+        this.id = id;
+    }
 
-public void setBenutzer(Benutzer benutzer) {
-    this.benutzer = benutzer;
-}
+    public Ticket[] getTicket() {
+        return ticket;
+    }
 
-//public Zahlungsmethode getZahlungsmethode() {
-//    return zahlungsmethode;
-//}
+    public void setTicket(Ticket[] ticket) {
+        this.ticket = ticket;
+    }
 
-//public void setZahlungsmethode(Zahlungsmethode zahlungsmethode) {
-//    this.zahlungsmethode = zahlungsmethode;
-//}
+    public Benutzer getBenutzer() {
+        return benutzer;
+    }
+
+    public void setBenutzer(Benutzer benutzer) {
+        this.benutzer = benutzer;
+    }
+
+    //public Zahlungsmethode getZahlungsmethode() {
+    //    return zahlungsmethode;
+    //}
+
+    //public void setZahlungsmethode(Zahlungsmethode zahlungsmethode) {
+    //    this.zahlungsmethode = zahlungsmethode;
+    //}
 
 
-public void reservierungStornieren(){
-    ticket=null;
-}
+    public void reservierungStornieren(){
+        ticket=null;
+    }
 
-public void reservierungBezahlen(){
-    this.bezahlt= true; //TODO bezahl möglichkeiten müssen implementiert werden
-}
-public void rechnungSenden(){
-    System.out.println(this.benutzer.getEmail()); //TODO implementieren der echten email versendung
-}
+    public void reservierungBezahlen(){
+        this.bezahlt= true; //TODO bezahl möglichkeiten müssen implementiert werden
+    }
+    public void rechnungSenden(){
+        System.out.println(this.benutzer.getEmail()); //TODO implementieren der echten email versendung
+    }
 
-public boolean isBezahlt() {
-	return bezahlt;
-}
+    public boolean isBezahlt() {
+        return bezahlt;
+    }
 
-public void setBezahlt(boolean bezahlt) {
-	this.bezahlt = bezahlt;
-}
+    public void setBezahlt(boolean bezahlt) {
+        this.bezahlt = bezahlt;
+    }
 
 }

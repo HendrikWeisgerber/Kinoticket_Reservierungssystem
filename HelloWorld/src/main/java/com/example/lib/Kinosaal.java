@@ -3,20 +3,36 @@ package com.example.lib;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+@Entity
 public class Kinosaal {
     private int anzahlSitze;
     private int spalte;
     private int reihe;
+    @Id
+    @GeneratedValue(strategy=GenerationType.AUTO)
     private int id;
     private ArrayList<Sitz> meineSitze;
     private ArrayList<Film> meineFilme;
     private ArrayList<Vorstellung> meineVorstellungen;
 
+    @Autowired
     public Kinosaal(int anzahlSitze, int spalte, int reihe, int id) {
         this.anzahlSitze = anzahlSitze;
         this.spalte = spalte;
         this.reihe = reihe;
         this.id = id;
+    }
+
+    @Autowired
+    public Kinosaal() {
+        
     }
 
     public int getAnzahlSitze() {

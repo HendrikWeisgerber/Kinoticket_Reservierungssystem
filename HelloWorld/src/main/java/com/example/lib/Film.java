@@ -2,9 +2,23 @@ package com.example.lib;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
 import java.util.ArrayList;
 
+
+@Entity
 public class Film {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private int id;
     private String name;
     private String bild;
     private String beschreibung;
@@ -15,6 +29,15 @@ public class Film {
 //TODO Genre enum statt string
     private String genre;
     private Vorstellung[] vorstellung;
+
+
+    public int getId() {
+        return this.id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public String getName() {
         return this.name;
@@ -80,6 +103,7 @@ public class Film {
         return this.genre;
     }
 
+    @Autowired
     public Film(String name, String bild, String beschreibung, int bewertung, int laenge, int mindestAlter,
             boolean aktiv, String genre) {
         this.name = name;
@@ -90,6 +114,10 @@ public class Film {
         this.mindestAlter = mindestAlter;
         this.aktiv = aktiv;
         this.genre = genre;
+    }
+
+    @Autowired
+    public Film() {
     }
 
     public void zuWunschlisteHinzufuegen(Benutzer benutzer) {

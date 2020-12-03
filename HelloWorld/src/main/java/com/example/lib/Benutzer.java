@@ -1,9 +1,19 @@
 package com.example.lib;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+@Entity
 public class Benutzer {
     private String vorname;
     private String nachname;
     private String username;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
     private int alter;
     private String email;
@@ -17,7 +27,7 @@ public class Benutzer {
     //private Zone lieblingszone;
 
 
-
+    @Autowired
     public Benutzer(String vorname, String nachname, String username, int id, int alter, String email,
             String passwortHash, Warenkorb warenkorb,Film[] wunschliste, Boolean newsletter) {
         this.vorname = vorname;
@@ -31,6 +41,7 @@ public class Benutzer {
         this.wunschliste= wunschliste;
         this.newsletter = newsletter;
     }
+    @Autowired
     public Benutzer(String vorname, String nachname, String username, int id, int alter, String email,
     String passwortHash, Warenkorb warenkorb, Boolean newsletter) {
     this.vorname = vorname;
@@ -42,7 +53,11 @@ public class Benutzer {
     this.passwortHash = passwortHash;
     this.warenkorb = warenkorb;
     this.newsletter = newsletter;
-}
+    }
+    @Autowired
+    public Benutzer (){
+
+    }
 
 
     
