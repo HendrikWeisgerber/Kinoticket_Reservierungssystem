@@ -54,12 +54,12 @@ public class Vorstellung {
         this.startZeit = startZeit;
     }
 
-    public SimpleDateFormat getEndZeit() {
-        SimpleDateFormat endZeit;
-        endZeit = this.getStartZeit();
-        Date date = endZeit;
-        endZeit.getTime();
-    }
+    // public SimpleDateFormat getEndZeit() {
+    //     SimpleDateFormat endZeit;
+    //     endZeit = this.getStartZeit();
+    //     Date date = endZeit;
+    //     endZeit.getTime();
+    // }
 
     public int getId() {
         return id;
@@ -69,10 +69,10 @@ public class Vorstellung {
         this.id = id;
     }
 
-    public void sitzplanAnzeigen() {
-        //TODO
-    }
-    public float prozentsatzFreierSitze() {
-        //TODO
-    }
+    // public void sitzplanAnzeigen() {
+    //     //TODO
+    // }
+    // public float prozentsatzFreierSitze() {
+    //     //TODO
+    // }
 }

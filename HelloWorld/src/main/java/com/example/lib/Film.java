@@ -12,8 +12,8 @@ public class Film {
     private int laenge;
     private int mindestAlter;
     private boolean aktiv;
-
-    private Genre[] genre;
+//TODO Genre enum statt string
+    private String genre;
     private Vorstellung[] vorstellung;
 
     public String getName() {
@@ -76,12 +76,12 @@ public class Film {
         return this.vorstellung;
     }
 
-    public Genre[] getGenre() {
+    public String getGenre() {
         return this.genre;
     }
 
     public Film(String name, String bild, String beschreibung, int bewertung, int laenge, int mindestAlter,
-            boolean aktiv, Genre genre, Vorstellung[] vorstellung) {
+            boolean aktiv, String genre) {
         this.name = name;
         this.bild = bild;
         this.beschreibung = beschreibung;
@@ -90,7 +90,6 @@ public class Film {
         this.mindestAlter = mindestAlter;
         this.aktiv = aktiv;
         this.genre = genre;
-        this.vorstellung = vorstellung;
     }
 
     public void zuWunschlisteHinzufuegen(Benutzer benutzer) {
@@ -99,8 +98,8 @@ public class Film {
     
     public ArrayList<SimpleDateFormat> zeigeVorstellungszeiten() {
         ArrayList<SimpleDateFormat> vorstellungszeiten = new ArrayList<SimpleDateFormat>();
-        for(int i=0; i < this.getVorstellung().startZeit; i++) {
-            vorstellungszeiten.add(this.getVorstellung().startZeit);
+        for(int i=0; i < this.getVorstellung().length; i++) {
+            vorstellungszeiten.add(this.getVorstellung()[i].getStartZeit());
         }
         return vorstellungszeiten;
     }

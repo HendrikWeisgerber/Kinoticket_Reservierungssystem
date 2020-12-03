@@ -79,17 +79,8 @@ public class Ticket {
         this.kaufdatum = kaufdatum;
     }
 
-    public Ticket(int id, Sitz sitz, Benutzer gast, Benutzer kaeufer, boolean bezahlt, SimpleDateFormat kaufdatum) {
-        this.id = id;
-        this.sitz = sitz;
-        this.gast = gast;
-        this.kaeufer = kaeufer;
-        this.bezahlt = bezahlt;
-        this.kaufdatum = kaufdatum;
-    }
-
     public void inDenWarenkorb(){
-        this.kaeufer.getWarenkorb.getTicket.append(this);
+        //TODO rethink this this.kaeufer.getWarenkorb().getTicket().append(this);
     }
     //TODO Preisberechnungen anpassen und aktivieren
     /*
@@ -103,6 +94,18 @@ public class Ticket {
     */
     public void ticketLoeschen(){
         this.istValide = false;
+    }
+
+    public Ticket(int id, Sitz sitz, Vorstellung vorstellung, Benutzer gast, Benutzer kaeufer, boolean bezahlt,
+            boolean istValide, SimpleDateFormat kaufdatum) {
+        this.id = id;
+        this.sitz = sitz;
+        this.vorstellung = vorstellung;
+        this.gast = gast;
+        this.kaeufer = kaeufer;
+        this.bezahlt = bezahlt;
+        this.istValide = istValide;
+        this.kaufdatum = kaufdatum;
     }
 
 }

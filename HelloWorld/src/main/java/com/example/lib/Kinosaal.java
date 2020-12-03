@@ -12,14 +12,11 @@ public class Kinosaal {
     private ArrayList<Film> meineFilme;
     private ArrayList<Vorstellung> meineVorstellungen;
 
-    public Kinosaal(int anzahlSitze, int spalte, int reihe, int id, ArrayList<Sitz> meineSitze, ArrayList<Film> meineFilme, ArrayList<Vorstellung> meineVorstellungen) {
+    public Kinosaal(int anzahlSitze, int spalte, int reihe, int id) {
         this.anzahlSitze = anzahlSitze;
         this.spalte = spalte;
         this.reihe = reihe;
         this.id = id;
-        this.meineSitze = meineSitze;
-        this.meineFilme = meineFilme;
-        this.meineVorstellungen = meineVorstellungen;
     }
 
     public int getAnzahlSitze() {
