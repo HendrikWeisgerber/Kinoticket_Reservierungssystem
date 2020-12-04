@@ -7,6 +7,7 @@ import java.util.ArrayList;
 
 public class Film {
     private String name;
+    private int id;
     private String bild;
     private String beschreibung;
     private int bewertung;
@@ -14,8 +15,8 @@ public class Film {
     private int mindestAlter;
     private boolean aktiv;
 
-    private Genre[] genre;
-    private Vorstellung[] vorstellung;
+    //private Genre[] genre;
+    private ArrayList<Vorstellung> vorstellungen;
 
     public String getName() {
         return this.name;
@@ -23,6 +24,14 @@ public class Film {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public int getId() {
+        return this.id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getBild() {
@@ -73,25 +82,36 @@ public class Film {
         this.aktiv = aktiv;
     }
 
-    public Vorstellung[] getVorstellung() {
-        return this.vorstellung;
+    public ArrayList<Vorstellung> getVorstellung() {
+        return this.vorstellungen;
     }
 
-    public Genre[] getGenre() {
-        return this.genre;
+    public void addVorstellung(Vorstellung vorstellung) {
+        if(this.vorstellungen == null) {
+            this.vorstellungen = new ArrayList<Vorstellung>();
+        }
+        this.vorstellungen.add(vorstellung);
     }
 
-    public Film(String name, String bild, String beschreibung, int bewertung, int laenge, int mindestAlter,
-            boolean aktiv, Genre genre, Vorstellung[] vorstellung) {
+  //  public Genre[] getGenre() {
+    //    return this.genre;
+    //}
+    public Film() {
+        super();
+    }
+    //Vorstellung Array wieder einbinden
+    public Film(String name, int id, String bild, String beschreibung, int bewertung, int laenge, int mindestAlter,
+            boolean aktiv, ArrayList<Vorstellung> vorstellungen) {
         this.name = name;
+        this.id = id;
         this.bild = bild;
         this.beschreibung = beschreibung;
         this.bewertung = bewertung;
         this.laenge = laenge;
         this.mindestAlter = mindestAlter;
         this.aktiv = aktiv;
-        this.genre = genre;
-        this.vorstellung = vorstellung;
+        this.vorstellungen = vorstellungen;
+        
     }
 
     public void zuWunschlisteHinzufuegen(Benutzer benutzer) {

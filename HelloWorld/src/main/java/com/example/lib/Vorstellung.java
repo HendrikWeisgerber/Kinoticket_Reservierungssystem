@@ -12,15 +12,19 @@ public class Vorstellung {
     private boolean aktiv;
 
     private Kinosaal saal;
-    private Film film;
+    private int filmId;
     private Ticket[] ticket;
 
     private SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 
-    public Vorstellung(int id, Date startZeit, Film film, BigDecimal grundpreis, boolean aktiv) {
+    public Vorstellung() {
+        super();
+    }
+
+    public Vorstellung(int id, Date startZeit, int filmId, BigDecimal grundpreis, boolean aktiv) {
         this.setId(id);
         this.setStartZeit(startZeit);
-        this.setFilm(film);
+        this.setFilmId(filmId);
         this.setGrundpreis(grundpreis);
         this.setAktiv(aktiv);
     }
@@ -49,12 +53,12 @@ public class Vorstellung {
         this.grundpreis = grundpreis;
     }
 
-    public Film getFilm() {
-        return film;
+    public int getFilmId() {
+        return filmId;
     }
 
-    public void setFilm(Film film) {
-        this.film = film;
+    public void setFilmId(int filmId) {
+        this.filmId = filmId;
     }
 
     public Date getStartZeit() {
@@ -65,11 +69,11 @@ public class Vorstellung {
         this.startZeit = startZeit;
     }
 
-    public Date getEndZeit() {
+    /*public Date getEndZeit() {
         Date endZeit;
         endZeit = new Date(this.getStartZeit().getTime() + film.getLaenge()*60000);
         return endZeit;
-    }
+    }*/
 
     public int getId() {
         return id;
