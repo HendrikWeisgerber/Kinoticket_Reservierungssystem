@@ -1,24 +1,25 @@
 package com.example.lib;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Entity
 public class Benutzer {
-    private String vorname;
-    private String nachname;
-    private String username;
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
+    private String vorname;
+    private String nachname;
+    private String username;
+    @Column(name = "age")
     private int alter;
     private String email;
     private String passwortHash;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "warenkorb_id", referencedColumnName = "id")
     private Warenkorb warenkorb;
+    @Transient
     private Film[] wunschliste;
     private Boolean newsletter;
     //private Rechte rechte;
@@ -26,10 +27,8 @@ public class Benutzer {
     //private Zahlungsmethode zahlungsmethode;
     //private Zone lieblingszone;
 
-
-    @Autowired
     public Benutzer(String vorname, String nachname, String username, int id, int alter, String email,
-            String passwortHash, Warenkorb warenkorb,Film[] wunschliste, Boolean newsletter) {
+                    String passwortHash, Warenkorb warenkorb, Film[] wunschliste, Boolean newsletter) {
         this.vorname = vorname;
         this.nachname = nachname;
         this.username = username;
@@ -38,29 +37,29 @@ public class Benutzer {
         this.email = email;
         this.passwortHash = passwortHash;
         this.warenkorb = warenkorb;
-        this.wunschliste= wunschliste;
+        this.wunschliste = wunschliste;
         this.newsletter = newsletter;
     }
-    @Autowired
+
     public Benutzer(String vorname, String nachname, String username, int id, int alter, String email,
-    String passwortHash, Warenkorb warenkorb, Boolean newsletter) {
-    this.vorname = vorname;
-    this.nachname = nachname;
-    this.username = username;
-    this.id = id;
-    this.alter = alter;
-    this.email = email;
-    this.passwortHash = passwortHash;
-    this.warenkorb = warenkorb;
-    this.newsletter = newsletter;
+                    String passwortHash, Warenkorb warenkorb, Boolean newsletter) {
+        this.vorname = vorname;
+        this.nachname = nachname;
+        this.username = username;
+        this.id = id;
+        this.alter = alter;
+        this.email = email;
+        this.passwortHash = passwortHash;
+        this.warenkorb = warenkorb;
+        this.newsletter = newsletter;
     }
+
     @Autowired
-    public Benutzer (){
+    public Benutzer() {
 
     }
 
 
-    
     public String getVorname() {
         return this.vorname;
     }
@@ -130,17 +129,17 @@ public class Benutzer {
     }
 
     public void setWunschliste(Film[] wunschliste) {
-       this.wunschliste = wunschliste;
+        this.wunschliste = wunschliste;
     }
 
-    public void derWunschlisteHinzufuegen(Film film){
-        Film[] neueWunschListe = new Film[this.wunschliste.length+1];
-        int i =0;
-        for (Film alterWunschFilm: this.wunschliste){
-            neueWunschListe[i] =alterWunschFilm;
+    public void derWunschlisteHinzufuegen(Film film) {
+        Film[] neueWunschListe = new Film[this.wunschliste.length + 1];
+        int i = 0;
+        for (Film alterWunschFilm : this.wunschliste) {
+            neueWunschListe[i] = alterWunschFilm;
             i++;
         }
-        neueWunschListe[i]=film;
+        neueWunschListe[i] = film;
     }
 
     public Boolean getNewsletter() {
@@ -151,11 +150,6 @@ public class Benutzer {
         this.newsletter = newsletter;
     }
 //TODO Preiskategorien bestimmen und Rechte 
-
-
-
-
-
 
 
 }

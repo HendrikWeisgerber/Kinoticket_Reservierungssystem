@@ -22,8 +22,6 @@ import com.example.lib.Repositories.*;
 
 @SpringBootApplication
 @RestController
-@ComponentScan
-@EnableAutoConfiguration
 public class HelloWorldApplication {
 	@Autowired
   	private SitzRepository sitzRepository;
@@ -47,13 +45,17 @@ public class HelloWorldApplication {
 	}
 
 	@RequestMapping(value = "/crud/ticket/all", produces = "application/json")
-	public ResponseEntity<Object> getallTickets(){
+	public ResponseEntity<Object> getAllTickets(){
 
 		Ticket testT = new Ticket();
-		//testT.setSitz(new Sitz(1,3,5,true,new BigDecimal(2)), new Vorstellung());
+		testT.setSitz(new Sitz(1,3,5,true,new BigDecimal(2)));
+		testT.setVorstellung(new Vorstellung());
+		testT.setKaeufer(new Benutzer());
+		testT.setGast(new Benutzer());
+		testT.setBezahlt(true);
+		testT.setIstValide(false);
 
-		// Sitz ersterSitz = new Sitz(1,3,5,true,new BigDecimal(2));
-		// sitzRepository.save(ersterSitz);
+		ticketRepository.save(testT);
 
 		return new ResponseEntity<>(ticketRepository.findAll(), HttpStatus.OK);
 	}

@@ -3,10 +3,7 @@ package com.example.lib;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -28,6 +25,7 @@ public class Film {
     private boolean aktiv;
 //TODO Genre enum statt string
     private String genre;
+    @Transient
     private Vorstellung[] vorstellung;
 
 

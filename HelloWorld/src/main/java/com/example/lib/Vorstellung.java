@@ -2,10 +2,7 @@ package com.example.lib;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -18,9 +15,13 @@ public class Vorstellung {
     private SimpleDateFormat startZeit;
     private BigDecimal grundpreis;
     private boolean aktiv;
-
+    @ManyToOne
+    @JoinColumn(name = "kinosaal_id")
     private Kinosaal saal;
+    @ManyToOne
+    @JoinColumn(name = "film_id")
     private Film film;
+    @Transient
     private Ticket[] ticket;
     
     @Autowired

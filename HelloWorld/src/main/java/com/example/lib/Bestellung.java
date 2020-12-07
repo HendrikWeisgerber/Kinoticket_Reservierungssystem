@@ -1,9 +1,6 @@
 package com.example.lib;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -12,10 +9,13 @@ public class Bestellung {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
-    private Ticket[] ticket;
+
+    @ManyToOne
     private Benutzer benutzer;
     private boolean bezahlt;
     //private Zahlungsmethode zahlungsmethode;
+    @Transient
+    private Ticket[] ticket;
 
     @Autowired
     public Bestellung(Ticket[] ticket, Benutzer benutzer, boolean bezahlt) { //,Zahlungsmethode zahlungsmethode
