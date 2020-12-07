@@ -114,7 +114,6 @@ public class Film {
         this.genre = genre;
     }
 
-    @Autowired
     public Film() {
     }
 

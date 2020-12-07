@@ -80,8 +80,8 @@ public class HelloWorldApplication {
 		testB.setEmail("max.mustermann@gmail.com");
 		testB.setPasswortHash("KFIWN");
 		testB.setWarenkorb(new Warenkorb());
-		testB.setNewsletter(false);
-		testB.derWunschlisteHinzufuegen(new Film());
+		//testB.setNewsletter(false);
+		//testB.derWunschlisteHinzufuegen(new Film("Star Wars", "hier ist das Bild", "das passiert", 10, 200, 12, true, "Sci-Fi"));
 		benutzerRepository.save(testB);
 
 		return new ResponseEntity<>(benutzerRepository.findAll(),HttpStatus.OK);
