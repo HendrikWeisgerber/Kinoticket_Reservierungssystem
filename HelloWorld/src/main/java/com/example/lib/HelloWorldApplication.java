@@ -31,6 +31,12 @@ public class HelloWorldApplication {
 	@Autowired
 	private TicketRepository ticketRepository;
 
+	@Autowired 
+	BenutzerRepository benutzerRepository;
+
+	@Autowired 
+	WarenkorbRepository warenkorbRepository;
+
 	@RequestMapping(value = "/", produces = "application/json")
 	public ResponseEntity<Object> home(){
 		Film starWars = new Film("Star Wars", "hier ist das Bild", "das passiert", 10, 200, 12, true, "Sci-Fi");
@@ -58,6 +64,27 @@ public class HelloWorldApplication {
 		return new ResponseEntity<>(ticketRepository.findAll(), HttpStatus.OK);
 	}
 
+	@RequestMapping(value = "/crud/benutzer/all", produces = "application/json")
+	public ResponseEntity<Object> getAllBenutzer(){
+
+		Warenkorb testW = new Warenkorb();
+		Benutzer testB = new Benutzer();
+		testW.setBenutzer(testB);
+		warenkorbRepository.save(testW);
+		testB.setVorname("Max");
+		testB.setNachname("Mustermann");
+		testB.setUsername("Mustermann_Max");
+		testB.setAlter(25);
+		testB.setEmail("max.mustermann@gmail.com");
+		testB.setPasswortHash("KFIWN");
+		testB.setWarenkorb(new Warenkorb());
+		testB.setNewsletter(false);
+		testB.derWunschlisteHinzufuegen(new Film());
+		benutzerRepository.save(testB);
+
+		return new ResponseEntity<>(benutzerRepository.findAll(),HttpStatus.OK);
+
+	}
 
 	public static void main(String[] args) {
 		//SpringApplication.run(HelloWorldApplication.class, args);
