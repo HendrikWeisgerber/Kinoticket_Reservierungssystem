@@ -1,19 +1,34 @@
 package com.example.lib;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+@Entity
 public class Vorstellung {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
     private SimpleDateFormat startZeit;
     private BigDecimal grundpreis;
     private boolean aktiv;
-
+    @ManyToOne
+    @JoinColumn(name = "kinosaal_id")
     private Kinosaal saal;
+    @ManyToOne
+    @JoinColumn(name = "film_id")
     private Film film;
+    @Transient
     private Ticket[] ticket;
     
+    @Autowired
+    public Vorstellung() {
+
+    }
+
     public Vorstellung(int id, SimpleDateFormat startZeit, Film film, BigDecimal grundpreis, boolean aktiv) {
         this.setId(id);
         this.setStartZeit(startZeit);
@@ -54,12 +69,12 @@ public class Vorstellung {
         this.startZeit = startZeit;
     }
 
-    public SimpleDateFormat getEndZeit() {
-        SimpleDateFormat endZeit;
-        endZeit = this.getStartZeit();
-        Date date = endZeit;
-        endZeit.getTime();
-    }
+    // public SimpleDateFormat getEndZeit() {
+    //     SimpleDateFormat endZeit;
+    //     endZeit = this.getStartZeit();
+    //     Date date = endZeit;
+    //     endZeit.getTime();
+    // }
 
     public int getId() {
         return id;
@@ -69,10 +84,10 @@ public class Vorstellung {
         this.id = id;
     }
 
-    public void sitzplanAnzeigen() {
-        //TODO
-    }
-    public float prozentsatzFreierSitze() {
-        //TODO
-    }
+    // public void sitzplanAnzeigen() {
+    //     //TODO
+    // }
+    // public float prozentsatzFreierSitze() {
+    //     //TODO
+    // }
 }

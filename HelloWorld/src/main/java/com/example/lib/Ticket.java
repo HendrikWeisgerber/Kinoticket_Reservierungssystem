@@ -1,20 +1,38 @@
 package com.example.lib;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 
+@Entity
 public class Ticket {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
+    @ManyToOne
+    @JoinColumn(name = "sitz_id")
     private Sitz sitz;
+    @ManyToOne
+    @JoinColumn(name = "vorstellung_id")
     private Vorstellung vorstellung;
+    @ManyToOne
+    @JoinColumn(name="gast_id", referencedColumnName = "id")
     private Benutzer gast;
+    @ManyToOne
+    @JoinColumn(name="kaeufer_id")
     private Benutzer kaeufer;
     private boolean bezahlt;
     private boolean istValide;
     private SimpleDateFormat kaufdatum;
 
     //TODO: implementiere Essen und trinken funktionen
-    
+
+    @Autowired
+    public Ticket() {
+    }
+
     public int getId() {
         return this.id;
     }
@@ -48,11 +66,12 @@ public class Ticket {
     }
 
     public Benutzer getKaeufer() {
-        return this.kaeufer;
+        //return this.kaeufer;
+        return new Benutzer();
     }
 
     public void setKaeufer(Benutzer kaeufer) {
-        this.kaeufer = kaeufer;
+        //this.kaeufer = kaeufer;
     }
 
     public boolean isBezahlt() {
@@ -79,17 +98,8 @@ public class Ticket {
         this.kaufdatum = kaufdatum;
     }
 
-    public Ticket(int id, Sitz sitz, Benutzer gast, Benutzer kaeufer, boolean bezahlt, SimpleDateFormat kaufdatum) {
-        this.id = id;
-        this.sitz = sitz;
-        this.gast = gast;
-        this.kaeufer = kaeufer;
-        this.bezahlt = bezahlt;
-        this.kaufdatum = kaufdatum;
-    }
-
     public void inDenWarenkorb(){
-        this.kaeufer.getWarenkorb.getTicket.append(this);
+        //TODO rethink this this.kaeufer.getWarenkorb().getTicket().append(this);
     }
     //TODO Preisberechnungen anpassen und aktivieren
     /*
@@ -103,6 +113,18 @@ public class Ticket {
     */
     public void ticketLoeschen(){
         this.istValide = false;
+    }
+
+    public Ticket(int id, Sitz sitz, Vorstellung vorstellung, Benutzer gast, Benutzer kaeufer, boolean bezahlt,
+            boolean istValide, SimpleDateFormat kaufdatum) {
+        this.id = id;
+        this.sitz = sitz;
+        this.vorstellung = vorstellung;
+        this.gast = gast;
+        //this.kaeufer = kaeufer;
+        this.bezahlt = bezahlt;
+        this.istValide = istValide;
+        this.kaufdatum = kaufdatum;
     }
 
 }

@@ -1,8 +1,24 @@
 package com.example.lib;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.persistence.*;
+
+@Entity
 public class Warenkorb {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private int id;
+    @OneToOne (cascade = CascadeType.ALL)
+    @JoinColumn(name = "benutzer_id", referencedColumnName = "id")
     private Benutzer benutzer;
+    @Transient
     private Ticket[] ticket;
+
+    @Autowired
+    public Warenkorb() {
+
+    }
 
     public Warenkorb(Benutzer benutzer, Ticket[] ticket) {
         this.benutzer = benutzer;

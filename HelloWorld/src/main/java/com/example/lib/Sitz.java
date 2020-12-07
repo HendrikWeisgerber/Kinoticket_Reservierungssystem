@@ -3,32 +3,54 @@ package com.example.lib;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 
+import javax.persistence.*;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+@Entity
 public class Sitz {
+    @Id
+    @GeneratedValue(strategy=GenerationType.AUTO)
     private int id;
     private int reihe;
     private int spalte;
     private boolean barriereFrei;
     private BigDecimal preisschluessel;
+    @ManyToOne
+    @JoinColumn(name = "kinosaal_id")
     private Kinosaal meinKinosaal;
-    private ArrayList<Ticket> meineTickets;
-
-    public Sitz(int id, int reihe, int spalte, boolean barriereFrei, BigDecimal preisschluessel, Kinosaal meinKinosaal, ArrayList<Ticket> meineTickets) {
+    //private ArrayList<Ticket> meineTickets;
+    
+    // @Autowired
+    // public Sitz(int id, int reihe, int spalte, boolean barriereFrei, BigDecimal preisschluessel, Kinosaal meinKinosaal) {
+    //     this.id = id;
+    //     this.reihe = reihe;
+    //     this.spalte = spalte;
+    //     this.barriereFrei = barriereFrei;
+    //     this.preisschluessel = preisschluessel;
+    //     this.meinKinosaal = meinKinosaal;
+    // }
+    @Autowired
+    public Sitz(int id, int reihe, int spalte, boolean barriereFrei, BigDecimal preisschluessel) {
         this.id = id;
         this.reihe = reihe;
         this.spalte = spalte;
         this.barriereFrei = barriereFrei;
         this.preisschluessel = preisschluessel;
-        this.meinKinosaal = meinKinosaal;
-        this.meineTickets = meineTickets;
     }
 
-    public ArrayList<Ticket> getMeineTickets() {
-        return meineTickets;
+    @Autowired
+    public Sitz(){
+        
     }
 
-    public void setMeineTickets(ArrayList<Ticket> meineTickets) {
-        this.meineTickets = meineTickets;
-    }
+    // public ArrayList<Ticket> getMeineTickets() {
+    //     return meineTickets;
+    // }
+
+    // public void setMeineTickets(ArrayList<Ticket> meineTickets) {
+    //     this.meineTickets = meineTickets;
+    // }
 
     public int getId() {
         return id;
@@ -70,11 +92,11 @@ public class Sitz {
         this.preisschluessel = preisschluessel;
     }
 
-    public Kinosaal getMeinKinosaal() {
-        return meinKinosaal;
-    }
+    // public Kinosaal getMeinKinosaal() {
+    //     return meinKinosaal;
+    // }
 
-    public void setMeinKinosaal(Kinosaal meinKinosaal) {
-        this.meinKinosaal = meinKinosaal;
-    }
+    // public void setMeinKinosaal(Kinosaal meinKinosaal) {
+    //     this.meinKinosaal = meinKinosaal;
+    // }
 }
