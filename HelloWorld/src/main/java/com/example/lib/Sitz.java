@@ -3,10 +3,7 @@ package com.example.lib;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -19,7 +16,9 @@ public class Sitz {
     private int spalte;
     private boolean barriereFrei;
     private BigDecimal preisschluessel;
-    //private Kinosaal meinKinosaal;
+    @ManyToOne
+    @JoinColumn(name = "kinosaal_id")
+    private Kinosaal meinKinosaal;
     //private ArrayList<Ticket> meineTickets;
     
     // @Autowired

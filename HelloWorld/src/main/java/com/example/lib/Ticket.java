@@ -2,10 +2,7 @@ package com.example.lib;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 
@@ -14,9 +11,17 @@ public class Ticket {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
+    @ManyToOne
+    @JoinColumn(name = "sitz_id")
     private Sitz sitz;
+    @ManyToOne
+    @JoinColumn(name = "vorstellung_id")
     private Vorstellung vorstellung;
+    @ManyToOne
+    @JoinColumn(name="gast_id", referencedColumnName = "id")
     private Benutzer gast;
+    @ManyToOne
+    @JoinColumn(name="kaeufer_id")
     private Benutzer kaeufer;
     private boolean bezahlt;
     private boolean istValide;
@@ -61,11 +66,12 @@ public class Ticket {
     }
 
     public Benutzer getKaeufer() {
-        return this.kaeufer;
+        //return this.kaeufer;
+        return new Benutzer();
     }
 
     public void setKaeufer(Benutzer kaeufer) {
-        this.kaeufer = kaeufer;
+        //this.kaeufer = kaeufer;
     }
 
     public boolean isBezahlt() {
@@ -115,7 +121,7 @@ public class Ticket {
         this.sitz = sitz;
         this.vorstellung = vorstellung;
         this.gast = gast;
-        this.kaeufer = kaeufer;
+        //this.kaeufer = kaeufer;
         this.bezahlt = bezahlt;
         this.istValide = istValide;
         this.kaufdatum = kaufdatum;
