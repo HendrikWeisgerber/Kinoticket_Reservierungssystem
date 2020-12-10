@@ -3,9 +3,20 @@ package com.example.lib;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+
+import javax.persistence.*;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
 import java.util.ArrayList;
 
+
+@Entity
 public class Film {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private int id;
     private String name;
     private int id;
     private String bild;
@@ -17,6 +28,15 @@ public class Film {
 
     //private Genre[] genre;
     private ArrayList<Vorstellung> vorstellungen;
+
+
+    public int getId() {
+        return this.id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public String getName() {
         return this.name;

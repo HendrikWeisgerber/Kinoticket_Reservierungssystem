@@ -1,25 +1,48 @@
 package com.example.lib;
 
+import javax.persistence.*;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+@Entity
 public class Benutzer {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private int id;
     private String vorname;
     private String nachname;
     private String username;
-    private int id;
+    @Column(name = "age")
     private int alter;
     private String email;
     private String passwortHash;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "warenkorb_id", referencedColumnName = "id")
     private Warenkorb warenkorb;
-    private Film wunschliste;
+    @Transient
+    private Film[] wunschliste;
     private Boolean newsletter;
     //private Rechte rechte;
     //private Preiskategorie preiskategorie;
     //private Zahlungsmethode zahlungsmethode;
     //private Zone lieblingszone;
 
-
+    public Benutzer(String vorname, String nachname, String username, int id, int alter, String email,
+                    String passwortHash, Warenkorb warenkorb, Film[] wunschliste, Boolean newsletter) {
+        this.vorname = vorname;
+        this.nachname = nachname;
+        this.username = username;
+        this.id = id;
+        this.alter = alter;
+        this.email = email;
+        this.passwortHash = passwortHash;
+        this.warenkorb = warenkorb;
+        this.wunschliste = wunschliste;
+        this.newsletter = newsletter;
+    }
 
     public Benutzer(String vorname, String nachname, String username, int id, int alter, String email,
-            String passwortHash, Warenkorb warenkorb, Boolean newsletter) {
+                    String passwortHash, Warenkorb warenkorb, Boolean newsletter) {
         this.vorname = vorname;
         this.nachname = nachname;
         this.username = username;
@@ -31,8 +54,12 @@ public class Benutzer {
         this.newsletter = newsletter;
     }
 
+    @Autowired
+    public Benutzer() {
 
-    
+    }
+
+
     public String getVorname() {
         return this.vorname;
     }
@@ -97,13 +124,23 @@ public class Benutzer {
         this.warenkorb = warenkorb;
     }
 
-    //public Film getWunschliste() {
-    //    return this.wunschliste;
-    //}
+    public Film[] getWunschliste() {
+        return this.wunschliste;
+    }
 
-    //public void setWunschliste(Film wunschliste) {
-    //    this.wunschliste = wunschliste;
-    //}
+    public void setWunschliste(Film[] wunschliste) {
+        this.wunschliste = wunschliste;
+    }
+
+    public void derWunschlisteHinzufuegen(Film film) {
+        Film[] neueWunschListe = new Film[this.wunschliste.length + 1];
+        int i = 0;
+        for (Film alterWunschFilm : this.wunschliste) {
+            neueWunschListe[i] = alterWunschFilm;
+            i++;
+        }
+        neueWunschListe[i] = film;
+    }
 
     public Boolean getNewsletter() {
         return this.newsletter;
@@ -112,10 +149,7 @@ public class Benutzer {
     public void setNewsletter(Boolean newsletter) {
         this.newsletter = newsletter;
     }
-
-
-
-
+//TODO Preiskategorien bestimmen und Rechte 
 
 
 }
