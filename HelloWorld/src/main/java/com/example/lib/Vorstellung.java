@@ -1,23 +1,36 @@
 package com.example.lib;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+@Entity
 public class Vorstellung {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
     private Date startZeit;
     private BigDecimal grundpreis;
     private boolean aktiv;
-
+    @ManyToOne
+    @JoinColumn(name = "kinosaal_id")
     private Kinosaal saal;
+    @ManyToOne
+    @JoinColumn(name = "film_id")
     private Film film;
+    @Transient
     private Ticket[] ticket;
+    
+    @Autowired
+    public Vorstellung() {
 
-    private SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+    }
 
-    public Vorstellung(int id, Date startZeit, Film film, BigDecimal grundpreis, boolean aktiv) {
+    public Vorstellung(int id, SimpleDateFormat startZeit, Film film, BigDecimal grundpreis, boolean aktiv) {
         this.setId(id);
         this.setStartZeit(startZeit);
         this.setFilm(film);
@@ -65,11 +78,12 @@ public class Vorstellung {
         this.startZeit = startZeit;
     }
 
-    public Date getEndZeit() {
-        Date endZeit;
-        endZeit = new Date(this.getStartZeit().getTime() + film.getLaenge()*60000);
-        return endZeit;
-    }
+    // public SimpleDateFormat getEndZeit() {
+    //     SimpleDateFormat endZeit;
+    //     endZeit = this.getStartZeit();
+    //     Date date = endZeit;
+    //     endZeit.getTime();
+    // }
 
     public int getId() {
         return id;
@@ -79,33 +93,10 @@ public class Vorstellung {
         this.id = id;
     }
 
-    public void sitzplanAnzeigen() {
-        //TODO
-        // Über eine Datenbankabfrage an die besetzten Sitze kommen und diese als Array mit dem entsprechenden Platz (Reihe,Spalte) ausgeben
-    }
-    public Ticket sitzWaehlen(int reihe, int spalte) {
-        //TODO
-        //1. Prüfen ob Sitz belegt
-        //      Datenbankabfrage nach allen Tickets für diese Vorstellung --> entsprechende Sitze des Tickets sind belegt
-        //2. Wer findet den Sitz zu der erntsprechenden Reihe und Spalte?; welches Datum ist Kaufdatum?
-        ArrayList<Sitz> ausSitze = this.getSaal().getMeineSitze();
-        //null nur temporäre Lösung, später lieber mit Exception ersetzen
-        Sitz ausSitz = null;
-        for(int i = 0; i < ausSitze.size(); i++) {
-            
-            if(ausSitze.get(i).getReihe() == reihe && ausSitze.get(i).getSpalte() == spalte) {
-                ausSitz = ausSitze.get(i);
-            }
-        }
-        return new Ticket(0, ausSitz, null, null, null); 
-    }
-    public float prozentsatzFreierSitze() {
-        //TODO
-        //1. Prüfen welche Sitz belegt
-        //      Datenbankabfrage nach allen Tickets für diese Vorstellung --> entsprechende Sitze der Tickets sind belegt
-        ArrayList<Sitz> ausSitze = this.getSaal().getMeineSitze();
-        int anzahlSitze = ausSitze.size();
-        //anzahlSitze mit anzahlBelegteTickets teilen
-        return 0;
-    }
+    // public void sitzplanAnzeigen() {
+    //     //TODO
+    // }
+    // public float prozentsatzFreierSitze() {
+    //     //TODO
+    // }
 }
