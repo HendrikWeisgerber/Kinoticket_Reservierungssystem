@@ -101,6 +101,18 @@ public class HelloWorldApplication {
 		return new ResponseEntity<>(ticketRepository.findByVorstellungId((int)vorstellung_id),HttpStatus.OK);
 	}
 
+	// TODO implement MappingMethods
+
+	/*
+	@RequestMapping(value = "/film/all", produces = "application/json")
+	@RequestMapping(value = "/film/{film_id}", produces = "application/json")
+	@RequestMapping(value = "/vorstellung/film/{film_id}", produces = "application/json")
+	@RequestMapping(value = "/sitz/vorstellung/{vorstellung_id}", produces = "application/json")
+	@RequestMapping(value = "/ticket/sitz/{sitz_id}/vorstellung/{vorstellung_id}/nutzer/{nutzer_id}", produces = "application/json")
+	@RequestMapping(value = "/ticket/sitz/{sitz_id}/vorstellung/{vorstellung_id}/nutzer/{nutzer_id}/gast/{gast_id)", produces = "application/json")
+	@RequestMapping(value = "/warenkorb/nutzer/{nutzer_id}", produces = "application/json")
+	*/
+
 	@RequestMapping(value = "/crud/benutzer/all", produces = "application/json")
 	public ResponseEntity<Object> getAllBenutzer(){
 
