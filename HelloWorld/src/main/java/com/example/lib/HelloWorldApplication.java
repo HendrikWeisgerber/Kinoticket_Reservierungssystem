@@ -4,9 +4,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties.Pageable;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -35,6 +38,20 @@ public class HelloWorldApplication {
 	@Autowired 
 	WarenkorbRepository warenkorbRepository;
 
+	@Autowired
+	VorstellungRepository vorstellungRepository;
+
+	@Autowired
+	BestellungRepository bestellungRepository;
+
+	@Autowired
+	FilmRepository filmRepository;
+
+	@Autowired
+	KinosaalRepository kinosaalRepository;
+
+
+
 	@RequestMapping(value = "/", produces = "application/json")
 	public ResponseEntity<Object> home(){
 		Film starWars = new Film("Star Wars", "hier ist das Bild", "das passiert", 10, 200, 12, true, "Sci-Fi");
@@ -50,20 +67,27 @@ public class HelloWorldApplication {
 		return new ResponseEntity<>(sitzRepository.findAll(), HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/crud/ticket/all", produces = "application/json")
-	public ResponseEntity<Object> getAllTickets(){
+	@RequestMapping(value = "/crud/ticket/{vorstellung_id}", produces = "application/json")
+	public ResponseEntity<Object> getAllTickets(@PathVariable(value = "vorstellung_id")long vorstellung_id, Pageable pageable){
 
 		Ticket testT = new Ticket();
-		testT.setSitz(new Sitz(1,3,5,true,new BigDecimal(2)));
-		testT.setVorstellung(new Vorstellung());
-		testT.setKaeufer(new Benutzer());
-		testT.setGast(new Benutzer());
+		Vorstellung testV = new Vorstellung();
+		Sitz testSitz = new Sitz(1,3,5,true,new BigDecimal(2));
+		Benutzer testBenutzer = new Benutzer();
+		vorstellungRepository.save(testV);
+		sitzRepository.save(testSitz);
+		benutzerRepository.save(testBenutzer);
+
+		testT.setSitz(testSitz);
+		testT.setVorstellung(testV);
+		testT.setKaeufer(testBenutzer);
+		testT.setGast(testBenutzer);
 		testT.setBezahlt(true);
 		testT.setIstValide(false);
 
 		ticketRepository.save(testT);
 
-		return new ResponseEntity<>(ticketRepository.findAll(), HttpStatus.OK);
+		return new ResponseEntity<>(ticketRepository.findByVorstellungId((int)vorstellung_id),HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/crud/benutzer/all", produces = "application/json")
