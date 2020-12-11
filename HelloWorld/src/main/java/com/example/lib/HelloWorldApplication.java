@@ -87,6 +87,17 @@ public class HelloWorldApplication {
 
 		ticketRepository.save(testT);
 
+		Ticket testT2 = new Ticket();
+		testT2.setSitz(testSitz);
+		testT2.setVorstellung(testV);
+		testT2.setKaeufer(testBenutzer);
+		testT2.setGast(testBenutzer);
+		testT2.setBezahlt(false);
+		testT2.setIstValide(false);
+
+		ticketRepository.save(testT2);
+
+
 		return new ResponseEntity<>(ticketRepository.findByVorstellungId((int)vorstellung_id),HttpStatus.OK);
 	}
 
