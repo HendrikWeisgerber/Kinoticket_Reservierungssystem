@@ -25,8 +25,8 @@ public class Kinosaal {
     @Autowired
     public Kinosaal(int anzahlSitze, int spalte, int reihe, int id) {
         this.anzahlSitze = anzahlSitze;
-        this.anzahlSpalte = anzahlSpalte;
-        this.anzahlReihe = anzahlReihe;
+        this.spalte = spalte;
+        this.reihe = reihe;
         this.id = id;
     }
 
@@ -43,20 +43,20 @@ public class Kinosaal {
         this.anzahlSitze = anzahlSitze;
     }
 
-    public int getAnzahlSpalte() {
-        return anzahlSpalte;
+    public int getSpalte() {
+        return spalte;
     }
 
-    public void setAnzahlSpalte(int anzahlSpalte) {
-        this.anzahlSpalte = anzahlSpalte;
+    public void setSpalte(int spalte) {
+        this.spalte = spalte;
     }
 
-    public int getAnzahlReihe() {
-        return anzahlReihe;
+    public int getReihe() {
+        return reihe;
     }
 
-    public void setAnzahlReihe(int anzahlReihe) {
-        this.anzahlReihe = anzahlReihe;
+    public void setReihe(int reihe) {
+        this.reihe = reihe;
     }
 
     public int getId() {

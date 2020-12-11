@@ -23,6 +23,7 @@ public class Ticket {
     @ManyToOne
     @JoinColumn(name="kaeufer_id")
     private Benutzer kaeufer;
+    private boolean bezahlt;
     private boolean istValide;
     private SimpleDateFormat kaufdatum;
 
@@ -71,6 +72,14 @@ public class Ticket {
 
     public void setKaeufer(Benutzer kaeufer) {
         //this.kaeufer = kaeufer;
+    }
+
+    public boolean isBezahlt() {
+        return this.bezahlt;
+    }
+
+    public void setBezahlt(boolean bezahlt) {
+        this.bezahlt = bezahlt;
     }
 
 	public boolean getIstValide() {

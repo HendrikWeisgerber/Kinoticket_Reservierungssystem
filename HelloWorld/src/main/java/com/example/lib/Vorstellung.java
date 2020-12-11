@@ -30,9 +30,8 @@ public class Vorstellung {
 
     }
 
-    public Vorstellung(int id, SimpleDateFormat startZeit, Film film, BigDecimal grundpreis, boolean aktiv) {
+    public Vorstellung(int id, Film film, BigDecimal grundpreis, boolean aktiv) {
         this.setId(id);
-        this.setStartZeit(startZeit);
         this.setFilm(film);
         this.setGrundpreis(grundpreis);
         this.setAktiv(aktiv);
