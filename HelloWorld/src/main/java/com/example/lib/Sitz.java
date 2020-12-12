@@ -92,11 +92,11 @@ public class Sitz {
         this.preisschluessel = preisschluessel;
     }
 
-    // public Kinosaal getMeinKinosaal() {
-    //     return meinKinosaal;
-    // }
+     public Kinosaal getMeinKinosaal() {
+         return meinKinosaal;
+     }
 
-    // public void setMeinKinosaal(Kinosaal meinKinosaal) {
-    //     this.meinKinosaal = meinKinosaal;
-    // }
+     public void setMeinKinosaal(Kinosaal meinKinosaal) {
+         this.meinKinosaal = meinKinosaal;
+     }
 }
