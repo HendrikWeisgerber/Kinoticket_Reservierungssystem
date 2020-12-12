@@ -136,6 +136,7 @@ public class HelloWorldApplication {
 	}
 
 	public static void main(String[] args) {
+		//Main Method starts the webserver on port 8081
 		//SpringApplication.run(HelloWorldApplication.class, args);
 		SpringApplication app =new SpringApplication(HelloWorldApplication.class);
 		app.setDefaultProperties(Collections.singletonMap("server.port", "8081"));
