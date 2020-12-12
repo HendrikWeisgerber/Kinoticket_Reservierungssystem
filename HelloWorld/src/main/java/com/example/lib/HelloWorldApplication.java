@@ -1,5 +1,6 @@
 package com.example.lib;
 
+import org.hibernate.sql.Delete;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -18,6 +19,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.*;
 
 import com.example.lib.Film;
 import com.example.lib.Kinosaal;
@@ -33,10 +35,10 @@ public class HelloWorldApplication {
 	@Autowired
 	private TicketRepository ticketRepository;
 
-	@Autowired 
+	@Autowired
 	BenutzerRepository benutzerRepository;
 
-	@Autowired 
+	@Autowired
 	WarenkorbRepository warenkorbRepository;
 
 	@Autowired
@@ -52,19 +54,26 @@ public class HelloWorldApplication {
 	KinosaalRepository kinosaalRepository;
 
 
-
-	@RequestMapping(value = "/", produces = "application/json")
+	@RequestMapping(value = "/reset", produces = "application/json")
 	public ResponseEntity<Object> home(){
-		Film starWars = new Film("Star Wars", "hier ist das Bild", "das passiert", 10, 200, 12, true, "Sci-Fi");
-		Film starWars2 = new Film("Star Wars 2", "hier ist das Bild", "das passiert", 10, 200, 12, true, "Sci-Fi");
-		final Map<String, Film> films = new HashMap<>();
-		
-		films.put("a",starWars);
-		films.put("b",starWars2);
-		
-		// Sitz ersterSitz = new Sitz(1,3,5,true,new BigDecimal(2));
-		// sitzRepository.save(ersterSitz);
-		
+
+	    sitzRepository.deleteAll();
+	    ticketRepository.deleteAll();
+	    //benutzerRepository.deleteAll();
+	    warenkorbRepository.deleteAll();
+	    vorstellungRepository.deleteAll();
+	    bestellungRepository.deleteAll();
+	    filmRepository.deleteAll();
+	    kinosaalRepository.deleteAll();
+        benutzerRepository.deleteAll();
+
+        Vorstellung testVor = new Vorstellung();
+        Film filmT = new Film("Star Wars", "Bild", "Das ist ein neuer Film", 9, 140, 12, true, "Sci-Fi");
+
+        filmRepository.save(filmT);
+        testVor.setFilmId(filmT.getId());
+        vorstellungRepository.save(testVor);
+
 		return new ResponseEntity<>(sitzRepository.findAll(), HttpStatus.OK);
 	}
 
@@ -115,13 +124,13 @@ public class HelloWorldApplication {
 		sitzRepository.save(testSitz);
 		benutzerRepository.save(testBenutzer);
 
-		
+
 		testBestellung.setBenutzer(testBenutzer);
 
 
 		testT.setSitz(testSitz);
 		testT.setVorstellung(testV);
-		
+
 		testT.setGast(testBenutzer);
 		testT.setKaeufer(testBenutzer);
 		testT.setBezahlt(true);
@@ -153,12 +162,12 @@ public class HelloWorldApplication {
 		}else{
 			t = new Ticket[0];
 		}
-		
+
 		return new ResponseEntity<>(t,HttpStatus.OK);
 	}
 	@RequestMapping(value = "/warenkorb/nutzer/{nutzer_id}", produces = "application/json")
 	public ResponseEntity<Object> getAllTicketsInWarenkorb(@PathVariable(value = "nutzer_id")long nutzer_id, Pageable pageable){
-		
+
 		/*
 		Ticket testT = new Ticket();
 		Vorstellung testV = new Vorstellung();
@@ -174,7 +183,7 @@ public class HelloWorldApplication {
 
 		testT.setSitz(testSitz);
 		testT.setVorstellung(testV);
-		
+
 		testT.setGast(testBenutzer);
 		testT.setKaeufer(testBenutzer);
 		testT.setBezahlt(true);
@@ -185,7 +194,7 @@ public class HelloWorldApplication {
 		ticketRepository.save(testT);
 		int b_id = testBenutzer.getId();
 		*/
-		
+
 		Optional<Benutzer> oB = benutzerRepository.findById((Integer)(int)nutzer_id);
 		Benutzer b;
 		if(!oB.isEmpty()){
@@ -205,7 +214,7 @@ public class HelloWorldApplication {
 		}else{
 			t = new Ticket[0];
 		}
-		
+
 		return new ResponseEntity<>(t,HttpStatus.OK);
 
 	}
@@ -214,7 +223,7 @@ public class HelloWorldApplication {
 
 	@RequestMapping(value= "/film/all", produces ="application/json")
 	public ResponseEntity<Object> getAllFilms(){
-		Film philosopherStone = new Film();
+		/*Film philosopherStone = new Film();
 		Film champerOfSecrets = new Film();
 
 		philosopherStone.setAktiv(true);
@@ -236,8 +245,7 @@ public class HelloWorldApplication {
 		champerOfSecrets.setName("Henry Otter and the Dungeon of Fakenews");
 
 		filmRepository.save(philosopherStone);
-		filmRepository.save(champerOfSecrets);
-
+		filmRepository.save(champerOfSecrets);*/
 
 
 		return new ResponseEntity<>(filmRepository.findAll(), HttpStatus.OK);
@@ -275,12 +283,71 @@ public class HelloWorldApplication {
 		return new ResponseEntity<>(filmRepository.findById((int)film_id), HttpStatus.OK);
 	}
 
-	/*@RequestMapping(value = "/vorstellung/film/{film_id}", produces = "application/json")
-	@RequestMapping(value = "/sitz/vorstellung/{vorstellung_id}", produces = "application/json")
+	/*
+	@RequestMapping(value = "/vorstellung/film/{film_id}", produces = "application/json")Niklas!!
+	@RequestMapping(value = "/sitz/vorstellung/{vorstellung_id}", produces = "application/json")Niklas!!
 	@RequestMapping(value = "/ticket/sitz/{sitz_id}/vorstellung/{vorstellung_id}/nutzer/{nutzer_id}", produces = "application/json")
 	@RequestMapping(value = "/ticket/sitz/{sitz_id}/vorstellung/{vorstellung_id}/nutzer/{nutzer_id}/gast/{gast_id)", produces = "application/json")
 	@RequestMapping(value = "/bestellung/nutzer/{nutzer_id}", produces = "application/json")
 	*/
+    @RequestMapping(value = "/vorstellung", produces = "application/json")
+    public ResponseEntity<Object> getVorstellung(Pageable pageable){
+
+        /*Vorstellung testVor = new Vorstellung();
+        Film filmT = new Film();
+        filmRepository.save(filmT);
+
+        testVor.setFilm(filmT);
+        vorstellungRepository.save(testVor);*/
+
+        return new ResponseEntity<>(vorstellungRepository.findAll(),HttpStatus.OK);
+        //return new ResponseEntity<>(vorstellungRepository.findByFilmId((int)film_id),HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/vorstellung/film/{film_id}", produces = "application/json")
+    public ResponseEntity<Object> getVorstellungByFilm(@PathVariable(value = "film_id")long film_id, Pageable pageable){
+
+        /*Vorstellung testVor = new Vorstellung();
+        Film filmT = new Film();
+        filmRepository.save(filmT);
+
+        testVor.setFilm(filmT);
+        vorstellungRepository.save(testVor);*/
+
+        return new ResponseEntity<>(vorstellungRepository.findByFilmId((int)film_id),HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/kinosaal/vorstellung/{vorstellung_id}", produces = "application/json")
+    public ResponseEntity<Object> getSaalByVorstellung(@PathVariable(value = "vorstellung_id")int vorstellung_id, Pageable pageable){
+
+        /*ArrayList<Sitz> sitze = new ArrayList<Sitz>();
+        Sitz testSitz = new Sitz(1,1,1,true,new BigDecimal(2));
+        Sitz testSitz2 = new Sitz(2,1,2,true,new BigDecimal(2));
+        Sitz testSitz3 = new Sitz(3,1,3,true,new BigDecimal(2));
+
+        sitzRepository.save(testSitz);
+        sitzRepository.save(testSitz2);
+        sitzRepository.save(testSitz3);
+        sitze.add(testSitz);
+        sitze.add(testSitz2);
+        sitze.add(testSitz3);
+        Kinosaal testSaal = new Kinosaal();
+        testSitz.setMeinKinosaal(testSaal);
+        testSitz2.setMeinKinosaal(testSaal);
+        testSitz3.setMeinKinosaal(testSaal);
+        testSaal.setMeineSitze(sitze);
+
+        kinosaalRepository.save(testSaal);
+        Vorstellung testVor = new Vorstellung();
+        Film filmT = new Film();
+        filmRepository.save(filmT);
+
+        testVor.setFilm(filmT);
+        testVor.setSaal(testSaal);
+        vorstellungRepository.save(testVor);*/
+
+        return new ResponseEntity<>(vorstellungRepository.findById(vorstellung_id).get().getSaal(),HttpStatus.OK);
+    }
 
 	@RequestMapping(value = "/crud/benutzer/all", produces = "application/json")
 	public ResponseEntity<Object> getAllBenutzer(){
