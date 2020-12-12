@@ -12,19 +12,23 @@ public class Ticket {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
     @ManyToOne
-    @JoinColumn(name = "sitz_id")
+    @JoinColumn(name = "sitz_id", referencedColumnName = "id")
     private Sitz sitz;
     @ManyToOne
-    @JoinColumn(name = "vorstellung_id")
+    @JoinColumn(name = "vorstellung_id", referencedColumnName = "id")
     private Vorstellung vorstellung;
     @ManyToOne
     @JoinColumn(name="gast_id", referencedColumnName = "id")
     private Benutzer gast;
     @ManyToOne
-    @JoinColumn(name="kaeufer_id")
+    @JoinColumn(name="kaeufer_id", referencedColumnName = "id")
     private Benutzer kaeufer;
     private boolean bezahlt;
     private boolean istValide;
+    @ManyToOne
+    @JoinColumn(name="warenkorb_id", referencedColumnName = "id")
+    private Warenkorb warenkorb;
+    private boolean istBestellt;
     private SimpleDateFormat kaufdatum;
 
     //TODO: implementiere Essen und trinken funktionen
@@ -39,6 +43,14 @@ public class Ticket {
     
     public void setId(int id) {
         this.id = id;
+    }
+
+    public Warenkorb getWarenkorb(){
+        return this.warenkorb;
+    }
+
+    public void setWarenkorb(Warenkorb warenkorb){
+        this.warenkorb = warenkorb;
     }
     
     public Sitz getSitz() {
@@ -66,14 +78,17 @@ public class Ticket {
     }
 
     public Benutzer getKaeufer() {
-        //return this.kaeufer;
-        return new Benutzer();
+        return this.kaeufer;
     }
 
     public void setKaeufer(Benutzer kaeufer) {
-        //this.kaeufer = kaeufer;
+        this.kaeufer = kaeufer;
     }
-
+    
+    public int getKaueferId(){
+        return (kaeufer == null) ? null : kaeufer.getId();
+    }
+    
     public boolean isBezahlt() {
         return this.bezahlt;
     }
@@ -84,11 +99,21 @@ public class Ticket {
 
 	public boolean getIstValide() {
 		return this.istValide;
-	}
+    }
+    
 
 	public void setIstValide(boolean istValide) {
 		this.istValide = istValide;
-	}
+    }
+    
+    
+    public boolean getIstBestellt() {
+		return this.istBestellt;
+    }
+    
+    public void setIstBestellt(boolean istBestellt) {
+		this.istBestellt = istBestellt;
+    }
 
     public SimpleDateFormat getKaufdatum() {
         return this.kaufdatum;
