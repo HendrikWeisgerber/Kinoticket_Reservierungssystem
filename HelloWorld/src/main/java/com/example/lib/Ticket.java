@@ -28,7 +28,9 @@ public class Ticket {
     @ManyToOne
     @JoinColumn(name="warenkorb_id", referencedColumnName = "id")
     private Warenkorb warenkorb;
-    private boolean istBestellt;
+    @ManyToOne
+    @JoinColumn(name="bestellung_id", referencedColumnName = "id")
+    private Bestellung bestellung;
     private SimpleDateFormat kaufdatum;
 
     //TODO: implementiere Essen und trinken funktionen
@@ -51,6 +53,14 @@ public class Ticket {
 
     public void setWarenkorb(Warenkorb warenkorb){
         this.warenkorb = warenkorb;
+    }
+
+    public Bestellung getBestellung(){
+        return this.bestellung;
+    }
+
+    public void setBestellung(Bestellung bestellung){
+        this.bestellung = bestellung;
     }
     
     public Sitz getSitz() {
@@ -100,19 +110,9 @@ public class Ticket {
 	public boolean getIstValide() {
 		return this.istValide;
     }
-    
 
 	public void setIstValide(boolean istValide) {
 		this.istValide = istValide;
-    }
-    
-    
-    public boolean getIstBestellt() {
-		return this.istBestellt;
-    }
-    
-    public void setIstBestellt(boolean istBestellt) {
-		this.istBestellt = istBestellt;
     }
 
     public SimpleDateFormat getKaufdatum() {

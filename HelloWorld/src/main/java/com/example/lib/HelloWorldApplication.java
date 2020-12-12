@@ -101,7 +101,61 @@ public class HelloWorldApplication {
 
 		return new ResponseEntity<>(ticketRepository.findByVorstellungId((int)vorstellung_id),HttpStatus.OK);
 	}
+	@RequestMapping(value = "/bestellung/nutzer/{nutzer_id}", produces = "application/json")
+	public ResponseEntity<Object> getAllTicketsInBestellung(@PathVariable(value = "nutzer_id")long nutzer_id, Pageable pageable){
+		/*
+		Ticket testT = new Ticket();
+		Vorstellung testV = new Vorstellung();
+		Sitz testSitz = new Sitz(1,3,5,true,new BigDecimal(2));
+		Benutzer testBenutzer = new Benutzer();
+		Bestellung testBestellung = new Bestellung();
+		ticketRepository.save(testT);
+		bestellungRepository.save(testBestellung);
+		vorstellungRepository.save(testV);
+		sitzRepository.save(testSitz);
+		benutzerRepository.save(testBenutzer);
 
+		
+		testBestellung.setBenutzer(testBenutzer);
+
+
+		testT.setSitz(testSitz);
+		testT.setVorstellung(testV);
+		
+		testT.setGast(testBenutzer);
+		testT.setKaeufer(testBenutzer);
+		testT.setBezahlt(true);
+		testT.setIstValide(false);
+		testT.setBestellung(testBestellung);
+		testT.setBezahlt(false);
+
+		ticketRepository.deleteById(testT.getId());
+		ticketRepository.save(testT);
+
+		int b_id = testBenutzer.getId();
+		*/
+		Optional<Benutzer> oB = benutzerRepository.findById((Integer)(int)nutzer_id);
+		Benutzer b;
+		if(!oB.isEmpty()){
+			b = oB.get();
+		}else{
+			b = null;
+		}
+		Bestellung[] bestellung;
+		if(b != null){
+			bestellung = bestellungRepository.findByBenutzer(b);
+		}else{
+			bestellung = new Bestellung[0];
+		}
+		Ticket[] t;
+		if(bestellung.length>0){
+			t =  ticketRepository.findByBestellung(bestellung[0]);
+		}else{
+			t = new Ticket[0];
+		}
+		
+		return new ResponseEntity<>(t,HttpStatus.OK);
+	}
 	@RequestMapping(value = "/warenkorb/nutzer/{nutzer_id}", produces = "application/json")
 	public ResponseEntity<Object> getAllTicketsInWarenkorb(@PathVariable(value = "nutzer_id")long nutzer_id, Pageable pageable){
 		
@@ -127,7 +181,6 @@ public class HelloWorldApplication {
 		testT.setIstValide(false);
 		testT.setWarenkorb(testWarenkorb);
 		testT.setBezahlt(false);
-		testT.setIstBestellt(false);
 
 		ticketRepository.save(testT);
 		int b_id = testBenutzer.getId();
