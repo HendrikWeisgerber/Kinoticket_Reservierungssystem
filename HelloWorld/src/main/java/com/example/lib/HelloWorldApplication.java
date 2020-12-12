@@ -103,10 +103,70 @@ public class HelloWorldApplication {
 
 	// TODO implement MappingMethods
 
-	/*
-	@RequestMapping(value = "/film/all", produces = "application/json")
+	@RequestMapping(value= "/film/all", produces ="application/json")
+	public ResponseEntity<Object> getAllFilms(){
+		Film philosopherStone = new Film();
+		Film champerOfSecrets = new Film();
+
+		philosopherStone.setAktiv(true);
+		philosopherStone.setBeschreibung("What a fantastic start of what is yet to come");
+		philosopherStone.setBild("A Picture of Stone");
+		philosopherStone.setBewertung(10);
+		philosopherStone.setId(1);
+		philosopherStone.setLaenge(2);
+		philosopherStone.setMindestAlter(6);
+		philosopherStone.setName("Henry Otter and the Knoledge Stone");
+
+		champerOfSecrets.setAktiv(true);
+		champerOfSecrets.setBeschreibung("It did do the fantastic start justice");
+		champerOfSecrets.setBild("A Picture of a Secret :D");
+		champerOfSecrets.setBewertung(10);
+		champerOfSecrets.setId(2);
+		champerOfSecrets.setLaenge(2);
+		champerOfSecrets.setMindestAlter(12);
+		champerOfSecrets.setName("Henry Otter and the Dungeon of Fakenews");
+
+		filmRepository.save(philosopherStone);
+		filmRepository.save(champerOfSecrets);
+
+
+
+		return new ResponseEntity<>(filmRepository.findAll(), HttpStatus.OK);
+	}
+
+
 	@RequestMapping(value = "/film/{film_id}", produces = "application/json")
-	@RequestMapping(value = "/vorstellung/film/{film_id}", produces = "application/json")
+	public ResponseEntity<Object> getFilmbyID(@PathVariable(value = "film_id")long film_id, Pageable pageable){
+
+		Film philosopherStone = new Film();
+		Film champerOfSecrets = new Film();
+
+		philosopherStone.setAktiv(true);
+		philosopherStone.setBeschreibung("What a fantastic start of what is yet to come");
+		philosopherStone.setBild("A Picture of Stone");
+		philosopherStone.setBewertung(10);
+		philosopherStone.setId(1);
+		philosopherStone.setLaenge(2);
+		philosopherStone.setMindestAlter(6);
+		philosopherStone.setName("Henry Otter and the Knoledge Stone");
+
+		champerOfSecrets.setAktiv(true);
+		champerOfSecrets.setBeschreibung("It did do the fantastic start justice");
+		champerOfSecrets.setBild("A Picture of a Secret :D");
+		champerOfSecrets.setBewertung(10);
+		champerOfSecrets.setId(2);
+		champerOfSecrets.setLaenge(2);
+		champerOfSecrets.setMindestAlter(12);
+		champerOfSecrets.setName("Henry Otter and the Dungeon of Fakenews");
+
+		filmRepository.save(philosopherStone);
+		filmRepository.save(champerOfSecrets);
+
+
+		return new ResponseEntity<>(filmRepository.findById((int)film_id), HttpStatus.OK);
+	}
+
+	/*@RequestMapping(value = "/vorstellung/film/{film_id}", produces = "application/json")
 	@RequestMapping(value = "/sitz/vorstellung/{vorstellung_id}", produces = "application/json")
 	@RequestMapping(value = "/ticket/sitz/{sitz_id}/vorstellung/{vorstellung_id}/nutzer/{nutzer_id}", produces = "application/json")
 	@RequestMapping(value = "/ticket/sitz/{sitz_id}/vorstellung/{vorstellung_id}/nutzer/{nutzer_id}/gast/{gast_id)", produces = "application/json")
