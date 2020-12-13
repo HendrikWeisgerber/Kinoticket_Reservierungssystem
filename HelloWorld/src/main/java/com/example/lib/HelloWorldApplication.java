@@ -59,7 +59,6 @@ public class HelloWorldApplication {
 	@Autowired
 	KinosaalRepository kinosaalRepository;
 
-
 	@RequestMapping(value = "/reset", produces = "application/json")
 	public ResponseEntity<Object> home() throws ParseException {
 		ticketRepository.deleteAll();
@@ -73,11 +72,13 @@ public class HelloWorldApplication {
         benutzerRepository.deleteAll();
 
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-		Date date = sdf.parse("2020-12-26 20:30:00.000");
+		Date date1 = sdf.parse("2020-12-26 15:30:00.000");
+		Date date2 = sdf.parse("2020-12-26 20:30:00.000");
+		Date date3 = sdf.parse("2020-12-26 21:30:00.000");
 
-        Vorstellung testVor = new Vorstellung(date, new BigDecimal(9), true);
-		Vorstellung testVor2 = new Vorstellung();
-		Vorstellung testVor3 = new Vorstellung();
+        Vorstellung testVor = new Vorstellung(date1, new BigDecimal(8), true);
+		Vorstellung testVor2 = new Vorstellung(date2, new BigDecimal(9), true);
+		Vorstellung testVor3 = new Vorstellung(date3, new BigDecimal(9), true);
         Film filmT = new Film("Star Wars", "Bild", "Das ist ein neuer Film", 9, 140, 12, true, "Sci-Fi");
 		Film filmT2 = new Film("Harry Potter", "Bild", "Das ist ein noch neuerer Film", 8, 150, 12, true, "Fantasy");
 		Kinosaal saalT = new Kinosaal(50,5,10);
@@ -85,36 +86,54 @@ public class HelloWorldApplication {
         filmRepository.save(filmT);
         filmRepository.save(filmT2);
         kinosaalRepository.save(saalT);
+		for(int i= 1; i < 3; i++) {
+			for(int k=1; k < 3; k++) {
+				Sitz sitz = new Sitz(i ,k , false, new BigDecimal(1));
+				sitz.setKinosaalId(saalT.getId());
+				sitzRepository.save(sitz);
+			}
+		}
         testVor.setFilmId(filmT.getId());
         testVor.setSaal(saalT);
 		testVor2.setFilmId(filmT.getId());
-		testVor2.setGrundpreis(new BigDecimal(11));
+		testVor2.setSaal(saalT);
 		testVor3.setFilmId(filmT2.getId());
-		testVor3.setGrundpreis(new BigDecimal(8));
+		testVor3.setSaal(saalT);
         vorstellungRepository.save(testVor);
 		vorstellungRepository.save(testVor2);
 		vorstellungRepository.save(testVor3);
 
+
+		Iterable<Kinosaal> alleSaeale =  kinosaalRepository.findAll();
+		for(Kinosaal saal: alleSaeale) {
+			Sitz[] sitze = sitzRepository.findByKinosaalId(saal.getId());
+			for(Sitz sitz : sitze) {
+				if(saal.getMeineSitze() == null) {
+					saal.setMeineSitze();
+				}
+				saal.getMeineSitze().add(sitz);
+			}
+		}
+
 		Ticket testT = new Ticket();
-		Vorstellung testV = new Vorstellung();
-		Sitz testSitz = new Sitz(3,5,true,new BigDecimal(2));
 		Benutzer testBenutzer = new Benutzer();
+		Warenkorb testWarenkorb = new Warenkorb();
+		testBenutzer.setVorname("Max");
+		testBenutzer.setNachname("Mustermann");
+		testBenutzer.setUsername("Mustermann_Max");
+		testBenutzer.setAlter(25);
+		testBenutzer.setEmail("max.mustermann@gmail.com");
+		testBenutzer.setPasswortHash("KFIWN");
+		testBenutzer.setWarenkorb(testWarenkorb);
 		Bestellung testBestellung = new Bestellung();
-		testV.setFilmId(filmT.getId());
-		sitzRepository.save(testSitz);
 		ticketRepository.save(testT);
 		bestellungRepository.save(testBestellung);
-		vorstellungRepository.save(testV);
-
 		benutzerRepository.save(testBenutzer);
 
 
 		testBestellung.setBenutzer(testBenutzer);
-
-
-		testT.setSitz(testSitz);
-		testT.setVorstellung(testV);
-
+		testT.setVorstellung(testVor);
+		testT.setSitz(testVor.getSaal().getMeineSitze().get(0));
 		testT.setGast(testBenutzer);
 		testT.setKaeufer(testBenutzer);
 		testT.setBezahlt(true);
@@ -125,9 +144,7 @@ public class HelloWorldApplication {
 		ticketRepository.deleteById(testT.getId());
 		ticketRepository.save(testT);
 
-		int b_id = testBenutzer.getId();
-
-		return new ResponseEntity<>(vorstellungRepository.findAll(), HttpStatus.OK);
+		return new ResponseEntity<>("Die Datenbank wurde erfolgreich resettet!", HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/crud/ticket/{vorstellung_id}", produces = "application/json")
@@ -165,36 +182,6 @@ public class HelloWorldApplication {
 	}
 	@RequestMapping(value = "/bestellung/nutzer/{nutzer_id}", produces = "application/json")
 	public ResponseEntity<Object> getAllTicketsInBestellung(@PathVariable(value = "nutzer_id")long nutzer_id, Pageable pageable){
-
-		Ticket testT = new Ticket();
-		Vorstellung testV = new Vorstellung();
-		Sitz testSitz = new Sitz(1,3,5,true,new BigDecimal(2));
-		Benutzer testBenutzer = new Benutzer();
-		Bestellung testBestellung = new Bestellung();
-		ticketRepository.save(testT);
-		bestellungRepository.save(testBestellung);
-		vorstellungRepository.save(testV);
-		sitzRepository.save(testSitz);
-		benutzerRepository.save(testBenutzer);
-
-
-		testBestellung.setBenutzer(testBenutzer);
-
-
-		testT.setSitz(testSitz);
-		testT.setVorstellung(testV);
-
-		testT.setGast(testBenutzer);
-		testT.setKaeufer(testBenutzer);
-		testT.setBezahlt(true);
-		testT.setIstValide(false);
-		testT.setBestellung(testBestellung);
-		testT.setBezahlt(false);
-
-		ticketRepository.deleteById(testT.getId());
-		ticketRepository.save(testT);
-
-		int b_id = testBenutzer.getId();
 
 		Optional<Benutzer> oB = benutzerRepository.findById((Integer)(int)nutzer_id);
 		Benutzer b;
@@ -276,6 +263,16 @@ public class HelloWorldApplication {
     @RequestMapping(value = "/vorstellung", produces = "application/json")
     public ResponseEntity<Object> getVorstellung(Pageable pageable){
 
+		Iterable<Kinosaal> alleSaeale =  kinosaalRepository.findAll();
+		for(Kinosaal saal: alleSaeale) {
+			Sitz[] sitze = sitzRepository.findByKinosaalId(saal.getId());
+			for(Sitz sitz : sitze) {
+				if(saal.getMeineSitze() == null) {
+					saal.setMeineSitze();
+				}
+				saal.getMeineSitze().add(sitz);
+			}
+		}
         /*Vorstellung testVor = new Vorstellung();
         Film filmT = new Film();
         filmRepository.save(filmT);
@@ -288,46 +285,35 @@ public class HelloWorldApplication {
     }
 
     @RequestMapping(value = "/vorstellung/film/{film_id}", produces = "application/json")
-    public ResponseEntity<Object> getVorstellungByFilm(@PathVariable(value = "film_id")long film_id, Pageable pageable){
+    public ResponseEntity<Object> getVorstellungByFilm(@PathVariable(value = "film_id")int film_id, Pageable pageable){
 
-        /*Vorstellung testVor = new Vorstellung();
-        Film filmT = new Film();
-        filmRepository.save(filmT);
+		Iterable<Kinosaal> alleSaeale =  kinosaalRepository.findAll();
+		for(Kinosaal saal: alleSaeale) {
+			Sitz[] sitze = sitzRepository.findByKinosaalId(saal.getId());
+			for(Sitz sitz : sitze) {
+				if(saal.getMeineSitze() == null) {
+					saal.setMeineSitze();
+				}
+				saal.getMeineSitze().add(sitz);
+			}
+		}
 
-        testVor.setFilm(filmT);
-        vorstellungRepository.save(testVor);*/
-
-        return new ResponseEntity<>(vorstellungRepository.findByFilmId((int)film_id),HttpStatus.OK);
+        return new ResponseEntity<>(vorstellungRepository.findByFilmId(film_id),HttpStatus.OK);
     }
 
     @RequestMapping(value = "/kinosaal/vorstellung/{vorstellung_id}", produces = "application/json")
     public ResponseEntity<Object> getSaalByVorstellung(@PathVariable(value = "vorstellung_id")int vorstellung_id, Pageable pageable){
 
-        ArrayList<Sitz> sitze = new ArrayList<Sitz>();
-        Sitz testSitz = new Sitz(1,1,true,new BigDecimal(2));
-        Sitz testSitz2 = new Sitz(1,2,true,new BigDecimal(2));
-        Sitz testSitz3 = new Sitz(1,3,true,new BigDecimal(2));
-
-        sitzRepository.save(testSitz);
-        sitzRepository.save(testSitz2);
-        sitzRepository.save(testSitz3);
-        sitze.add(testSitz);
-        sitze.add(testSitz2);
-        sitze.add(testSitz3);
-        Kinosaal testSaal = new Kinosaal();
-        testSitz.setMeinKinosaal(testSaal);
-        testSitz2.setMeinKinosaal(testSaal);
-        testSitz3.setMeinKinosaal(testSaal);
-        testSaal.setMeineSitze(sitze);
-
-        kinosaalRepository.save(testSaal);
-        Vorstellung testVor = new Vorstellung();
-        Film filmT = new Film();
-        filmRepository.save(filmT);
-
-        testVor.setFilmId(filmT.getId());
-        testVor.setSaal(testSaal);
-        vorstellungRepository.save(testVor);
+		Iterable<Kinosaal> alleSaeale =  kinosaalRepository.findAll();
+		for(Kinosaal saal: alleSaeale) {
+			Sitz[] sitze = sitzRepository.findByKinosaalId(saal.getId());
+			for(Sitz sitz : sitze) {
+				if(saal.getMeineSitze() == null) {
+					saal.setMeineSitze();
+				}
+				saal.getMeineSitze().add(sitz);
+			}
+		}
 
         return new ResponseEntity<>(vorstellungRepository.findById(vorstellung_id).get().getSaal(),HttpStatus.OK);
     }
@@ -381,7 +367,7 @@ public class HelloWorldApplication {
             kinosaal.setReihe(5);
             kinosaal.setSpalte(5);
             kinosaalRepository.save(kinosaal);
-            sitz.setMeinKinosaal(kinosaal);
+            sitz.setKinosaalId(kinosaal.getId());
             sitzRepository.save(sitz);
             ticket.setSitz(sitz);
             System.out.println("Kein Sitz gefunden");

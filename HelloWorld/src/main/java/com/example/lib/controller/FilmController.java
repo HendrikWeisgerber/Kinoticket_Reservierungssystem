@@ -1,8 +1,12 @@
 package com.example.lib.controller;
 
 import com.example.lib.Film;
+import com.example.lib.Kinosaal;
 import com.example.lib.Repositories.FilmRepository;
+import com.example.lib.Repositories.KinosaalRepository;
+import com.example.lib.Repositories.SitzRepository;
 import com.example.lib.Repositories.VorstellungRepository;
+import com.example.lib.Sitz;
 import com.example.lib.Vorstellung;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties;
@@ -22,10 +26,27 @@ public class FilmController {
     FilmRepository filmRepository;
 
     @Autowired
+    KinosaalRepository kinosaalRepository;
+
+    @Autowired
     VorstellungRepository vorstellungRepository;
+
+    @Autowired
+    SitzRepository sitzRepository;
 
     @RequestMapping(value= "/all", produces ="application/json")
     public ResponseEntity<Object> getAllFilms(){
+
+        Iterable<Kinosaal> alleSaeale =  kinosaalRepository.findAll();
+        for(Kinosaal saal: alleSaeale) {
+            Sitz[] sitze = sitzRepository.findByKinosaalId(saal.getId());
+            for(Sitz sitz : sitze) {
+                if(saal.getMeineSitze() == null) {
+                    saal.setMeineSitze();
+                }
+                saal.getMeineSitze().add(sitz);
+            }
+        }
 
         Iterable<Film> alleFilme = filmRepository.findAll();
         for(Film film: alleFilme) {
@@ -38,12 +59,23 @@ public class FilmController {
             }
         }
 
-        return new ResponseEntity<Object>(alleFilme, HttpStatus.OK);
+        return new ResponseEntity<>(filmRepository.findAll(), HttpStatus.OK);
     }
 
 
     @RequestMapping(value = "/{film_id}", produces = "application/json")
     public ResponseEntity<Object> getFilmbyID(@PathVariable(value = "film_id")int film_id, SpringDataWebProperties.Pageable pageable){
+
+        Iterable<Kinosaal> alleSaeale =  kinosaalRepository.findAll();
+        for(Kinosaal saal: alleSaeale) {
+            Sitz[] sitze = sitzRepository.findByKinosaalId(saal.getId());
+            for(Sitz sitz : sitze) {
+                if(saal.getMeineSitze() == null) {
+                    saal.setMeineSitze();
+                }
+                saal.getMeineSitze().add(sitz);
+            }
+        }
 
         Optional<Film> film = filmRepository.findById(film_id);
         Vorstellung[] vorstellungen = vorstellungRepository.findByFilmId(film.get().getId());

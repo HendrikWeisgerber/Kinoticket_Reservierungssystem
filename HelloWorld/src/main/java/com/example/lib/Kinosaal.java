@@ -70,8 +70,8 @@ public class Kinosaal {
         return meineSitze;
     }
 
-    public void setMeineSitze(ArrayList<Sitz> meineSitze) {
-        this.meineSitze = meineSitze;
+    public void setMeineSitze() {
+        this.meineSitze = new ArrayList<Sitz>();
     }
 
     public ArrayList<Film> getMeineFilme() {
