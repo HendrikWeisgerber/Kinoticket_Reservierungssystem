@@ -16,9 +16,10 @@ public class Sitz {
     private int spalte;
     private boolean barriereFrei;
     private BigDecimal preisschluessel;
-    @ManyToOne
+    private int kinosaalId;
+    /*@ManyToOne
     @JoinColumn(name = "kinosaal_id")
-    private Kinosaal meinKinosaal;
+    private Kinosaal meinKinosaal;*/
     //private ArrayList<Ticket> meineTickets;
     
     // @Autowired
@@ -31,16 +32,15 @@ public class Sitz {
     //     this.meinKinosaal = meinKinosaal;
     // }
     @Autowired
+    public Sitz(){
+
+    }
+
     public Sitz(int reihe, int spalte, boolean barriereFrei, BigDecimal preisschluessel) {
         this.reihe = reihe;
         this.spalte = spalte;
         this.barriereFrei = barriereFrei;
         this.preisschluessel = preisschluessel;
-    }
-
-    @Autowired
-    public Sitz(){
-        
     }
 
     // public ArrayList<Ticket> getMeineTickets() {
@@ -91,11 +91,11 @@ public class Sitz {
         this.preisschluessel = preisschluessel;
     }
 
-     public Kinosaal getMeinKinosaal() {
-         return meinKinosaal;
+     public int getKinosaalId() {
+         return kinosaalId;
      }
 
-     public void setMeinKinosaal(Kinosaal meinKinosaal) {
-         this.meinKinosaal = meinKinosaal;
+     public void setKinosaalId(int kinosaalId) {
+         this.kinosaalId = kinosaalId;
      }
 }
