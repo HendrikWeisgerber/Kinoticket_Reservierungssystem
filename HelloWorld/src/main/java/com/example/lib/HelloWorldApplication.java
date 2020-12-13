@@ -62,9 +62,9 @@ public class HelloWorldApplication {
 
 	@RequestMapping(value = "/reset", produces = "application/json")
 	public ResponseEntity<Object> home() throws ParseException {
+		ticketRepository.deleteAll();
 
 	    sitzRepository.deleteAll();
-	    ticketRepository.deleteAll();
 	    warenkorbRepository.deleteAll();
 	    vorstellungRepository.deleteAll();
 	    bestellungRepository.deleteAll();
@@ -95,7 +95,39 @@ public class HelloWorldApplication {
 		vorstellungRepository.save(testVor2);
 		vorstellungRepository.save(testVor3);
 
-		return new ResponseEntity<>(sitzRepository.findAll(), HttpStatus.OK);
+		Ticket testT = new Ticket();
+		Vorstellung testV = new Vorstellung();
+		Sitz testSitz = new Sitz(3,5,true,new BigDecimal(2));
+		Benutzer testBenutzer = new Benutzer();
+		Bestellung testBestellung = new Bestellung();
+		testV.setFilmId(filmT.getId());
+		sitzRepository.save(testSitz);
+		ticketRepository.save(testT);
+		bestellungRepository.save(testBestellung);
+		vorstellungRepository.save(testV);
+
+		benutzerRepository.save(testBenutzer);
+
+
+		testBestellung.setBenutzer(testBenutzer);
+
+
+		testT.setSitz(testSitz);
+		testT.setVorstellung(testV);
+
+		testT.setGast(testBenutzer);
+		testT.setKaeufer(testBenutzer);
+		testT.setBezahlt(true);
+		testT.setIstValide(false);
+		testT.setBestellung(testBestellung);
+		testT.setBezahlt(false);
+
+		ticketRepository.deleteById(testT.getId());
+		ticketRepository.save(testT);
+
+		int b_id = testBenutzer.getId();
+
+		return new ResponseEntity<>(vorstellungRepository.findAll(), HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/crud/ticket/{vorstellung_id}", produces = "application/json")
@@ -103,7 +135,7 @@ public class HelloWorldApplication {
 
 		Ticket testT = new Ticket();
 		Vorstellung testV = new Vorstellung();
-		Sitz testSitz = new Sitz(1,3,5,true,new BigDecimal(2));
+		Sitz testSitz = new Sitz(3,5,true,new BigDecimal(2));
 		Benutzer testBenutzer = new Benutzer();
 		vorstellungRepository.save(testV);
 		sitzRepository.save(testSitz);
@@ -272,9 +304,9 @@ public class HelloWorldApplication {
     public ResponseEntity<Object> getSaalByVorstellung(@PathVariable(value = "vorstellung_id")int vorstellung_id, Pageable pageable){
 
         ArrayList<Sitz> sitze = new ArrayList<Sitz>();
-        Sitz testSitz = new Sitz(1,1,1,true,new BigDecimal(2));
-        Sitz testSitz2 = new Sitz(2,1,2,true,new BigDecimal(2));
-        Sitz testSitz3 = new Sitz(3,1,3,true,new BigDecimal(2));
+        Sitz testSitz = new Sitz(1,1,true,new BigDecimal(2));
+        Sitz testSitz2 = new Sitz(1,2,true,new BigDecimal(2));
+        Sitz testSitz3 = new Sitz(1,3,true,new BigDecimal(2));
 
         sitzRepository.save(testSitz);
         sitzRepository.save(testSitz2);
@@ -325,7 +357,7 @@ public class HelloWorldApplication {
 	}
 
     @RequestMapping(value = "/ticket/sitz/{sitz_id}/vorstellung/{vorstellung_id}/benutzer/{benutzer_id}", produces = "application/json", method = POST)
-    public ResponseEntity<Object> setTicket(@PathVariable(value = "sitz_id") long sitz_id,
+    public ResponseEntity<Object> setTicketOhneGast(@PathVariable(value = "sitz_id") long sitz_id,
                                             @PathVariable(value = "vorstellung_id") long vorstellung_id,
                                             @PathVariable(value = "benutzer_id") long kaeufer_id) {
 
@@ -378,7 +410,7 @@ public class HelloWorldApplication {
     }
 
 	@RequestMapping(value = "/ticket/sitz/{sitz_id}/vorstellung/{vorstellung_id}/benutzer/{benutzer_id}/gast/{gast_id)", produces = "application/json", method = POST)
-	public ResponseEntity<Object> setTicket(@PathVariable(value = "sitz_id") long sitz_id,
+	public ResponseEntity<Object> setTicketMitGast(@PathVariable(value = "sitz_id") long sitz_id,
 											@PathVariable(value = "vorstellung_id") long vorstellung_id,
 											@PathVariable(value = "benutzer_id") long kaeufer_id,
 											@PathVariable(value = "gast_id") long gast_id) {

@@ -31,8 +31,7 @@ public class Sitz {
     //     this.meinKinosaal = meinKinosaal;
     // }
     @Autowired
-    public Sitz(int id, int reihe, int spalte, boolean barriereFrei, BigDecimal preisschluessel) {
-        this.id = id;
+    public Sitz(int reihe, int spalte, boolean barriereFrei, BigDecimal preisschluessel) {
         this.reihe = reihe;
         this.spalte = spalte;
         this.barriereFrei = barriereFrei;
