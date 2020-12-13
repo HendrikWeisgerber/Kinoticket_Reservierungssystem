@@ -14,6 +14,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+
+
 import java.util.*;
 
 import com.example.lib.Film;
@@ -52,11 +61,10 @@ public class HelloWorldApplication {
 
 
 	@RequestMapping(value = "/reset", produces = "application/json")
-	public ResponseEntity<Object> home(){
+	public ResponseEntity<Object> home() throws ParseException {
 
 	    sitzRepository.deleteAll();
 	    ticketRepository.deleteAll();
-	    //benutzerRepository.deleteAll();
 	    warenkorbRepository.deleteAll();
 	    vorstellungRepository.deleteAll();
 	    bestellungRepository.deleteAll();
@@ -64,12 +72,28 @@ public class HelloWorldApplication {
 	    kinosaalRepository.deleteAll();
         benutzerRepository.deleteAll();
 
-        Vorstellung testVor = new Vorstellung();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+		Date date = sdf.parse("2020-12-26 20:30:00.000");
+
+        Vorstellung testVor = new Vorstellung(date, new BigDecimal(9), true);
+		Vorstellung testVor2 = new Vorstellung();
+		Vorstellung testVor3 = new Vorstellung();
         Film filmT = new Film("Star Wars", "Bild", "Das ist ein neuer Film", 9, 140, 12, true, "Sci-Fi");
+		Film filmT2 = new Film("Harry Potter", "Bild", "Das ist ein noch neuerer Film", 8, 150, 12, true, "Fantasy");
+		Kinosaal saalT = new Kinosaal(50,5,10);
 
         filmRepository.save(filmT);
+        filmRepository.save(filmT2);
+        kinosaalRepository.save(saalT);
         testVor.setFilmId(filmT.getId());
+        testVor.setSaal(saalT);
+		testVor2.setFilmId(filmT.getId());
+		testVor2.setGrundpreis(new BigDecimal(11));
+		testVor3.setFilmId(filmT2.getId());
+		testVor3.setGrundpreis(new BigDecimal(8));
         vorstellungRepository.save(testVor);
+		vorstellungRepository.save(testVor2);
+		vorstellungRepository.save(testVor3);
 
 		return new ResponseEntity<>(sitzRepository.findAll(), HttpStatus.OK);
 	}
@@ -217,76 +241,6 @@ public class HelloWorldApplication {
 	}
 
 	// TODO implement MappingMethods
-
-	@RequestMapping(value= "/film/all", produces ="application/json")
-	public ResponseEntity<Object> getAllFilms(){
-		/*Film philosopherStone = new Film();
-		Film champerOfSecrets = new Film();
-
-		philosopherStone.setAktiv(true);
-		philosopherStone.setBeschreibung("What a fantastic start of what is yet to come");
-		philosopherStone.setBild("A Picture of Stone");
-		philosopherStone.setBewertung(10);
-		philosopherStone.setId(1);
-		philosopherStone.setLaenge(2);
-		philosopherStone.setMindestAlter(6);
-		philosopherStone.setName("Henry Otter and the Knoledge Stone");
-
-		champerOfSecrets.setAktiv(true);
-		champerOfSecrets.setBeschreibung("It did do the fantastic start justice");
-		champerOfSecrets.setBild("A Picture of a Secret :D");
-		champerOfSecrets.setBewertung(10);
-		champerOfSecrets.setId(2);
-		champerOfSecrets.setLaenge(2);
-		champerOfSecrets.setMindestAlter(12);
-		champerOfSecrets.setName("Henry Otter and the Dungeon of Fakenews");
-
-		filmRepository.save(philosopherStone);
-		filmRepository.save(champerOfSecrets);*/
-
-
-		return new ResponseEntity<>(filmRepository.findAll(), HttpStatus.OK);
-	}
-
-
-	@RequestMapping(value = "/film/{film_id}", produces = "application/json")
-	public ResponseEntity<Object> getFilmbyID(@PathVariable(value = "film_id")long film_id, Pageable pageable){
-
-		Film philosopherStone = new Film();
-		Film champerOfSecrets = new Film();
-
-		philosopherStone.setAktiv(true);
-		philosopherStone.setBeschreibung("What a fantastic start of what is yet to come");
-		philosopherStone.setBild("A Picture of Stone");
-		philosopherStone.setBewertung(10);
-		philosopherStone.setId(1);
-		philosopherStone.setLaenge(2);
-		philosopherStone.setMindestAlter(6);
-		philosopherStone.setName("Henry Otter and the Knoledge Stone");
-
-		champerOfSecrets.setAktiv(true);
-		champerOfSecrets.setBeschreibung("It did do the fantastic start justice");
-		champerOfSecrets.setBild("A Picture of a Secret :D");
-		champerOfSecrets.setBewertung(10);
-		champerOfSecrets.setId(2);
-		champerOfSecrets.setLaenge(2);
-		champerOfSecrets.setMindestAlter(12);
-		champerOfSecrets.setName("Henry Otter and the Dungeon of Fakenews");
-
-		filmRepository.save(philosopherStone);
-		filmRepository.save(champerOfSecrets);
-
-
-		return new ResponseEntity<>(filmRepository.findById((int)film_id), HttpStatus.OK);
-	}
-
-	/*
-	@RequestMapping(value = "/vorstellung/film/{film_id}", produces = "application/json")Niklas!!
-	@RequestMapping(value = "/sitz/vorstellung/{vorstellung_id}", produces = "application/json")Niklas!!
-	@RequestMapping(value = "/ticket/sitz/{sitz_id}/vorstellung/{vorstellung_id}/nutzer/{nutzer_id}", produces = "application/json")
-	@RequestMapping(value = "/ticket/sitz/{sitz_id}/vorstellung/{vorstellung_id}/nutzer/{nutzer_id}/gast/{gast_id)", produces = "application/json")
-	@RequestMapping(value = "/bestellung/nutzer/{nutzer_id}", produces = "application/json")
-	*/
     @RequestMapping(value = "/vorstellung", produces = "application/json")
     public ResponseEntity<Object> getVorstellung(Pageable pageable){
 

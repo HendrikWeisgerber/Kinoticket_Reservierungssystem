@@ -23,11 +23,10 @@ public class Kinosaal {
     private ArrayList<Vorstellung> meineVorstellungen;
 
     @Autowired
-    public Kinosaal(int anzahlSitze, int spalte, int reihe, int id) {
+    public Kinosaal(int anzahlSitze, int spalte, int reihe) {
         this.anzahlSitze = anzahlSitze;
         this.spalte = spalte;
         this.reihe = reihe;
-        this.id = id;
     }
 
     @Autowired

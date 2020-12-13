@@ -27,7 +27,7 @@ public class Film {
 //TODO Genre enum statt string
     private String genre;
     @Transient
-    private Vorstellung[] vorstellung;
+    private ArrayList<Vorstellung> vorstellung;
 
 
     public int getId() {
@@ -94,8 +94,11 @@ public class Film {
         this.aktiv = aktiv;
     }
 
-    public Vorstellung[] getVorstellung() {
+    public ArrayList<Vorstellung> getVorstellung() {
         return this.vorstellung;
+    }
+    public void setVorstellung() {
+        this.vorstellung = new ArrayList<Vorstellung>();
     }
 
     public String getGenre() {
