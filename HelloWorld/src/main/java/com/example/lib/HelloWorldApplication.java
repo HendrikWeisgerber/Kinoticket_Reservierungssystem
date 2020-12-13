@@ -129,7 +129,7 @@ public class HelloWorldApplication {
 	}
 	@RequestMapping(value = "/bestellung/nutzer/{nutzer_id}", produces = "application/json")
 	public ResponseEntity<Object> getAllTicketsInBestellung(@PathVariable(value = "nutzer_id")long nutzer_id, Pageable pageable){
-		/*
+
 		Ticket testT = new Ticket();
 		Vorstellung testV = new Vorstellung();
 		Sitz testSitz = new Sitz(1,3,5,true,new BigDecimal(2));
@@ -159,7 +159,7 @@ public class HelloWorldApplication {
 		ticketRepository.save(testT);
 
 		int b_id = testBenutzer.getId();
-		*/
+
 		Optional<Benutzer> oB = benutzerRepository.findById((Integer)(int)nutzer_id);
 		Benutzer b;
 		if(!oB.isEmpty()){
