@@ -16,11 +16,11 @@ public class Vorstellung {
     private Date startZeit;
     private BigDecimal grundpreis;
     private boolean aktiv;
+    private int filmId;
     @ManyToOne
     @JoinColumn(name = "kinosaal_id")
     private Kinosaal saal;
 
-    private int filmId;
     @Transient
     private Ticket[] ticket;
     
@@ -29,9 +29,8 @@ public class Vorstellung {
 
     }
 
-    public Vorstellung(int id, int filmId, BigDecimal grundpreis, boolean aktiv) {
-        this.setId(id);
-        this.setFilmId(filmId);
+    public Vorstellung(Date startzeit, BigDecimal grundpreis, boolean aktiv) {
+        this.setStartZeit(startzeit);
         this.setGrundpreis(grundpreis);
         this.setAktiv(aktiv);
     }
