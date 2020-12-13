@@ -1,6 +1,5 @@
 package com.example.lib;
 
-import org.hibernate.sql.Delete;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -15,16 +14,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
 import java.util.*;
 
 import com.example.lib.Film;
 import com.example.lib.Kinosaal;
 import com.example.lib.Sitz;
 import com.example.lib.Repositories.*;
+
+import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 @SpringBootApplication
 @RestController
@@ -35,10 +32,10 @@ public class HelloWorldApplication {
 	@Autowired
 	private TicketRepository ticketRepository;
 
-	@Autowired
+	@Autowired 
 	BenutzerRepository benutzerRepository;
 
-	@Autowired
+	@Autowired 
 	WarenkorbRepository warenkorbRepository;
 
 	@Autowired
@@ -108,7 +105,7 @@ public class HelloWorldApplication {
 		ticketRepository.save(testT2);
 
 
-		return new ResponseEntity<>(ticketRepository.findByVorstellungId((int)vorstellung_id),HttpStatus.OK);
+        return new ResponseEntity<>(ticketRepository.findByVorstellungId((int) vorstellung_id), HttpStatus.OK);
 	}
 	@RequestMapping(value = "/bestellung/nutzer/{nutzer_id}", produces = "application/json")
 	public ResponseEntity<Object> getAllTicketsInBestellung(@PathVariable(value = "nutzer_id")long nutzer_id, Pageable pageable){
@@ -320,7 +317,7 @@ public class HelloWorldApplication {
     @RequestMapping(value = "/kinosaal/vorstellung/{vorstellung_id}", produces = "application/json")
     public ResponseEntity<Object> getSaalByVorstellung(@PathVariable(value = "vorstellung_id")int vorstellung_id, Pageable pageable){
 
-        /*ArrayList<Sitz> sitze = new ArrayList<Sitz>();
+        ArrayList<Sitz> sitze = new ArrayList<Sitz>();
         Sitz testSitz = new Sitz(1,1,1,true,new BigDecimal(2));
         Sitz testSitz2 = new Sitz(2,1,2,true,new BigDecimal(2));
         Sitz testSitz3 = new Sitz(3,1,3,true,new BigDecimal(2));
@@ -342,15 +339,15 @@ public class HelloWorldApplication {
         Film filmT = new Film();
         filmRepository.save(filmT);
 
-        testVor.setFilm(filmT);
+        testVor.setFilmId(filmT.getId());
         testVor.setSaal(testSaal);
-        vorstellungRepository.save(testVor);*/
+        vorstellungRepository.save(testVor);
 
         return new ResponseEntity<>(vorstellungRepository.findById(vorstellung_id).get().getSaal(),HttpStatus.OK);
     }
 
-	@RequestMapping(value = "/crud/benutzer/all", produces = "application/json")
-	public ResponseEntity<Object> getAllBenutzer(){
+    @RequestMapping(value = "/crud/benutzer/all", produces = "application/json")
+    public ResponseEntity<Object> getAllBenutzer() {
 
 		Warenkorb testW = new Warenkorb();
 		Benutzer testB = new Benutzer();
@@ -366,19 +363,120 @@ public class HelloWorldApplication {
 
 		//testB.setNewsletter(false);
 		//testB.derWunschlisteHinzufuegen(new Film("Star Wars", "hier ist das Bild", "das passiert", 10, 200, 12, true, "Sci-Fi"));
-		
+
 		benutzerRepository.save(testB);
 
 		return new ResponseEntity<>(benutzerRepository.findAll(),HttpStatus.OK);
 
 	}
 
-	public static void main(String[] args) {
-		//Main Method starts the webserver on port 8081
-		//SpringApplication.run(HelloWorldApplication.class, args);
-		SpringApplication app =new SpringApplication(HelloWorldApplication.class);
-		app.setDefaultProperties(Collections.singletonMap("server.port", "8081"));
-		app.run(args);
+    @RequestMapping(value = "/ticket/sitz/{sitz_id}/vorstellung/{vorstellung_id}/benutzer/{benutzer_id}", produces = "application/json", method = POST)
+    public ResponseEntity<Object> setTicket(@PathVariable(value = "sitz_id") long sitz_id,
+                                            @PathVariable(value = "vorstellung_id") long vorstellung_id,
+                                            @PathVariable(value = "benutzer_id") long kaeufer_id) {
 
+        Ticket ticket = new Ticket();
+        Sitz sitz = new Sitz();
+        Vorstellung vorstellung = new Vorstellung();
+        Benutzer kaeufer = new Benutzer();
+
+        Optional<Sitz> sitzOptional = sitzRepository.findById((int) sitz_id);
+        if (sitzOptional.isPresent()) {
+            sitz = sitzOptional.get();
+            ticket.setSitz(sitz);
+
+        } else {
+            sitz.setSpalte(5);
+            sitz.setReihe(5);
+            sitz.setPreisschluessel(new BigDecimal(5));
+            sitz.setBarriereFrei(true);
+            Kinosaal kinosaal = new Kinosaal();
+            kinosaal.setAnzahlSitze(25);
+            kinosaal.setReihe(5);
+            kinosaal.setSpalte(5);
+            kinosaalRepository.save(kinosaal);
+            sitz.setMeinKinosaal(kinosaal);
+            sitzRepository.save(sitz);
+            ticket.setSitz(sitz);
+            System.out.println("Kein Sitz gefunden");
+        }
+
+        Optional<Vorstellung> vorstellungOptional = vorstellungRepository.findById((int) vorstellung_id);
+        if (vorstellungOptional.isPresent()) {
+            vorstellung = vorstellungOptional.get();
+            ticket.setVorstellung(vorstellung);
+        } else {
+            System.out.println("Keine Vorstellung gefunden");
+        }
+
+        Optional<Benutzer> kaeuferOptional = benutzerRepository.findById((int) kaeufer_id);
+        if (kaeuferOptional.isPresent()) {
+            kaeufer = kaeuferOptional.get();
+            ticket.setKaeufer(kaeufer);
+        } else {
+            System.out.println("Keine Kaeufer gefunden");
+        }
+
+
+        ticketRepository.save(ticket);
+
+        return new ResponseEntity<>("Ticket wurde gespeichert, der Besteller entspricht dem Gast", HttpStatus.OK);
+    }
+
+	@RequestMapping(value = "/ticket/sitz/{sitz_id}/vorstellung/{vorstellung_id}/benutzer/{benutzer_id}/gast/{gast_id)", produces = "application/json", method = POST)
+	public ResponseEntity<Object> setTicket(@PathVariable(value = "sitz_id") long sitz_id,
+											@PathVariable(value = "vorstellung_id") long vorstellung_id,
+											@PathVariable(value = "benutzer_id") long kaeufer_id,
+											@PathVariable(value = "gast_id") long gast_id) {
+
+        Ticket ticket = new Ticket();
+        Sitz sitz = new Sitz();
+		Vorstellung vorstellung = new Vorstellung();
+		Benutzer kaeufer = new Benutzer();
+		Benutzer gast = new Benutzer();
+
+		Optional<Sitz> sitzOptional = sitzRepository.findById((int) sitz_id);
+		if (sitzOptional.isPresent()) {
+			sitz = sitzOptional.get();
+            ticket.setSitz(sitz);
+        } else {
+			System.out.println("Kein Sitz gefunden");
+		}
+
+		Optional<Vorstellung> vorstellungOptional = vorstellungRepository.findById((int) vorstellung_id);
+		if (vorstellungOptional.isPresent()) {
+			vorstellung = vorstellungOptional.get();
+            ticket.setVorstellung(vorstellung);
+        } else {
+			System.out.println("Keine Vorstellung gefunden");
+		}
+
+		Optional<Benutzer> kaeuferOptional = benutzerRepository.findById((int) kaeufer_id);
+		if (kaeuferOptional.isPresent()) {
+			kaeufer = kaeuferOptional.get();
+            ticket.setKaeufer(kaeufer);
+        } else {
+			System.out.println("Keine Kaeufer gefunden");
+		}
+
+		Optional<Benutzer> gastOptional = benutzerRepository.findById((int) gast_id);
+		if (gastOptional.isPresent()) {
+			gast = gastOptional.get();
+            ticket.setGast(gast);
+        } else {
+			System.out.println("Kein Gast gefunden");
+		}
+
+		ticketRepository.save(ticket);
+
+		return new ResponseEntity<>("Ticket wurde gespeichert, der Besteller entspricht NICHT dem Gast", HttpStatus.OK);
 	}
+
+    public static void main(String[] args) {
+        //SpringApplication.run(HelloWorldApplication.class, args);
+        SpringApplication app = new SpringApplication(HelloWorldApplication.class);
+        app.setDefaultProperties(Collections.singletonMap("server.port", "8081"));
+        app.run(args);
+
+    }
 }
