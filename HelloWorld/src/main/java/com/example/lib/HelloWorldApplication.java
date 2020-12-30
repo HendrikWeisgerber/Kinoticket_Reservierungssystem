@@ -349,6 +349,45 @@ public class HelloWorldApplication {
                                             @PathVariable(value = "vorstellung_id") long vorstellung_id,
                                             @PathVariable(value = "benutzer_id") long kaeufer_id) {
 
+	    Object o = makeTicket(sitz_id, vorstellung_id, kaeufer_id).getBody();
+	    if (o instanceof Ticket) {
+            Ticket ticket = (Ticket) o;
+            ticketRepository.save(ticket);
+            return new ResponseEntity<>("Ticket wurde gespeichert, Kaeufer entspricht dem Gast", HttpStatus.OK);
+        }
+
+        return new ResponseEntity<>(o, HttpStatus.OK);
+
+    }
+
+	@RequestMapping(value = "/ticket/sitz/{sitz_id}/vorstellung/{vorstellung_id}/benutzer/{benutzer_id}/gast/{gast_id}", produces = "application/json", method = POST)
+	public ResponseEntity<Object> setTicketMitGast(@PathVariable(value = "sitz_id") long sitz_id,
+											@PathVariable(value = "vorstellung_id") long vorstellung_id,
+											@PathVariable(value = "benutzer_id") long kaeufer_id,
+											@PathVariable(value = "gast_id") long gast_id) {
+        Benutzer gast = new Benutzer();
+
+        Object o = makeTicket(sitz_id, vorstellung_id, kaeufer_id).getBody();
+        if (o instanceof Ticket) {
+            Ticket ticket = (Ticket) o;
+            Optional<Benutzer> gastOptional = benutzerRepository.findById((int) gast_id);
+            if (gastOptional.isPresent()) {
+                gast = gastOptional.get();
+                ticket.setGast(gast);
+            } else {
+                System.out.println("Kein Gast gefunden");
+                return new ResponseEntity<>("Kein Gast gefunden", HttpStatus.OK);
+            }
+            ticketRepository.save(ticket);
+            return new ResponseEntity<>("Ticket wurde gespeichert, der Besteller entspricht dem Gast", HttpStatus.OK);
+        }
+
+        return new ResponseEntity<>(o, HttpStatus.OK);
+	}
+
+    private ResponseEntity<Object> makeTicket(@PathVariable(value = "sitz_id") long sitz_id,
+                              @PathVariable(value = "vorstellung_id") long vorstellung_id,
+                              @PathVariable(value = "benutzer_id") long kaeufer_id) {
         Ticket ticket = new Ticket();
         Sitz sitz = new Sitz();
         Vorstellung vorstellung = new Vorstellung();
@@ -357,12 +396,12 @@ public class HelloWorldApplication {
         // Prüfe ob das Ticket bereits existiert
         Ticket[] ticketsByVorstellung = ticketRepository.findByVorstellungId((int) vorstellung_id);
         if (ticketsByVorstellung != null) {
-        	for (Ticket t: ticketsByVorstellung) {
-        		if (t.getSitz().getId() == sitz_id) {
-					return new ResponseEntity<>("Das Ticket ist leider nicht mehr verfügbar", HttpStatus.OK);
-				}
-			}
-		}
+            for (Ticket t: ticketsByVorstellung) {
+                if (t.getSitz().getId() == sitz_id) {
+                    return new ResponseEntity<>("Das Ticket ist leider nicht mehr verfügbar", HttpStatus.OK);
+                }
+            }
+        }
 
         Optional<Sitz> sitzOptional = sitzRepository.findById((int) sitz_id);
         if (sitzOptional.isPresent()) {
@@ -383,7 +422,7 @@ public class HelloWorldApplication {
             sitzRepository.save(sitz);
             ticket.setSitz(sitz);*/
             System.out.println("Kein Sitz gefunden");
-			return new ResponseEntity<>("Kein Sitz gefunden", HttpStatus.OK);
+            return new ResponseEntity<>("Kein Sitz gefunden", HttpStatus.OK);
         }
 
         Optional<Vorstellung> vorstellungOptional = vorstellungRepository.findById((int) vorstellung_id);
@@ -392,7 +431,7 @@ public class HelloWorldApplication {
             ticket.setVorstellung(vorstellung);
         } else {
             System.out.println("Keine Vorstellung gefunden");
-			return new ResponseEntity<>("Keine Vorstellung gefunden", HttpStatus.OK);
+            return new ResponseEntity<>("Keine Vorstellung gefunden", HttpStatus.OK);
         }
 
         Optional<Benutzer> kaeuferOptional = benutzerRepository.findById((int) kaeufer_id);
@@ -401,64 +440,12 @@ public class HelloWorldApplication {
             ticket.setKaeufer(kaeufer);
         } else {
             System.out.println("Keine Kaeufer gefunden");
-			return new ResponseEntity<>("Kein Kaeufer gefunden", HttpStatus.OK);
+            return new ResponseEntity<>("Kein Kaeufer gefunden", HttpStatus.OK);
         }
-
-        ticketRepository.save(ticket);
-
-        return new ResponseEntity<>("Ticket wurde gespeichert, der Besteller entspricht dem Gast", HttpStatus.OK);
+        return new ResponseEntity<>(ticket, HttpStatus.OK);
     }
 
-	@RequestMapping(value = "/ticket/sitz/{sitz_id}/vorstellung/{vorstellung_id}/benutzer/{benutzer_id}/gast/{gast_id}", produces = "application/json", method = POST)
-	public ResponseEntity<Object> setTicketMitGast(@PathVariable(value = "sitz_id") long sitz_id,
-											@PathVariable(value = "vorstellung_id") long vorstellung_id,
-											@PathVariable(value = "benutzer_id") long kaeufer_id,
-											@PathVariable(value = "gast_id") long gast_id) {
-
-        Ticket ticket = new Ticket();
-        Sitz sitz = new Sitz();
-		Vorstellung vorstellung = new Vorstellung();
-		Benutzer kaeufer = new Benutzer();
-		Benutzer gast = new Benutzer();
-
-		Optional<Sitz> sitzOptional = sitzRepository.findById((int) sitz_id);
-		if (sitzOptional.isPresent()) {
-			sitz = sitzOptional.get();
-            ticket.setSitz(sitz);
-        } else {
-			System.out.println("Kein Sitz gefunden");
-		}
-
-		Optional<Vorstellung> vorstellungOptional = vorstellungRepository.findById((int) vorstellung_id);
-		if (vorstellungOptional.isPresent()) {
-			vorstellung = vorstellungOptional.get();
-            ticket.setVorstellung(vorstellung);
-        } else {
-			System.out.println("Keine Vorstellung gefunden");
-		}
-
-		Optional<Benutzer> kaeuferOptional = benutzerRepository.findById((int) kaeufer_id);
-		if (kaeuferOptional.isPresent()) {
-			kaeufer = kaeuferOptional.get();
-            ticket.setKaeufer(kaeufer);
-        } else {
-			System.out.println("Keine Kaeufer gefunden");
-		}
-
-		Optional<Benutzer> gastOptional = benutzerRepository.findById((int) gast_id);
-		if (gastOptional.isPresent()) {
-			gast = gastOptional.get();
-            ticket.setGast(gast);
-        } else {
-			System.out.println("Kein Gast gefunden");
-		}
-
-		ticketRepository.save(ticket);
-
-		return new ResponseEntity<>("Ticket wurde gespeichert, der Besteller entspricht NICHT dem Gast", HttpStatus.OK);
-	}
-
-    public static void main(String[] args) {
+	public static void main(String[] args) {
         //SpringApplication.run(HelloWorldApplication.class, args);
         SpringApplication app = new SpringApplication(HelloWorldApplication.class);
         app.setDefaultProperties(Collections.singletonMap("server.port", "8081"));
