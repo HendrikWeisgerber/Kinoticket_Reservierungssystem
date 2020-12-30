@@ -9,6 +9,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,6 +33,7 @@ import com.example.lib.Repositories.*;
 
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
+@CrossOrigin(origins = "*")
 @SpringBootApplication
 @RestController
 public class HelloWorldApplication {
@@ -352,13 +354,23 @@ public class HelloWorldApplication {
         Vorstellung vorstellung = new Vorstellung();
         Benutzer kaeufer = new Benutzer();
 
+        // Prüfe ob das Ticket bereits existiert
+        Ticket[] ticketsByVorstellung = ticketRepository.findByVorstellungId((int) vorstellung_id);
+        if (ticketsByVorstellung != null) {
+        	for (Ticket t: ticketsByVorstellung) {
+        		if (t.getSitz().getId() == sitz_id) {
+					return new ResponseEntity<>("Das Ticket ist leider nicht mehr verfügbar", HttpStatus.OK);
+				}
+			}
+		}
+
         Optional<Sitz> sitzOptional = sitzRepository.findById((int) sitz_id);
         if (sitzOptional.isPresent()) {
             sitz = sitzOptional.get();
             ticket.setSitz(sitz);
 
         } else {
-            sitz.setSpalte(5);
+            /*sitz.setSpalte(5);
             sitz.setReihe(5);
             sitz.setPreisschluessel(new BigDecimal(5));
             sitz.setBarriereFrei(true);
@@ -369,8 +381,9 @@ public class HelloWorldApplication {
             kinosaalRepository.save(kinosaal);
             sitz.setKinosaalId(kinosaal.getId());
             sitzRepository.save(sitz);
-            ticket.setSitz(sitz);
+            ticket.setSitz(sitz);*/
             System.out.println("Kein Sitz gefunden");
+			return new ResponseEntity<>("Kein Sitz gefunden", HttpStatus.OK);
         }
 
         Optional<Vorstellung> vorstellungOptional = vorstellungRepository.findById((int) vorstellung_id);
@@ -379,6 +392,7 @@ public class HelloWorldApplication {
             ticket.setVorstellung(vorstellung);
         } else {
             System.out.println("Keine Vorstellung gefunden");
+			return new ResponseEntity<>("Keine Vorstellung gefunden", HttpStatus.OK);
         }
 
         Optional<Benutzer> kaeuferOptional = benutzerRepository.findById((int) kaeufer_id);
@@ -387,15 +401,15 @@ public class HelloWorldApplication {
             ticket.setKaeufer(kaeufer);
         } else {
             System.out.println("Keine Kaeufer gefunden");
+			return new ResponseEntity<>("Kein Kaeufer gefunden", HttpStatus.OK);
         }
-
 
         ticketRepository.save(ticket);
 
         return new ResponseEntity<>("Ticket wurde gespeichert, der Besteller entspricht dem Gast", HttpStatus.OK);
     }
 
-	@RequestMapping(value = "/ticket/sitz/{sitz_id}/vorstellung/{vorstellung_id}/benutzer/{benutzer_id}/gast/{gast_id)", produces = "application/json", method = POST)
+	@RequestMapping(value = "/ticket/sitz/{sitz_id}/vorstellung/{vorstellung_id}/benutzer/{benutzer_id}/gast/{gast_id}", produces = "application/json", method = POST)
 	public ResponseEntity<Object> setTicketMitGast(@PathVariable(value = "sitz_id") long sitz_id,
 											@PathVariable(value = "vorstellung_id") long vorstellung_id,
 											@PathVariable(value = "benutzer_id") long kaeufer_id,

@@ -12,12 +12,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Optional;
 
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/film")
 public class FilmController {
@@ -34,6 +36,7 @@ public class FilmController {
     @Autowired
     SitzRepository sitzRepository;
 
+    @CrossOrigin(origins = "*")
     @RequestMapping(value= "/all", produces ="application/json")
     public ResponseEntity<Object> getAllFilms(){
 
@@ -78,6 +81,9 @@ public class FilmController {
         }
 
         Optional<Film> film = filmRepository.findById(film_id);
+        if(film.isEmpty()) {
+            return new ResponseEntity<Object>("Kein Film mit der Id: " + film_id, HttpStatus.OK);
+        }
         Vorstellung[] vorstellungen = vorstellungRepository.findByFilmId(film.get().getId());
         for(Vorstellung vorstellung : vorstellungen) {
             if(film.get().getVorstellung() == null) {
