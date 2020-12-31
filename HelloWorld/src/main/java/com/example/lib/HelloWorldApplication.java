@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
 
+import java.net.http.HttpResponse;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
@@ -31,6 +32,10 @@ import com.example.lib.Sitz;
 import com.example.lib.Repositories.*;
 
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
+
+/*import com.mashape.unirest.http.JsonNode;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;*/
 
 @SpringBootApplication
 @RestController
@@ -444,11 +449,22 @@ public class HelloWorldApplication {
 		return new ResponseEntity<>("Ticket wurde gespeichert, der Besteller entspricht NICHT dem Gast", HttpStatus.OK);
 	}
 
+	/*protected HttpResponse<JsonNode> queryServer() throws UnirestException {
+
+		HttpResponse response = (HttpResponse) Unirest.get("imdb-api.com/en/API/SearchMovie/")
+				.header("X-RapidAPI-Key", "k_ucj1yd23")
+				.queryString("parameter", "John")
+				.queryString("parameter", "C2")
+				.queryString("parameter", "Wick")
+				//.field("parameter", "value")
+				.asJson();
+		return response;
+	}*/
+
     public static void main(String[] args) {
         //SpringApplication.run(HelloWorldApplication.class, args);
         SpringApplication app = new SpringApplication(HelloWorldApplication.class);
         app.setDefaultProperties(Collections.singletonMap("server.port", "8081"));
         app.run(args);
-
     }
 }
