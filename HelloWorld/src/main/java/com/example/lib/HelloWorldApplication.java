@@ -465,6 +465,7 @@ public class HelloWorldApplication {
         //SpringApplication.run(HelloWorldApplication.class, args);
         SpringApplication app = new SpringApplication(HelloWorldApplication.class);
         app.setDefaultProperties(Collections.singletonMap("server.port", "8081"));
+        //test
         app.run(args);
     }
 }
