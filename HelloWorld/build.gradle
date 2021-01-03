@@ -2,26 +2,18 @@ plugins {
 	id 'org.springframework.boot' version '2.4.0'
 	id 'io.spring.dependency-management' version '1.0.10.RELEASE'
 	id 'java'
-	id "com.microsoft.azure.azurefunctions" version "1.5.0"
 }
 
-apply plugin: "java"
 
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '8'
-targetCompatibility = '8'
-
-sourceCompatibility = 8
+sourceCompatibility = '11'
 
 repositories {
 	mavenCentral()
 }
-jar {
-	manifest {
-		attributes 'Main-Class' : 'com.example.HelloWorldApplication'
-	}
-}
+
+
 dependencies {
 
 	//implementation 'com.mashape.unirest:unirest-java:1.4.9'
@@ -29,21 +21,16 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	runtimeOnly 'mysql:mysql-connector-java'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	implementation 'commons-io:commons-io:2.6'
-	testCompile group: 'junit', name: 'junit', version: '4.12'
-	implementation 'com.microsoft.azure.functions:azure-functions-java-library:1.4.0'
 }
 
-azurefunctions {
-	subscription = '6dfcf302-fa16-4ad5-82f9-80561a44630c'
-	resourceGroup = 'csb1003200108881352'
-	appName = 'HelloWorld'
-	pricingTier = 'Free'
-	region = 'westeurope'
-	runtime {
-		os = 'windows'
-	}
-	// localDebug = "transport=dt_socket,server=y,suspend=n,address=5005"
+task stage(dependsOn: ['build', 'clean'])
+build.mustRunAfter clean
+
+gradle.taskGraph.whenReady {
+	taskGraph ->
+		if (taskGraph.hasTask(stage)) {
+			test.enabled = false
+		}
 }
 
 test {
