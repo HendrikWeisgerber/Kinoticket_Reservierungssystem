@@ -23,23 +23,6 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
-task stage(dependsOn: ['build', 'clean'])
-build.mustRunAfter clean
-
-gradle.taskGraph.whenReady {
-	taskGraph ->
-		if (taskGraph.hasTask(stage)) {
-			test.enabled = false
-		}
-}
-
-task copyToLib(type: Copy) {
-	into "$buildDir/libs"
-	from(configurations.compile)
-}
-
-stage.dependsOn(copyToLib)
-
 test {
 	useJUnitPlatform()
 }
