@@ -140,6 +140,7 @@ public class Benutzer {
             i++;
         }
         neueWunschListe[i] = film;
+        this.wunschliste = neueWunschListe;
     }
 
     public Boolean getNewsletter() {
@@ -148,6 +149,10 @@ public class Benutzer {
 
     public void setNewsletter(Boolean newsletter) {
         this.newsletter = newsletter;
+    }
+
+    public boolean istRichtigesPasswort(String passwort){
+        return ((Integer)passwort.hashCode()).toString().equals(passwortHash) ;
     }
 //TODO Preiskategorien bestimmen und Rechte 
 
