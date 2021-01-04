@@ -36,28 +36,28 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 @RestController
 public class HelloWorldApplication {
 	@Autowired
-  	private SitzRepository sitzRepository;
+	public SitzRepository sitzRepository;
 
 	@Autowired
-	private TicketRepository ticketRepository;
+	public TicketRepository ticketRepository;
 
 	@Autowired 
-	BenutzerRepository benutzerRepository;
+	public BenutzerRepository benutzerRepository;
 
 	@Autowired 
-	WarenkorbRepository warenkorbRepository;
+	public WarenkorbRepository warenkorbRepository;
 
 	@Autowired
-	VorstellungRepository vorstellungRepository;
+	public VorstellungRepository vorstellungRepository;
 
 	@Autowired
-	BestellungRepository bestellungRepository;
+	public BestellungRepository bestellungRepository;
 
 	@Autowired
-	FilmRepository filmRepository;
-
+	public FilmRepository filmRepository;
+	
 	@Autowired
-	KinosaalRepository kinosaalRepository;
+	public KinosaalRepository kinosaalRepository;
 
 	@RequestMapping(value = "/reset", produces = "application/json")
 	public ResponseEntity<Object> home() throws ParseException {
@@ -363,7 +363,7 @@ public class HelloWorldApplication {
             sitz.setPreisschluessel(new BigDecimal(5));
             sitz.setBarriereFrei(true);
             Kinosaal kinosaal = new Kinosaal();
-            kinosaal.setAnzahlSitze(25);
+            //kinosaal.setAnzahlSitze(25);  Ergibt sich aus reihe und spalte
             kinosaal.setReihe(5);
             kinosaal.setSpalte(5);
             kinosaalRepository.save(kinosaal);
