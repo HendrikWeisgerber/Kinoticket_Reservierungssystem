@@ -22,8 +22,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-
-
+import java.util.concurrent.Semaphore;
 import java.util.*;
 
 import com.example.lib.Film;
@@ -64,6 +63,43 @@ public class HelloWorldApplication {
 	@Autowired
 	public KinosaalRepository kinosaalRepository;
 
+	private static Semaphore mutex; 
+
+	private boolean ticketExistiertBereits(long sitz_id, long vorstellung_id){
+		Optional<Sitz> oSitz = sitzRepository.findById((int)sitz_id);
+		Optional<Vorstellung> oVorstellung = vorstellungRepository.findById((int)vorstellung_id);
+		
+		Sitz sitz;
+		Vorstellung vorstellung;
+
+		if(oSitz == null) return false;
+		if(oVorstellung == null) return false;
+
+		vorstellung = oVorstellung.get();
+		sitz = oSitz.get();
+
+		Ticket[] ticketsMitSitz, ticketsMitVorstellung;
+		ticketsMitSitz = ticketRepository.findBySitz(sitz);
+		ticketsMitVorstellung = ticketRepository.findByVorstellung(vorstellung);
+
+		if(ticketsMitSitz.length == 0 || ticketsMitVorstellung.length == 0){
+			return false;
+		}
+
+		for(Ticket ticketMitSitz : ticketsMitSitz){
+			for(Ticket ticketMitVorstellung : ticketsMitVorstellung){
+				if(ticketMitSitz.getVorstellung() == ticketMitVorstellung.getVorstellung() 
+				   && ticketMitSitz.getSitz() == ticketMitVorstellung.getSitz() 
+				   && ticketMitSitz.getIstValide() 
+				   && ticketMitVorstellung.getIstValide()){
+					return true;
+				}
+			}
+		}
+		return false;
+
+	}
+
 	@RequestMapping(value = "/reset", produces = "application/json")
 	public ResponseEntity<Object> home() throws ParseException {
 		ticketRepository.deleteAll();
@@ -90,11 +126,14 @@ public class HelloWorldApplication {
 
         filmRepository.save(filmT);
         filmRepository.save(filmT2);
-        kinosaalRepository.save(saalT);
+		kinosaalRepository.save(saalT);
+		
+		int saalId;
+		saalId = saalT.getId();
 		for(int i= 1; i < 3; i++) {
 			for(int k=1; k < 3; k++) {
 				Sitz sitz = new Sitz(i ,k , false, new BigDecimal(1));
-				sitz.setKinosaalId(saalT.getId());
+				sitz.setKinosaalId(saalId);
 				sitzRepository.save(sitz);
 			}
 		}
@@ -352,101 +391,125 @@ public class HelloWorldApplication {
                                             @PathVariable(value = "vorstellung_id") long vorstellung_id,
                                             @PathVariable(value = "benutzer_id") long kaeufer_id) {
 
-        Ticket ticket = new Ticket();
-        Sitz sitz = new Sitz();
-        Vorstellung vorstellung = new Vorstellung();
-        Benutzer kaeufer = new Benutzer();
 
-        Optional<Sitz> sitzOptional = sitzRepository.findById((int) sitz_id);
-        if (sitzOptional.isPresent()) {
-            sitz = sitzOptional.get();
-            ticket.setSitz(sitz);
+		try{
+			mutex.acquire();
+		}catch(InterruptedException e){e.printStackTrace();}			
+		
+		if(ticketExistiertBereits(sitz_id, vorstellung_id)){
+			mutex.release();
+			return new ResponseEntity<>("Ticket wurde nicht gespeichert, da der Sitz in dieser Vorstellung bereits belegt ist", HttpStatus.OK);
+		}else{
 
-        } else {
-            sitz.setSpalte(5);
-            sitz.setReihe(5);
-            sitz.setPreisschluessel(new BigDecimal(5));
-            sitz.setBarriereFrei(true);
-            Kinosaal kinosaal = new Kinosaal();
-            //kinosaal.setAnzahlSitze(25);  Ergibt sich aus reihe und spalte
-            kinosaal.setReihe(5);
-            kinosaal.setSpalte(5);
-            kinosaalRepository.save(kinosaal);
-            sitz.setKinosaalId(kinosaal.getId());
-            sitzRepository.save(sitz);
-            ticket.setSitz(sitz);
-            System.out.println("Kein Sitz gefunden");
-        }
-
-        Optional<Vorstellung> vorstellungOptional = vorstellungRepository.findById((int) vorstellung_id);
-        if (vorstellungOptional.isPresent()) {
-            vorstellung = vorstellungOptional.get();
-            ticket.setVorstellung(vorstellung);
-        } else {
-            System.out.println("Keine Vorstellung gefunden");
-        }
-
-        Optional<Benutzer> kaeuferOptional = benutzerRepository.findById((int) kaeufer_id);
-        if (kaeuferOptional.isPresent()) {
-            kaeufer = kaeuferOptional.get();
-            ticket.setKaeufer(kaeufer);
-        } else {
-            System.out.println("Keine Kaeufer gefunden");
-        }
-
-
-        ticketRepository.save(ticket);
-
-        return new ResponseEntity<>("Ticket wurde gespeichert, der Besteller entspricht dem Gast", HttpStatus.OK);
+			Ticket ticket = new Ticket();
+			Sitz sitz = new Sitz();
+			Vorstellung vorstellung = new Vorstellung();
+			Benutzer kaeufer = new Benutzer();
+	
+			Optional<Sitz> sitzOptional = sitzRepository.findById((int) sitz_id);
+			if (sitzOptional.isPresent()) {
+				sitz = sitzOptional.get();
+				ticket.setSitz(sitz);
+	
+			} else {
+				sitz.setSpalte(5);
+				sitz.setReihe(5);
+				sitz.setPreisschluessel(new BigDecimal(5));
+				sitz.setBarriereFrei(true);
+				Kinosaal kinosaal = new Kinosaal();
+				//kinosaal.setAnzahlSitze(25);  Ergibt sich aus reihe und spalte
+				kinosaal.setReihe(5);
+				kinosaal.setSpalte(5);
+				kinosaalRepository.save(kinosaal);
+				sitz.setKinosaalId(kinosaal.getId());
+				sitzRepository.save(sitz);
+				ticket.setSitz(sitz);
+				System.out.println("Kein Sitz gefunden");
+			}
+	
+			Optional<Vorstellung> vorstellungOptional = vorstellungRepository.findById((int) vorstellung_id);
+			if (vorstellungOptional.isPresent()) {
+				vorstellung = vorstellungOptional.get();
+				ticket.setVorstellung(vorstellung);
+			} else {
+				System.out.println("Keine Vorstellung gefunden");
+			}
+	
+			Optional<Benutzer> kaeuferOptional = benutzerRepository.findById((int) kaeufer_id);
+			if (kaeuferOptional.isPresent()) {
+				kaeufer = kaeuferOptional.get();
+				ticket.setKaeufer(kaeufer);
+			} else {
+				System.out.println("Keine Kaeufer gefunden");
+			}
+	
+	
+			ticketRepository.save(ticket);
+	
+			mutex.release();
+			return new ResponseEntity<>("Ticket wurde gespeichert, der Besteller entspricht dem Gast", HttpStatus.OK);
+		}
     }
 
 	@RequestMapping(value = "/ticket/sitz/{sitz_id}/vorstellung/{vorstellung_id}/benutzer/{benutzer_id}/gast/{gast_id)", produces = "application/json", method = POST)
 	public ResponseEntity<Object> setTicketMitGast(@PathVariable(value = "sitz_id") long sitz_id,
 											@PathVariable(value = "vorstellung_id") long vorstellung_id,
 											@PathVariable(value = "benutzer_id") long kaeufer_id,
-											@PathVariable(value = "gast_id") long gast_id) {
+											@PathVariable(value = "gast_id") long gast_id) 
+										
+		{
+		try{
+			mutex.acquire();
+		}catch(InterruptedException e){e.printStackTrace();}			
+		
+		if(ticketExistiertBereits(sitz_id, vorstellung_id)){
+			mutex.release();
+			return new ResponseEntity<>("Ticket wurde nicht gespeichert, da der Sitz in dieser Vorstellung bereits belegt ist", HttpStatus.OK);
+		}else{
 
-        Ticket ticket = new Ticket();
-        Sitz sitz = new Sitz();
-		Vorstellung vorstellung = new Vorstellung();
-		Benutzer kaeufer = new Benutzer();
-		Benutzer gast = new Benutzer();
-
-		Optional<Sitz> sitzOptional = sitzRepository.findById((int) sitz_id);
-		if (sitzOptional.isPresent()) {
-			sitz = sitzOptional.get();
-            ticket.setSitz(sitz);
-        } else {
-			System.out.println("Kein Sitz gefunden");
+			Ticket ticket = new Ticket();
+			Sitz sitz = new Sitz();
+			Vorstellung vorstellung = new Vorstellung();
+			Benutzer kaeufer = new Benutzer();
+			Benutzer gast = new Benutzer();
+	
+			Optional<Sitz> sitzOptional = sitzRepository.findById((int) sitz_id);
+			if (sitzOptional.isPresent()) {
+				sitz = sitzOptional.get();
+				ticket.setSitz(sitz);
+			} else {
+				System.out.println("Kein Sitz gefunden");
+			}
+	
+			Optional<Vorstellung> vorstellungOptional = vorstellungRepository.findById((int) vorstellung_id);
+			if (vorstellungOptional.isPresent()) {
+				vorstellung = vorstellungOptional.get();
+				ticket.setVorstellung(vorstellung);
+			} else {
+				System.out.println("Keine Vorstellung gefunden");
+			}
+	
+			Optional<Benutzer> kaeuferOptional = benutzerRepository.findById((int) kaeufer_id);
+			if (kaeuferOptional.isPresent()) {
+				kaeufer = kaeuferOptional.get();
+				ticket.setKaeufer(kaeufer);
+			} else {
+				System.out.println("Keine Kaeufer gefunden");
+			}
+	
+			Optional<Benutzer> gastOptional = benutzerRepository.findById((int) gast_id);
+			if (gastOptional.isPresent()) {
+				gast = gastOptional.get();
+				ticket.setGast(gast);
+			} else {
+				System.out.println("Kein Gast gefunden");
+			}
+	
+			ticketRepository.save(ticket);
+	
+			mutex.release();
+			return new ResponseEntity<>("Ticket wurde gespeichert, der Besteller entspricht NICHT dem Gast", HttpStatus.OK);
 		}
-
-		Optional<Vorstellung> vorstellungOptional = vorstellungRepository.findById((int) vorstellung_id);
-		if (vorstellungOptional.isPresent()) {
-			vorstellung = vorstellungOptional.get();
-            ticket.setVorstellung(vorstellung);
-        } else {
-			System.out.println("Keine Vorstellung gefunden");
-		}
-
-		Optional<Benutzer> kaeuferOptional = benutzerRepository.findById((int) kaeufer_id);
-		if (kaeuferOptional.isPresent()) {
-			kaeufer = kaeuferOptional.get();
-            ticket.setKaeufer(kaeufer);
-        } else {
-			System.out.println("Keine Kaeufer gefunden");
-		}
-
-		Optional<Benutzer> gastOptional = benutzerRepository.findById((int) gast_id);
-		if (gastOptional.isPresent()) {
-			gast = gastOptional.get();
-            ticket.setGast(gast);
-        } else {
-			System.out.println("Kein Gast gefunden");
-		}
-
-		ticketRepository.save(ticket);
-
-		return new ResponseEntity<>("Ticket wurde gespeichert, der Besteller entspricht NICHT dem Gast", HttpStatus.OK);
 	}
 
 	/*protected HttpResponse<JsonNode> queryServer() throws UnirestException {
@@ -462,7 +525,8 @@ public class HelloWorldApplication {
 	}*/
 
     public static void main(String[] args) {
-        //SpringApplication.run(HelloWorldApplication.class, args);
+		//SpringApplication.run(HelloWorldApplication.class, args);
+		mutex = new Semaphore(1, true);
         SpringApplication app = new SpringApplication(HelloWorldApplication.class);
         app.setDefaultProperties(Collections.singletonMap("server.port", "8081"));
         //test
