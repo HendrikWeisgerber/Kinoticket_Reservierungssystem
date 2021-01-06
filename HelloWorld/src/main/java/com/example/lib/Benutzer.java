@@ -6,6 +6,7 @@ import javax.persistence.*;
 
 import com.example.lib.Enum.Preiskategorie;
 import com.example.lib.Enum.Rechte;
+import com.example.lib.Enum.Zone;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -29,9 +30,9 @@ public class Benutzer {
     private Boolean newsletter;
     private Rechte rechte;
     private Preiskategorie preiskategorie;
-    
+    private Zone lieblingszone;
+
     //private Zahlungsmethode zahlungsmethode;
-    //private Zone lieblingszone;
     
     public Benutzer(String vorname, String nachname, String username, int id, int alter, String email,
     String passwortHash, Warenkorb warenkorb, Film[] wunschliste, Boolean newsletter) {
@@ -47,6 +48,7 @@ public class Benutzer {
         this.newsletter = newsletter;
         this.preiskategorie = Preiskategorie.ERWACHSENER;
         this.rechte = Rechte.USER;
+        this.lieblingszone = Zone.MITTE_MITTE;
     }
     
     public Benutzer(String vorname, String nachname, String username, int id, int alter, String email,
@@ -63,6 +65,7 @@ public class Benutzer {
         this.newsletter = newsletter;
         this.preiskategorie = preiskategorie;
         this.rechte = Rechte.USER;
+        this.lieblingszone = Zone.MITTE_MITTE;
         
     }
     
@@ -80,6 +83,24 @@ public class Benutzer {
         this.newsletter = newsletter;
         this.preiskategorie = preiskategorie;
         this.rechte = rechte;
+        this.lieblingszone = Zone.MITTE_MITTE;
+    }
+
+    public Benutzer(String vorname, String nachname, String username, int id, int alter, String email,
+    String passwortHash, Warenkorb warenkorb, Film[] wunschliste, Boolean newsletter, Preiskategorie preiskategorie, Rechte rechte, Zone zone) {
+        this.vorname = vorname;
+        this.nachname = nachname;
+        this.username = username;
+        this.id = id;
+        this.alter = alter;
+        this.email = email;
+        this.passwortHash = passwortHash;
+        this.warenkorb = warenkorb;
+        this.wunschliste = wunschliste;
+        this.newsletter = newsletter;
+        this.preiskategorie = preiskategorie;
+        this.rechte = rechte;
+        this.lieblingszone = zone;
     }
     
     public Benutzer(String vorname, String nachname, String username, int id, int alter, String email,
@@ -93,13 +114,16 @@ public class Benutzer {
         this.passwortHash = passwortHash;
         this.warenkorb = warenkorb;
         this.newsletter = newsletter;
+        this.wunschliste = new Film[0];
+        this.preiskategorie = Preiskategorie.ERWACHSENER;
+        this.rechte = Rechte.USER;
+        this.lieblingszone = Zone.MITTE_MITTE;
     }
     
     @Autowired
     public Benutzer() {
         
     }
-    
     
     public String getVorname() {
         return this.vorname;
@@ -206,6 +230,14 @@ public class Benutzer {
     
     public void setRechte(Rechte rechte) {
         this.rechte = rechte;
+    }
+
+    public Zone getLieblingszone() {
+        return this.lieblingszone;
+    }
+
+    public void setLieblingszone(Zone lieblingszone) {
+        this.lieblingszone = lieblingszone;
     }
     
     public BigDecimal getPreisSchluessel(){
