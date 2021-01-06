@@ -2,6 +2,7 @@ package com.example.lib;
 
 import javax.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Entity
@@ -16,6 +17,7 @@ public class Benutzer {
     private int alter;
     private String email;
     private String passwortHash;
+    @JsonManagedReference
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "warenkorb_id", referencedColumnName = "id")
     private Warenkorb warenkorb;
