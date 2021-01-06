@@ -23,12 +23,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-
 import java.util.*;
 
 import com.example.lib.Film;
 import com.example.lib.Kinosaal;
 import com.example.lib.Sitz;
+import com.example.lib.Enum.Genre;
 import com.example.lib.Repositories.*;
 
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
@@ -84,8 +84,8 @@ public class HelloWorldApplication {
         Vorstellung testVor = new Vorstellung(date1, new BigDecimal(8), true);
 		Vorstellung testVor2 = new Vorstellung(date2, new BigDecimal(9), true);
 		Vorstellung testVor3 = new Vorstellung(date3, new BigDecimal(9), true);
-        Film filmT = new Film("Star Wars", "Bild", "Das ist ein neuer Film", 9, 140, 12, true, "Sci-Fi");
-		Film filmT2 = new Film("Harry Potter", "Bild", "Das ist ein noch neuerer Film", 8, 150, 12, true, "Fantasy");
+        Film filmT = new Film("Star Wars", "Bild", "Das ist ein neuer Film", 9, 140, 12, true, Genre.SCI_FI);
+		Film filmT2 = new Film("Harry Potter", "Bild", "Das ist ein noch neuerer Film", 8, 150, 12, true, Genre.FANTASY);
 		Kinosaal saalT = new Kinosaal(50,5,10);
 
         filmRepository.save(filmT);
@@ -339,7 +339,7 @@ public class HelloWorldApplication {
 		testB.setWarenkorb(new Warenkorb());
 
 		//testB.setNewsletter(false);
-		//testB.derWunschlisteHinzufuegen(new Film("Star Wars", "hier ist das Bild", "das passiert", 10, 200, 12, true, "Sci-Fi"));
+		//testB.derWunschlisteHinzufuegen(new Film("Star Wars", "hier ist das Bild", "das passiert", 10, 200, 12, true, Genre.SCI_FI));
 
 		benutzerRepository.save(testB);
 
