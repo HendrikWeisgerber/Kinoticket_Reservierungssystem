@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import javax.persistence.*;
 
 import com.example.lib.Enum.Preiskategorie;
+import com.example.lib.Enum.Rechte;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -26,12 +27,12 @@ public class Benutzer {
     @Transient
     private Film[] wunschliste;
     private Boolean newsletter;
-    //private Rechte rechte;
+    private Rechte rechte;
     private Preiskategorie preiskategorie;
-
+    
     //private Zahlungsmethode zahlungsmethode;
     //private Zone lieblingszone;
-
+    
     public Benutzer(String vorname, String nachname, String username, int id, int alter, String email,
     String passwortHash, Warenkorb warenkorb, Film[] wunschliste, Boolean newsletter) {
         this.vorname = vorname;
@@ -45,8 +46,9 @@ public class Benutzer {
         this.wunschliste = wunschliste;
         this.newsletter = newsletter;
         this.preiskategorie = Preiskategorie.ERWACHSENER;
+        this.rechte = Rechte.USER;
     }
-
+    
     public Benutzer(String vorname, String nachname, String username, int id, int alter, String email,
     String passwortHash, Warenkorb warenkorb, Film[] wunschliste, Boolean newsletter, Preiskategorie preiskategorie) {
         this.vorname = vorname;
@@ -60,8 +62,26 @@ public class Benutzer {
         this.wunschliste = wunschliste;
         this.newsletter = newsletter;
         this.preiskategorie = preiskategorie;
+        this.rechte = Rechte.USER;
+        
     }
-
+    
+    public Benutzer(String vorname, String nachname, String username, int id, int alter, String email,
+    String passwortHash, Warenkorb warenkorb, Film[] wunschliste, Boolean newsletter, Preiskategorie preiskategorie, Rechte rechte) {
+        this.vorname = vorname;
+        this.nachname = nachname;
+        this.username = username;
+        this.id = id;
+        this.alter = alter;
+        this.email = email;
+        this.passwortHash = passwortHash;
+        this.warenkorb = warenkorb;
+        this.wunschliste = wunschliste;
+        this.newsletter = newsletter;
+        this.preiskategorie = preiskategorie;
+        this.rechte = rechte;
+    }
+    
     public Benutzer(String vorname, String nachname, String username, int id, int alter, String email,
     String passwortHash, Warenkorb warenkorb, Boolean newsletter) {
         this.vorname = vorname;
@@ -180,23 +200,31 @@ public class Benutzer {
         this.preiskategorie = preiskategorie;
     }
 
+    public Rechte getRechte() {
+        return this.rechte;
+    }
+    
+    public void setRechte(Rechte rechte) {
+        this.rechte = rechte;
+    }
+    
     public BigDecimal getPreisSchluessel(){
         switch (this.preiskategorie){
             case STUDIEREND:
-                return new BigDecimal(0.8);
+            return new BigDecimal(0.8);
             case KIND:
-                return new BigDecimal(0.6);
+            return new BigDecimal(0.6);
             case SENIOR:
-                return new BigDecimal(0.7);
+            return new BigDecimal(0.7);
             case MENSCH_MIT_BEHINDERUNG:
-                return new BigDecimal(0.5);
+            return new BigDecimal(0.5);
             case BEGLEITPERSON:
-                return new BigDecimal(0);
+            return new BigDecimal(0);
             default:
-                return new BigDecimal(1.0);
+            return new BigDecimal(1.0);
         }
     }
-
+    
     public boolean istRichtigesPasswort(String passwort){
         return ((Integer)passwort.hashCode()).toString().equals(passwortHash) ;
     }

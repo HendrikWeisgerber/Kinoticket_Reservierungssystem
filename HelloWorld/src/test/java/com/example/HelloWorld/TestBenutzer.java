@@ -4,6 +4,9 @@ import com.example.lib.Benutzer;
 import com.example.lib.Film;
 import com.example.lib.Ticket;
 import com.example.lib.Warenkorb;
+import com.example.lib.Enum.Genre;
+
+import com.example.lib.Enum.Genre;
 
 import org.assertj.core.internal.bytebuddy.utility.RandomString;
 import org.junit.jupiter.api.*;
@@ -17,7 +20,7 @@ public class TestBenutzer {
     static void setUpAll(){
         Warenkorb warenkorb = new Warenkorb(benutzer, new Ticket[0]);
         Film[] wunschliste = new Film[1];
-        Film film = new Film("Star Wars", "Bild", "Das ist ein neuer Film", 9, 140, 12, true, "Sci-Fi");
+        Film film = new Film("Star Wars", "Bild", "Das ist ein neuer Film", 9, 140, 12, true, Genre.SCI_FI);
         wunschliste[0] = film;
         passwort = ((Integer)(int)(Math.random() * 100000000)).toString();
         benutzer = new Benutzer("Kurt C.", "Hose", "KurtCeHose", 1, 14, "kurtCHose@gmail.com", ((Integer)passwort.hashCode()).toString(), warenkorb, wunschliste, true);
@@ -30,7 +33,7 @@ public class TestBenutzer {
         int alteLaenge = benutzer.getWunschliste().length;
         
         Film[] alteWunschliste = benutzer.getWunschliste();
-        Film film = new Film("Harry Potter", "Bild", "Das ist ein noch neuerer Film", 8, 150, 12, true, "Fantasy");
+        Film film = new Film("Harry Potter", "Bild", "Das ist ein noch neuerer Film", 8, 150, 12, true, Genre.FANTASY);
         benutzer.derWunschlisteHinzufuegen(film);
 
         Assertions.assertEquals((alteLaenge + 1) , benutzer.getWunschliste().length);

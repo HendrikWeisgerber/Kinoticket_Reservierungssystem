@@ -11,6 +11,7 @@ import com.example.lib.Sitz;
 import com.example.lib.Ticket;
 import com.example.lib.Vorstellung;
 import com.example.lib.Warenkorb;
+import com.example.lib.Enum.Genre;
 
 import org.junit.jupiter.api.*;
 
@@ -23,7 +24,7 @@ public class TestBestellung {
         Benutzer benutzer = new Benutzer();
         Warenkorb warenkorb = new Warenkorb(benutzer, new Ticket[0]);
         Film[] wunschliste = new Film[1];
-        Film film = new Film("Star Wars", "Bild", "Das ist ein neuer Film", 9, 140, 12, true, "Sci-Fi");
+        Film film = new Film("Star Wars", "Bild", "Das ist ein neuer Film", 9, 140, 12, true, Genre.SCI_FI);
         wunschliste[0] = film;
         String passwort = ((Integer)(int)(Math.random() * 100000000)).toString();
         benutzer = new Benutzer("Kurt C.", "Hose", "KurtCeHose", 1, 14, "kurtCHose@gmail.com", ((Integer)passwort.hashCode()).toString(), warenkorb, wunschliste, true);
@@ -54,7 +55,7 @@ public class TestBestellung {
         Benutzer benutzer = new Benutzer();
         Warenkorb warenkorb = new Warenkorb(benutzer, new Ticket[0]);
         Film[] wunschliste = new Film[1];
-        Film film = new Film("Star Wars", "Bild", "Das ist ein neuer Film", 9, 140, 12, true, "Sci-Fi");
+        Film film = new Film("Star Wars", "Bild", "Das ist ein neuer Film", 9, 140, 12, true, Genre.SCI_FI);
         wunschliste[0] = film;
         String passwort = ((Integer)(int)(Math.random() * 100000000)).toString();
         benutzer = new Benutzer("Kurt C.", "Hose", "KurtCeHose", 1, 14, "kurtCHose@gmail.com", ((Integer)passwort.hashCode()).toString(), warenkorb, wunschliste, true);
