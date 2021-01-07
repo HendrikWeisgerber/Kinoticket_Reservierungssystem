@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 
 @Entity
@@ -150,6 +151,18 @@ public class Ticket {
         this.bezahlt = bezahlt;
         this.istValide = istValide;
         this.kaufdatum = kaufdatum;
+    }
+
+    public BigDecimal getPreis(){
+        BigDecimal preis = new BigDecimal(0.0);
+        if(this.vorstellung.getGrundpreis() != null){
+            preis.add(this.vorstellung.getGrundpreis());
+        }
+        if(this.gast != null){
+            preis.multiply(this.gast.getPreisSchluessel());
+        }
+        preis.setScale(2, RoundingMode.HALF_UP);
+        return preis;
     }
 
 }
