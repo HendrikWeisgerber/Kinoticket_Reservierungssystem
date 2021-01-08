@@ -12,98 +12,41 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
-
-import java.net.http.HttpResponse;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Optional;
 
-import java.util.concurrent.Semaphore;
-
-import java.util.*;
-
-import com.example.lib.Film;
-import com.example.lib.Kinosaal;
-import com.example.lib.Sitz;
-import com.example.lib.Enum.Genre;
-import com.example.lib.Repositories.*;
-
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 @CrossOrigin(origins = "*")
-/*import com.mashape.unirest.http.JsonNode;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;*/
-
 @SpringBootApplication
 @RestController
 public class HelloWorldApplication {
     @Autowired
-    public SitzRepository sitzRepository;
-	@Autowired
-	public SitzRepository sitzRepository;
+    private SitzRepository sitzRepository;
 
     @Autowired
     private TicketRepository ticketRepository;
-	@Autowired
-	public TicketRepository ticketRepository;
 
-	@Autowired 
-	public BenutzerRepository benutzerRepository;
+    @Autowired
+    BenutzerRepository benutzerRepository;
 
-	@Autowired 
-	public WarenkorbRepository warenkorbRepository;
+    @Autowired
+    WarenkorbRepository warenkorbRepository;
 
-	@Autowired
-	public VorstellungRepository vorstellungRepository;
+    @Autowired
+    VorstellungRepository vorstellungRepository;
 
-	@Autowired
-	public BestellungRepository bestellungRepository;
+    @Autowired
+    BestellungRepository bestellungRepository;
 
-	@Autowired
-	public FilmRepository filmRepository;
+    @Autowired
+    FilmRepository filmRepository;
 
-	@Autowired
-	public KinosaalRepository kinosaalRepository;
-
-	private static Semaphore mutex;
-
-	private boolean ticketExistiertBereits(long sitz_id, long vorstellung_id){
-		Optional<Sitz> oSitz = sitzRepository.findById((int)sitz_id);
-		Optional<Vorstellung> oVorstellung = vorstellungRepository.findById((int)vorstellung_id);
-
-		Sitz sitz;
-		Vorstellung vorstellung;
-
-		if(oSitz == null) return false;
-		if(oVorstellung == null) return false;
-
-		vorstellung = oVorstellung.get();
-		sitz = oSitz.get();
-
-		Ticket[] ticketsMitSitz, ticketsMitVorstellung;
-		ticketsMitSitz = ticketRepository.findBySitz(sitz);
-		ticketsMitVorstellung = ticketRepository.findByVorstellung(vorstellung);
-
-		if(ticketsMitSitz.length == 0 || ticketsMitVorstellung.length == 0){
-			return false;
-		}
-
-		for(Ticket ticketMitSitz : ticketsMitSitz){
-			for(Ticket ticketMitVorstellung : ticketsMitVorstellung){
-				if(ticketMitSitz.getVorstellung() == ticketMitVorstellung.getVorstellung()
-				   && ticketMitSitz.getSitz() == ticketMitVorstellung.getSitz()
-				   && ticketMitSitz.getIstValide()
-				   && ticketMitVorstellung.getIstValide()){
-					return true;
-				}
-			}
-		}
-		return false;
-
-	}
+    @Autowired
+    KinosaalRepository kinosaalRepository;
 
     @RequestMapping(value = "/reset", produces = "application/json")
     public ResponseEntity<Object> home() throws ParseException {
@@ -123,25 +66,22 @@ public class HelloWorldApplication {
         Date date3 = sdf.parse("2020-12-26 21:30:00.000");
 
         Vorstellung testVor = new Vorstellung(date1, new BigDecimal(8), true);
-		Vorstellung testVor2 = new Vorstellung(date2, new BigDecimal(9), true);
-		Vorstellung testVor3 = new Vorstellung(date3, new BigDecimal(9), true);
-        Film filmT = new Film("Star Wars", "Bild", "Das ist ein neuer Film", 9, 140, 12, true, Genre.SCI_FI);
-		Film filmT2 = new Film("Harry Potter", "Bild", "Das ist ein noch neuerer Film", 8, 150, 12, true, Genre.FANTASY);
-		Kinosaal saalT = new Kinosaal(50,5,10);
+        Vorstellung testVor2 = new Vorstellung(date2, new BigDecimal(9), true);
+        Vorstellung testVor3 = new Vorstellung(date3, new BigDecimal(9), true);
+        Film filmT = new Film("Star Wars", "Bild", "Das ist ein neuer Film", 9, 140, 12, true, "Sci-Fi");
+        Film filmT2 = new Film("Harry Potter", "Bild", "Das ist ein noch neuerer Film", 8, 150, 12, true, "Fantasy");
+        Kinosaal saalT = new Kinosaal(50, 5, 10);
 
         filmRepository.save(filmT);
         filmRepository.save(filmT2);
-		kinosaalRepository.save(saalT);
-
-		int saalId;
-		saalId = saalT.getId();
-		for(int i= 1; i < 3; i++) {
-			for(int k=1; k < 3; k++) {
-				Sitz sitz = new Sitz(i ,k , false, new BigDecimal(1));
-				sitz.setKinosaalId(saalId);
-				sitzRepository.save(sitz);
-			}
-		}
+        kinosaalRepository.save(saalT);
+        for (int i = 1; i < 3; i++) {
+            for (int k = 1; k < 3; k++) {
+                Sitz sitz = new Sitz(i, k, false, new BigDecimal(1));
+                sitz.setKinosaalId(saalT.getId());
+                sitzRepository.save(sitz);
+            }
+        }
         testVor.setFilmId(filmT.getId());
         testVor.setSaal(saalT);
         testVor2.setFilmId(filmT.getId());
@@ -385,8 +325,8 @@ public class HelloWorldApplication {
         testB.setPasswortHash("KFIWN");
         testB.setWarenkorb(new Warenkorb());
 
-		//testB.setNewsletter(false);
-		//testB.derWunschlisteHinzufuegen(new Film("Star Wars", "hier ist das Bild", "das passiert", 10, 200, 12, true, Genre.SCI_FI));
+        //testB.setNewsletter(false);
+        //testB.derWunschlisteHinzufuegen(new Film("Star Wars", "hier ist das Bild", "das passiert", 10, 200, 12, true, "Sci-Fi"));
 
         benutzerRepository.save(testB);
 
@@ -509,10 +449,10 @@ public class HelloWorldApplication {
 
     @RequestMapping(value = "/insert/vorstellung/film/{film_id}/kinosaal/{kinosaal_id}/startzeit/{startzeit}/grundpreis/{grundpreis}/aktiv/{aktiv]", produces = "application/json", method = POST)
     public ResponseEntity<Object> setVorstellung(@PathVariable(value = "kinosaal_id") long kinosaal_id,
-                                                @PathVariable(value = "film_id") long film_id,
-                                                @PathVariable(value = "startzeit") @DateTimeFormat(pattern = "MMddyyyyHHmm") Date startzeit,
-                                                @PathVariable(value = "grundpreis") BigDecimal grundpreis,
-                                                @PathVariable(value = "aktiv") long aktiv) {
+                                                 @PathVariable(value = "film_id") long film_id,
+                                                 @PathVariable(value = "startzeit") @DateTimeFormat(pattern = "MMddyyyyHHmm") Date startzeit,
+                                                 @PathVariable(value = "grundpreis") BigDecimal grundpreis,
+                                                 @PathVariable(value = "aktiv") long aktiv) {
 
         Optional<Kinosaal> kinosaal = kinosaalRepository.findById((int)kinosaal_id);
         Optional<Film> film = filmRepository.findById((int)film_id);
@@ -599,62 +539,5 @@ public class HelloWorldApplication {
             return new ResponseEntity<>("Kein Kaeufer gefunden", HttpStatus.OK);
         }
         return new ResponseEntity<>(ticket, HttpStatus.OK);
-    }
-
-	@RequestMapping(value = "/ticket/sitz/{sitz_id}/vorstellung/{vorstellung_id}/benutzer/{benutzer_id}/gast/{gast_id)", produces = "application/json", method = POST)
-	public ResponseEntity<Object> setTicketMitGast(@PathVariable(value = "sitz_id") long sitz_id,
-											@PathVariable(value = "vorstellung_id") long vorstellung_id,
-											@PathVariable(value = "benutzer_id") long kaeufer_id,
-											@PathVariable(value = "gast_id") long gast_id) {
-
-        Ticket ticket = new Ticket();
-        Sitz sitz = new Sitz();
-		Vorstellung vorstellung = new Vorstellung();
-		Benutzer kaeufer = new Benutzer();
-		Benutzer gast = new Benutzer();
-
-		Optional<Sitz> sitzOptional = sitzRepository.findById((int) sitz_id);
-		if (sitzOptional.isPresent()) {
-			sitz = sitzOptional.get();
-            ticket.setSitz(sitz);
-        } else {
-			System.out.println("Kein Sitz gefunden");
-		}
-
-		Optional<Vorstellung> vorstellungOptional = vorstellungRepository.findById((int) vorstellung_id);
-		if (vorstellungOptional.isPresent()) {
-			vorstellung = vorstellungOptional.get();
-            ticket.setVorstellung(vorstellung);
-        } else {
-			System.out.println("Keine Vorstellung gefunden");
-		}
-
-		Optional<Benutzer> kaeuferOptional = benutzerRepository.findById((int) kaeufer_id);
-		if (kaeuferOptional.isPresent()) {
-			kaeufer = kaeuferOptional.get();
-            ticket.setKaeufer(kaeufer);
-        } else {
-			System.out.println("Keine Kaeufer gefunden");
-		}
-
-		Optional<Benutzer> gastOptional = benutzerRepository.findById((int) gast_id);
-		if (gastOptional.isPresent()) {
-			gast = gastOptional.get();
-            ticket.setGast(gast);
-        } else {
-			System.out.println("Kein Gast gefunden");
-		}
-
-		ticketRepository.save(ticket);
-
-		return new ResponseEntity<>("Ticket wurde gespeichert, der Besteller entspricht NICHT dem Gast", HttpStatus.OK);
-	}
-
-    public static void main(String[] args) {
-        //SpringApplication.run(HelloWorldApplication.class, args);
-        SpringApplication app = new SpringApplication(HelloWorldApplication.class);
-        app.setDefaultProperties(Collections.singletonMap("server.port", "8081"));
-        app.run(args);
-
     }
 }
