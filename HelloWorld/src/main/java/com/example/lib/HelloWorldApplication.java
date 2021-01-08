@@ -430,7 +430,7 @@ public class HelloWorldApplication {
     }
 
     //Mit body
-    @RequestMapping(value = "/vorstellung/", produces = "application/json", method = POST)
+    @RequestMapping(value = "/insert/vorstellung", produces = "application/json", method = POST)
     public ResponseEntity<Object> setVorstellung(@RequestBody(required = true) Vorstellung vorstellung) {
         Optional<Kinosaal> kinosaal = kinosaalRepository.findById(vorstellung.getSaal().getId());
         Optional<Film> film = filmRepository.findById(vorstellung.getFilmId());
@@ -447,7 +447,7 @@ public class HelloWorldApplication {
         return new ResponseEntity<Object>(response, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/vorstellung/film/{film_id}/kinosaal/{kinosaal_id}/startzeit/{startzeit}/grundpreis/{grundpreis}/aktiv/{aktiv]", produces = "application/json", method = POST)
+    @RequestMapping(value = "/insert/vorstellung/film/{film_id}/kinosaal/{kinosaal_id}/startzeit/{startzeit}/grundpreis/{grundpreis}/aktiv/{aktiv]", produces = "application/json", method = POST)
     public ResponseEntity<Object> setVorstellung(@PathVariable(value = "kinosaal_id") long kinosaal_id,
                                                 @PathVariable(value = "film_id") long film_id,
                                                 @PathVariable(value = "startzeit") @DateTimeFormat(pattern = "MMddyyyyHHmm") Date startzeit,
