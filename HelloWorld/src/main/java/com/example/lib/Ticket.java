@@ -15,6 +15,7 @@ public class Ticket {
     @ManyToOne
     @JoinColumn(name = "sitz_id", referencedColumnName = "id")
     private Sitz sitz;
+    private double preis;
     @ManyToOne
     @JoinColumn(name = "vorstellung_id", referencedColumnName = "id")
     private Vorstellung vorstellung;
@@ -124,6 +125,12 @@ public class Ticket {
         this.kaufdatum = kaufdatum;
     }
 
+    
+    public double getPreis() {
+        this.updatePreis();
+        return this.preis;
+    }
+
     public void inDenWarenkorb(){
         //TODO rethink this this.kaeufer.getWarenkorb().getTicket().append(this);
     }
@@ -151,18 +158,19 @@ public class Ticket {
         this.bezahlt = bezahlt;
         this.istValide = istValide;
         this.kaufdatum = kaufdatum;
+        this.updatePreis();
     }
 
-    public BigDecimal getPreis(){
-        BigDecimal preis = new BigDecimal(0.0);
+    public void updatePreis(){
+        BigDecimal neuerPreis = new BigDecimal(0.0);
         if(this.vorstellung.getGrundpreis() != null){
-            preis.add(this.vorstellung.getGrundpreis());
+            neuerPreis = neuerPreis.add(this.vorstellung.getGrundpreis());
         }
         if(this.gast != null){
-            preis.multiply(this.gast.getPreisSchluessel());
+            neuerPreis = neuerPreis.multiply(this.gast.getPreisSchluessel());
         }
-        preis.setScale(2, RoundingMode.HALF_UP);
-        return preis;
+        neuerPreis.setScale(2, RoundingMode.HALF_UP);
+        this.preis = neuerPreis.doubleValue();
     }
 
 }
