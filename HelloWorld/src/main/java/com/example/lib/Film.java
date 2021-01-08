@@ -6,6 +6,8 @@ import java.util.ArrayList;
 
 import javax.persistence.*;
 
+import com.example.lib.Enum.Genre;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
@@ -25,7 +27,8 @@ public class Film {
     private int mindestAlter;
     private boolean aktiv;
 //TODO Genre enum statt string
-    private String genre;
+    //private String genre;
+    private Genre genre;
     @Transient
     private ArrayList<Vorstellung> vorstellung;
 
@@ -101,13 +104,13 @@ public class Film {
         this.vorstellung = new ArrayList<Vorstellung>();
     }
 
-    public String getGenre() {
+    public Genre getGenre() {
         return this.genre;
     }
 
     @Autowired
     public Film(String name, String bild, String beschreibung, int bewertung, int laenge, int mindestAlter,
-            boolean aktiv, String genre) {
+            boolean aktiv, Genre genre) {
         this.name = name;
         this.bild = bild;
         this.beschreibung = beschreibung;

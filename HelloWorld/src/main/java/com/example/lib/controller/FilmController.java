@@ -14,12 +14,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Optional;
 
 @CrossOrigin(origins = "*")
+import static org.springframework.web.bind.annotation.RequestMethod.POST;
+
 @RestController
 @RequestMapping("/film")
 public class FilmController {
@@ -93,5 +96,13 @@ public class FilmController {
         }
 
         return new ResponseEntity<Object>(film, HttpStatus.OK);
+    }
+
+    @RequestMapping(value= "/", produces ="application/json", method = POST)
+    public ResponseEntity<Object> postNewFilm(@RequestBody Film film){
+        //Film film = new Film();
+        //film = (Film) object;
+        filmRepository.save(film);
+        return new ResponseEntity<>("Der Film wurde hinzugefügt!", HttpStatus.OK);
     }
 }

@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 
 @Entity
@@ -14,6 +15,7 @@ public class Ticket {
     @ManyToOne
     @JoinColumn(name = "sitz_id", referencedColumnName = "id")
     private Sitz sitz;
+    private double preis;
     @ManyToOne
     @JoinColumn(name = "vorstellung_id", referencedColumnName = "id")
     private Vorstellung vorstellung;
@@ -123,6 +125,12 @@ public class Ticket {
         this.kaufdatum = kaufdatum;
     }
 
+    
+    public double getPreis() {
+        this.updatePreis();
+        return this.preis;
+    }
+
     public void inDenWarenkorb(){
         //TODO rethink this this.kaeufer.getWarenkorb().getTicket().append(this);
     }
@@ -150,6 +158,19 @@ public class Ticket {
         this.bezahlt = bezahlt;
         this.istValide = istValide;
         this.kaufdatum = kaufdatum;
+        this.updatePreis();
+    }
+
+    public void updatePreis(){
+        BigDecimal neuerPreis = new BigDecimal(0.0);
+        if(this.vorstellung.getGrundpreis() != null){
+            neuerPreis = neuerPreis.add(this.vorstellung.getGrundpreis());
+        }
+        if(this.gast != null){
+            neuerPreis = neuerPreis.multiply(this.gast.getPreisSchluessel());
+        }
+        neuerPreis.setScale(2, RoundingMode.HALF_UP);
+        this.preis = neuerPreis.doubleValue();
     }
 
 }

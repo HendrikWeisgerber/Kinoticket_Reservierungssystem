@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 @Entity
 public class Kinosaal {
-    private int anzahlSitze;
+    //private int anzahlSitze;
     private int spalte;
     private int reihe;
     @Id
@@ -20,13 +20,19 @@ public class Kinosaal {
     private ArrayList<Film> meineFilme;
     @Transient
     private ArrayList<Vorstellung> meineVorstellungen;
-
+    
     @Autowired
-    public Kinosaal(int anzahlSitze, int spalte, int reihe) {
-        this.anzahlSitze = anzahlSitze;
+    public Kinosaal(int spalte, int reihe){
         this.spalte = spalte;
         this.reihe = reihe;
     }
+
+    @Autowired
+    public Kinosaal(int anzahlSitze, int spalte, int reihe) {
+        //this.anzahlSitze = anzahlSitze;
+        this(spalte, reihe);
+    }
+
 
     @Autowired
     public Kinosaal() {
@@ -34,12 +40,12 @@ public class Kinosaal {
     }
 
     public int getAnzahlSitze() {
-        return anzahlSitze;
+        return spalte * reihe;
     }
 
-    public void setAnzahlSitze(int anzahlSitze) {
+    /*public void setAnzahlSitze(int anzahlSitze) {
         this.anzahlSitze = anzahlSitze;
-    }
+    }*/
 
     public int getSpalte() {
         return spalte;

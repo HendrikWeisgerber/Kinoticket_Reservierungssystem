@@ -45,9 +45,12 @@ public class Warenkorb {
         this.ticket = ticket;
     }
 
-    public Bestellung bezahlen() {
-        Bestellung neueBestellung = new Bestellung(this.ticket, benutzer, true);
-        this.ticket = null;
+    public int getId(){
+        return this.id;
+    }
+    public Bestellung bezahlen(){
+        Bestellung neueBestellung =new Bestellung(this.ticket, benutzer, true);
+        this.ticket=null;
         return neueBestellung;
     }
 //TODO bezahlen muss noch fertig implementiert werden
