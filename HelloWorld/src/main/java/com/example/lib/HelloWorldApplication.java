@@ -1,32 +1,22 @@
 package com.example.lib;
 
+import com.example.lib.Repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties.Pageable;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.data.domain.Page;
+import org.springframework.data.repository.config.RepositoryConfigurationSource;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Date;
 import java.util.Optional;
-
-
-import java.util.*;
-
-import com.example.lib.Film;
-import com.example.lib.Kinosaal;
-import com.example.lib.Sitz;
-import com.example.lib.Repositories.*;
 
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
@@ -437,6 +427,51 @@ public class HelloWorldApplication {
             return new ResponseEntity<Object>(bestellung, HttpStatus.OK);
         }
         return new ResponseEntity<Object>("OO", HttpStatus.OK);
+    }
+
+    //Mit body
+    @RequestMapping(value = "/vorstellung/", produces = "application/json", method = POST)
+    public ResponseEntity<Object> setVorstellung(@RequestBody(required = true) Vorstellung vorstellung) {
+        Optional<Kinosaal> kinosaal = kinosaalRepository.findById(vorstellung.getSaal().getId());
+        Optional<Film> film = filmRepository.findById(vorstellung.getFilmId());
+
+        String response = "";
+        vorstellungRepository.save(vorstellung);
+        response += "Vorstellung hinzugefügt \n";
+
+        if(kinosaal.isEmpty()) {
+            kinosaalRepository.save(vorstellung.getSaal());
+            response += "Kinosaal nicht gefunden, wurde erstellt";
+        } //TODO Das gleiche für Film wenn ohne ID!
+
+        return new ResponseEntity<Object>(response, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/vorstellung/film/{film_id}/kinosaal/{kinosaal_id}/startzeit/{startzeit}/grundpreis/{grundpreis}/aktiv/{aktiv]", produces = "application/json", method = POST)
+    public ResponseEntity<Object> setVorstellung(@PathVariable(value = "kinosaal_id") long kinosaal_id,
+                                                @PathVariable(value = "film_id") long film_id,
+                                                @PathVariable(value = "startzeit") @DateTimeFormat(pattern = "MMddyyyyHHmm") Date startzeit,
+                                                @PathVariable(value = "grundpreis") BigDecimal grundpreis,
+                                                @PathVariable(value = "aktiv") long aktiv) {
+
+        Optional<Kinosaal> kinosaal = kinosaalRepository.findById((int)kinosaal_id);
+        Optional<Film> film = filmRepository.findById((int)film_id);
+
+        if(kinosaal.isPresent() && film.isPresent()) {
+            Vorstellung vorstellung = new Vorstellung();
+            vorstellung.setFilmId((int) film_id);
+            vorstellung.setSaal(kinosaal.get());
+            vorstellung.setStartZeit(startzeit);
+            vorstellung.setGrundpreis(grundpreis);
+            Boolean istAktiv = false;
+            istAktiv = (aktiv != 0);
+            vorstellung.setAktiv(istAktiv);
+            vorstellungRepository.save(vorstellung);
+
+            return new ResponseEntity<Object>(vorstellung, HttpStatus.OK);
+        }
+
+        return new ResponseEntity<Object>("Kinosaal oder Film nicht gefunden", HttpStatus.OK);
     }
 
     public static void main(String[] args) {
