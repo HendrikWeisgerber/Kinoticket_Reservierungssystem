@@ -1,9 +1,13 @@
 package com.example.lib;
 
-import javax.persistence.*;
-
+import com.example.lib.Enum.Preiskategorie;
+import com.example.lib.Enum.Rechte;
+import com.example.lib.Enum.Zone;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.persistence.*;
+import java.math.BigDecimal;
 
 @Entity
 public class Benutzer {
