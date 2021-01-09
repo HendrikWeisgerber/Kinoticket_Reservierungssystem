@@ -17,6 +17,7 @@ import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Optional;
+import java.util.concurrent.Semaphore;
 
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
@@ -24,8 +25,9 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 @SpringBootApplication
 @RestController
 public class HelloWorldApplication {
+    private static Semaphore mutex;
     @Autowired
-    private SitzRepository sitzRepository;
+    public SitzRepository sitzRepository;
 
     @Autowired
     private TicketRepository ticketRepository;
@@ -339,13 +341,19 @@ public class HelloWorldApplication {
                                                     @PathVariable(value = "vorstellung_id") long vorstellung_id,
                                                     @PathVariable(value = "benutzer_id") long kaeufer_id) {
 
+        try {
+            mutex.acquire();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         Object o = makeTicket(sitz_id, vorstellung_id, kaeufer_id).getBody();
         if (o instanceof Ticket) {
             Ticket ticket = (Ticket) o;
             ticketRepository.save(ticket);
+            mutex.release();
             return new ResponseEntity<>("Ticket wurde gespeichert, Kaeufer entspricht dem Gast", HttpStatus.OK);
         }
-
+        mutex.release();
         return new ResponseEntity<>(o, HttpStatus.OK);
 
     }
@@ -355,6 +363,11 @@ public class HelloWorldApplication {
                                                    @PathVariable(value = "vorstellung_id") long vorstellung_id,
                                                    @PathVariable(value = "benutzer_id") long kaeufer_id,
                                                    @PathVariable(value = "gast_id") long gast_id) {
+        try {
+            mutex.acquire();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         Benutzer gast = new Benutzer();
 
         Object o = makeTicket(sitz_id, vorstellung_id, kaeufer_id).getBody();
@@ -369,9 +382,10 @@ public class HelloWorldApplication {
                 return new ResponseEntity<>("Kein Gast gefunden", HttpStatus.OK);
             }
             ticketRepository.save(ticket);
+            mutex.release();
             return new ResponseEntity<>("Ticket wurde gespeichert, der Besteller entspricht dem Gast", HttpStatus.OK);
         }
-
+        mutex.release();
         return new ResponseEntity<>(o, HttpStatus.OK);
     }
 
@@ -439,7 +453,7 @@ public class HelloWorldApplication {
         vorstellungRepository.save(vorstellung);
         response += "Vorstellung hinzugefügt \n";
 
-        if(kinosaal.isEmpty()) {
+        if (kinosaal.isEmpty()) {
             kinosaalRepository.save(vorstellung.getSaal());
             response += "Kinosaal nicht gefunden, wurde erstellt";
         } //TODO Das gleiche für Film wenn ohne ID!
@@ -454,10 +468,10 @@ public class HelloWorldApplication {
                                                  @PathVariable(value = "grundpreis") BigDecimal grundpreis,
                                                  @PathVariable(value = "aktiv") long aktiv) {
 
-        Optional<Kinosaal> kinosaal = kinosaalRepository.findById((int)kinosaal_id);
-        Optional<Film> film = filmRepository.findById((int)film_id);
+        Optional<Kinosaal> kinosaal = kinosaalRepository.findById((int) kinosaal_id);
+        Optional<Film> film = filmRepository.findById((int) film_id);
 
-        if(kinosaal.isPresent() && film.isPresent()) {
+        if (kinosaal.isPresent() && film.isPresent()) {
             Vorstellung vorstellung = new Vorstellung();
             vorstellung.setFilmId((int) film_id);
             vorstellung.setSaal(kinosaal.get());
@@ -476,11 +490,13 @@ public class HelloWorldApplication {
 
     public static void main(String[] args) {
         //SpringApplication.run(HelloWorldApplication.class, args);
+        mutex = new Semaphore(1, true);
         SpringApplication app = new SpringApplication(HelloWorldApplication.class);
         app.setDefaultProperties(Collections.singletonMap("server.port", "8081"));
         app.run(args);
     }
 
+    // Diese Methode darf nur in einem Semaphor aufgerufen werden!!!
     private ResponseEntity<Object> makeTicket(@PathVariable(value = "sitz_id") long sitz_id,
                                               @PathVariable(value = "vorstellung_id") long vorstellung_id,
                                               @PathVariable(value = "benutzer_id") long kaeufer_id) {
@@ -491,12 +507,8 @@ public class HelloWorldApplication {
 
         // Prüfe ob das Ticket bereits existiert
         Ticket[] ticketsByVorstellung = ticketRepository.findByVorstellungId((int) vorstellung_id);
-        if (ticketsByVorstellung != null) {
-            for (Ticket t : ticketsByVorstellung) {
-                if (t.getSitz().getId() == sitz_id) {
-                    return new ResponseEntity<>("Das Ticket ist leider nicht mehr verfügbar", HttpStatus.OK);
-                }
-            }
+        if (ticketExistiertBereits(sitz_id, vorstellung_id)) {
+            return new ResponseEntity<>("Das Ticket ist leider nicht mehr verfügbar", HttpStatus.OK);
         }
 
         Optional<Sitz> sitzOptional = sitzRepository.findById((int) sitz_id);
@@ -539,5 +551,42 @@ public class HelloWorldApplication {
             return new ResponseEntity<>("Kein Kaeufer gefunden", HttpStatus.OK);
         }
         return new ResponseEntity<>(ticket, HttpStatus.OK);
+    }
+
+}
+
+    private boolean ticketExistiertBereits(long sitz_id, long vorstellung_id) {
+        Optional<Sitz> oSitz = sitzRepository.findById((int) sitz_id);
+        Optional<Vorstellung> oVorstellung = vorstellungRepository.findById((int) vorstellung_id);
+
+        Sitz sitz;
+        Vorstellung vorstellung;
+
+        if (oSitz == null) return false;
+        if (oVorstellung == null) return false;
+
+        vorstellung = oVorstellung.get();
+        sitz = oSitz.get();
+
+        Ticket[] ticketsMitSitz, ticketsMitVorstellung;
+        ticketsMitSitz = ticketRepository.findBySitz(sitz);
+        ticketsMitVorstellung = ticketRepository.findByVorstellung(vorstellung);
+
+        if (ticketsMitSitz.length == 0 || ticketsMitVorstellung.length == 0) {
+            return false;
+        }
+
+        for (Ticket ticketMitSitz : ticketsMitSitz) {
+            for (Ticket ticketMitVorstellung : ticketsMitVorstellung) {
+                if (ticketMitSitz.getVorstellung() == ticketMitVorstellung.getVorstellung()
+                        && ticketMitSitz.getSitz() == ticketMitVorstellung.getSitz()
+                        && ticketMitSitz.getIstValide()
+                        && ticketMitVorstellung.getIstValide()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+
     }
 }
