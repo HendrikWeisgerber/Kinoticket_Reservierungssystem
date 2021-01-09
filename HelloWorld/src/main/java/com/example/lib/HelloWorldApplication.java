@@ -562,8 +562,8 @@ public class HelloWorldApplication {
         Sitz sitz;
         Vorstellung vorstellung;
 
-        if (oSitz == null) return false;
-        if (oVorstellung == null) return false;
+        if (oSitz.isEmpty()) return false;
+        if (oVorstellung.isEmpty()) return false;
 
         vorstellung = oVorstellung.get();
         sitz = oSitz.get();
