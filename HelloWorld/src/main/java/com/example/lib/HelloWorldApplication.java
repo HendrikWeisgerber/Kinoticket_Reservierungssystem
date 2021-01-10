@@ -553,8 +553,6 @@ public class HelloWorldApplication {
         return new ResponseEntity<>(ticket, HttpStatus.OK);
     }
 
-}
-
     private boolean ticketExistiertBereits(long sitz_id, long vorstellung_id) {
         Optional<Sitz> oSitz = sitzRepository.findById((int) sitz_id);
         Optional<Vorstellung> oVorstellung = vorstellungRepository.findById((int) vorstellung_id);
