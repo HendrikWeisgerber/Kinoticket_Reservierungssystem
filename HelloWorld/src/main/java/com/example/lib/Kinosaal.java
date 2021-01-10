@@ -1,11 +1,10 @@
 package com.example.lib;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.*;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 
 @Entity
 public class Kinosaal {
