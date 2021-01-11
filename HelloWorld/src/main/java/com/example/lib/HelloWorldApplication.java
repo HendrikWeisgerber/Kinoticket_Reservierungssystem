@@ -27,7 +27,13 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 public class HelloWorldApplication {
     private static Semaphore mutex;
     @Autowired
-    public SitzRepository sitzRepository;
+	public SitzRepository sitzRepository;
+	
+	@Autowired
+	public SnackRepository snackRepository;
+	
+	@Autowired
+    public GetraenkRepository getraenkRepository;
 
     @Autowired
     private TicketRepository ticketRepository;
