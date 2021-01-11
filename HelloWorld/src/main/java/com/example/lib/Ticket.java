@@ -34,7 +34,15 @@ public class Ticket {
     @JoinColumn(name="bestellung_id", referencedColumnName = "id")
     private Bestellung bestellung;
     private SimpleDateFormat kaufdatum;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "snack_id", referencedColumnName = "id")
+    private Snack snack;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "getraenk_id", referencedColumnName = "id")
+    private Getraenk getraenk;
 
+
+    
     //TODO: implementiere Essen und trinken funktionen
 
     @Autowired
@@ -131,6 +139,20 @@ public class Ticket {
         return this.preis;
     }
 
+    public Snack getSnack() {
+        return this.snack;
+    }
+
+    public void setSnack(Snack snack) {
+        this.snack = snack;
+    }
+    public Getraenk getGetraenk() {
+        return this.getraenk;
+    }
+
+    public void setGetraenk(Getraenk getraenk) {
+        this.getraenk = getraenk;
+    }
     public void inDenWarenkorb(){
         //TODO rethink this this.kaeufer.getWarenkorb().getTicket().append(this);
     }
@@ -168,6 +190,77 @@ public class Ticket {
         }
         if(this.gast != null){
             neuerPreis = neuerPreis.multiply(this.gast.getPreisSchluessel());
+        }
+        if (this.snack != null) {
+
+            BigDecimal snackPreis = new BigDecimal(0.0);
+
+            switch (this.snack.getName()) {
+                case POPCORN_SALZIG:
+                    snackPreis = new BigDecimal(2.0);
+                    break;
+                case POPCORN_SUESS:
+                    snackPreis = new BigDecimal(2.0);
+                    break;
+                case NACHOS:
+                    snackPreis = new BigDecimal(4.0);
+                    break;
+                case GUMMIBAERCHEN:
+                    snackPreis = new BigDecimal(1.5);
+                    break;
+            }
+            switch (this.snack.getGroesse()) {
+                case GROSS:
+                    snackPreis = snackPreis.multiply(new BigDecimal(1.5));
+                    break;
+                case NORMAL:
+                    snackPreis = snackPreis.multiply(new BigDecimal(1.0));
+                    break;
+                case KLEIN:
+                    snackPreis = snackPreis.multiply(new BigDecimal(0.8));
+                    break;
+            }
+        }
+
+        if (this.getraenk != null) {
+
+            BigDecimal getraenkPreis = new BigDecimal(0.0);
+
+            switch (this.getraenk.getName()) {
+                case COLA:
+                    getraenkPreis = new BigDecimal(2.0);
+                    break;
+                case FANTA:
+                    getraenkPreis = new BigDecimal(2.0);
+                    break;
+                case SPRITE:
+                    getraenkPreis = new BigDecimal(2.0);
+                    break;
+                case SPEZI:
+                    getraenkPreis = new BigDecimal(2.0);
+                    break;
+                case APFELSCHORLE:
+                    getraenkPreis = new BigDecimal(1.8);
+                    break;
+                case WASSER:
+                    getraenkPreis = new BigDecimal(1.0);
+                    break;
+                case PILS:
+                    getraenkPreis = new BigDecimal(2.5);
+                    break;
+            }
+
+            switch (this.snack.getGroesse()) {
+                case GROSS:
+                    getraenkPreis = getraenkPreis.multiply(new BigDecimal(1.5));
+                    break;
+                case NORMAL:
+                    getraenkPreis = getraenkPreis.multiply(new BigDecimal(1.0));
+                    break;
+                case KLEIN:
+                    getraenkPreis = getraenkPreis.multiply(new BigDecimal(0.8));
+                    break;
+            }
         }
         neuerPreis.setScale(2, RoundingMode.HALF_UP);
         this.preis = neuerPreis.doubleValue();
