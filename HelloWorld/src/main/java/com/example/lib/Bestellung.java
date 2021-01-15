@@ -64,10 +64,16 @@ public class Bestellung {
 
 
     public void reservierungStornieren(){
+        for (Ticket einTicket : ticket){
+            einTicket.setIstValide(false);
+        }
         ticket=null;
     }
 
     public void reservierungBezahlen(){
+        for (Ticket einTicket : ticket){
+            einTicket.setBezahlt(true);
+        }
         this.bezahlt= true; //TODO bezahl möglichkeiten müssen implementiert werden
     }
     public void rechnungSenden(){
@@ -80,6 +86,7 @@ public class Bestellung {
 
     public void setBezahlt(boolean bezahlt) {
         this.bezahlt = bezahlt;
+        if(bezahlt)this.reservierungBezahlen();
     }
 
 }

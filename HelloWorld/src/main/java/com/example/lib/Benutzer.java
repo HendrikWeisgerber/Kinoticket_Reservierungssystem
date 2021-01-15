@@ -1,8 +1,13 @@
 package com.example.lib;
 
-import javax.persistence.*;
-
+import com.example.lib.Enum.Preiskategorie;
+import com.example.lib.Enum.Rechte;
+import com.example.lib.Enum.Zone;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.persistence.*;
+import java.math.BigDecimal;
 
 @Entity
 public class Benutzer {
@@ -16,19 +21,21 @@ public class Benutzer {
     private int alter;
     private String email;
     private String passwortHash;
+    @JsonManagedReference
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "warenkorb_id", referencedColumnName = "id")
     private Warenkorb warenkorb;
     @Transient
     private Film[] wunschliste;
     private Boolean newsletter;
-    //private Rechte rechte;
-    //private Preiskategorie preiskategorie;
+    private Rechte rechte;
+    private Preiskategorie preiskategorie;
+    private Zone lieblingszone;
+
     //private Zahlungsmethode zahlungsmethode;
-    //private Zone lieblingszone;
 
     public Benutzer(String vorname, String nachname, String username, int id, int alter, String email,
-                    String passwortHash, Warenkorb warenkorb, Film[] wunschliste, Boolean newsletter) {
+    String passwortHash, Warenkorb warenkorb, Film[] wunschliste, Boolean newsletter) {
         this.vorname = vorname;
         this.nachname = nachname;
         this.username = username;
@@ -39,10 +46,65 @@ public class Benutzer {
         this.warenkorb = warenkorb;
         this.wunschliste = wunschliste;
         this.newsletter = newsletter;
+        this.preiskategorie = Preiskategorie.ERWACHSENER;
+        this.rechte = Rechte.USER;
+        this.lieblingszone = Zone.MITTE_MITTE;
     }
 
     public Benutzer(String vorname, String nachname, String username, int id, int alter, String email,
-                    String passwortHash, Warenkorb warenkorb, Boolean newsletter) {
+    String passwortHash, Warenkorb warenkorb, Film[] wunschliste, Boolean newsletter, Preiskategorie preiskategorie) {
+        this.vorname = vorname;
+        this.nachname = nachname;
+        this.username = username;
+        this.id = id;
+        this.alter = alter;
+        this.email = email;
+        this.passwortHash = passwortHash;
+        this.warenkorb = warenkorb;
+        this.wunschliste = wunschliste;
+        this.newsletter = newsletter;
+        this.preiskategorie = preiskategorie;
+        this.rechte = Rechte.USER;
+        this.lieblingszone = Zone.MITTE_MITTE;
+
+    }
+
+    public Benutzer(String vorname, String nachname, String username, int id, int alter, String email,
+    String passwortHash, Warenkorb warenkorb, Film[] wunschliste, Boolean newsletter, Preiskategorie preiskategorie, Rechte rechte) {
+        this.vorname = vorname;
+        this.nachname = nachname;
+        this.username = username;
+        this.id = id;
+        this.alter = alter;
+        this.email = email;
+        this.passwortHash = passwortHash;
+        this.warenkorb = warenkorb;
+        this.wunschliste = wunschliste;
+        this.newsletter = newsletter;
+        this.preiskategorie = preiskategorie;
+        this.rechte = rechte;
+        this.lieblingszone = Zone.MITTE_MITTE;
+    }
+
+    public Benutzer(String vorname, String nachname, String username, int id, int alter, String email,
+    String passwortHash, Warenkorb warenkorb, Film[] wunschliste, Boolean newsletter, Preiskategorie preiskategorie, Rechte rechte, Zone zone) {
+        this.vorname = vorname;
+        this.nachname = nachname;
+        this.username = username;
+        this.id = id;
+        this.alter = alter;
+        this.email = email;
+        this.passwortHash = passwortHash;
+        this.warenkorb = warenkorb;
+        this.wunschliste = wunschliste;
+        this.newsletter = newsletter;
+        this.preiskategorie = preiskategorie;
+        this.rechte = rechte;
+        this.lieblingszone = zone;
+    }
+
+    public Benutzer(String vorname, String nachname, String username, int id, int alter, String email,
+    String passwortHash, Warenkorb warenkorb, Boolean newsletter) {
         this.vorname = vorname;
         this.nachname = nachname;
         this.username = username;
@@ -52,13 +114,16 @@ public class Benutzer {
         this.passwortHash = passwortHash;
         this.warenkorb = warenkorb;
         this.newsletter = newsletter;
+        this.wunschliste = new Film[0];
+        this.preiskategorie = Preiskategorie.ERWACHSENER;
+        this.rechte = Rechte.USER;
+        this.lieblingszone = Zone.MITTE_MITTE;
     }
 
     @Autowired
     public Benutzer() {
 
     }
-
 
     public String getVorname() {
         return this.vorname;
@@ -140,6 +205,7 @@ public class Benutzer {
             i++;
         }
         neueWunschListe[i] = film;
+        this.wunschliste = neueWunschListe;
     }
 
     public Boolean getNewsletter() {
@@ -149,7 +215,52 @@ public class Benutzer {
     public void setNewsletter(Boolean newsletter) {
         this.newsletter = newsletter;
     }
-//TODO Preiskategorien bestimmen und Rechte 
+
+    public Preiskategorie getPreiskategorie() {
+        return this.preiskategorie;
+    }
+
+    public void setPreiskategorie(Preiskategorie preiskategorie) {
+        this.preiskategorie = preiskategorie;
+    }
+
+    public Rechte getRechte() {
+        return this.rechte;
+    }
+
+    public void setRechte(Rechte rechte) {
+        this.rechte = rechte;
+    }
+
+    public Zone getLieblingszone() {
+        return this.lieblingszone;
+    }
+
+    public void setLieblingszone(Zone lieblingszone) {
+        this.lieblingszone = lieblingszone;
+    }
+
+    public BigDecimal getPreisSchluessel(){
+        switch (this.preiskategorie){
+            case STUDIEREND:
+            return new BigDecimal(0.8);
+            case KIND:
+            return new BigDecimal(0.6);
+            case SENIOR:
+            return new BigDecimal(0.7);
+            case MENSCH_MIT_BEHINDERUNG:
+            return new BigDecimal(0.5);
+            case BEGLEITPERSON:
+            return new BigDecimal(0);
+            default:
+            return new BigDecimal(1.0);
+        }
+    }
+
+    public boolean istRichtigesPasswort(String passwort){
+        return ((Integer)passwort.hashCode()).toString().equals(passwortHash) ;
+    }
+    //TODO Rechte
 
 
 }
