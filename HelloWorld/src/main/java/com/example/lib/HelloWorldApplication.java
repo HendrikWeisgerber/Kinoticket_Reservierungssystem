@@ -81,11 +81,12 @@ public class HelloWorldApplication {
 		Date date2 = sdf.parse("2020-12-26 20:30:00.000");
 		Date date3 = sdf.parse("2020-12-26 21:30:00.000");
 
+		String[] genre = {"Sci-Fi"};
         Vorstellung testVor = new Vorstellung(date1, new BigDecimal(8), true);
 		Vorstellung testVor2 = new Vorstellung(date2, new BigDecimal(9), true);
 		Vorstellung testVor3 = new Vorstellung(date3, new BigDecimal(9), true);
-        Film filmT = new Film("Star Wars", "Bild", "Das ist ein neuer Film", 9, 140, 12, true, "Sci-Fi");
-		Film filmT2 = new Film("Harry Potter", "Bild", "Das ist ein noch neuerer Film", 8, 150, 12, true, "Fantasy");
+        Film filmT = new Film("Star Wars", "Bild", "Das ist ein neuer Film", 9, 140, 12, true, genre);
+		Film filmT2 = new Film("Harry Potter", "Bild", "Das ist ein noch neuerer Film", 8, 150, 12, true, genre);
 		Kinosaal saalT = new Kinosaal(50,5,10);
 
         filmRepository.save(filmT);
