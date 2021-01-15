@@ -76,12 +76,12 @@ public class HelloWorldApplication {
         Vorstellung testVor = new Vorstellung(date1, new BigDecimal(8), true);
         Vorstellung testVor2 = new Vorstellung(date2, new BigDecimal(9), true);
         Vorstellung testVor3 = new Vorstellung(date3, new BigDecimal(9), true);
-        Film filmT = new Film("Star Wars", "Bild", "Das ist ein neuer Film", 9, 140, 12, true, Genre.SCI_FI);
-        Film filmT2 = new Film("Harry Potter", "Bild", "Das ist ein noch neuerer Film", 8, 150, 12, true, Genre.FANTASY);
+        //Film filmT = new Film("Star Wars", "Bild", "Das ist ein neuer Film", 9, 140, 12, true, Genre.SCI_FI);
+        //Film filmT2 = new Film("Harry Potter", "Bild", "Das ist ein noch neuerer Film", 8, 150, 12, true, Genre.FANTASY);
         Kinosaal saalT = new Kinosaal(50, 5, 10);
 
-        filmRepository.save(filmT);
-        filmRepository.save(filmT2);
+        //filmRepository.save(filmT);
+        //filmRepository.save(filmT2);
         kinosaalRepository.save(saalT);
         for (int i = 1; i < 3; i++) {
             for (int k = 1; k < 3; k++) {
@@ -90,11 +90,11 @@ public class HelloWorldApplication {
                 sitzRepository.save(sitz);
             }
         }
-        testVor.setFilmId(filmT.getId());
+        //testVor.setFilmId(filmT.getId());
         testVor.setSaal(saalT);
-        testVor2.setFilmId(filmT.getId());
+        //testVor2.setFilmId(filmT.getId());
         testVor2.setSaal(saalT);
-        testVor3.setFilmId(filmT2.getId());
+        //testVor3.setFilmId(filmT2.getId());
         testVor3.setSaal(saalT);
         vorstellungRepository.save(testVor);
         vorstellungRepository.save(testVor2);
