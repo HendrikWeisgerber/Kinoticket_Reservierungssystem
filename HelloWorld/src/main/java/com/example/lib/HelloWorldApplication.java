@@ -4,6 +4,7 @@ import com.example.lib.Enum.Genre;
 import com.example.lib.Repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -12,6 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+
+import java.net.http.HttpResponse;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
@@ -28,10 +31,10 @@ public class HelloWorldApplication {
     private static Semaphore mutex;
     @Autowired
 	public SitzRepository sitzRepository;
-	
+
 	@Autowired
 	public SnackRepository snackRepository;
-	
+
 	@Autowired
     public GetraenkRepository getraenkRepository;
 
@@ -68,17 +71,18 @@ public class HelloWorldApplication {
         kinosaalRepository.deleteAll();
         benutzerRepository.deleteAll();
 
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-        Date date1 = sdf.parse("2020-12-26 15:30:00.000");
-        Date date2 = sdf.parse("2020-12-26 20:30:00.000");
-        Date date3 = sdf.parse("2020-12-26 21:30:00.000");
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+		Date date1 = sdf.parse("2020-12-26 15:30:00.000");
+		Date date2 = sdf.parse("2020-12-26 20:30:00.000");
+		Date date3 = sdf.parse("2020-12-26 21:30:00.000");
 
+		String[] genre = {"Sci-Fi"};
         Vorstellung testVor = new Vorstellung(date1, new BigDecimal(8), true);
-        Vorstellung testVor2 = new Vorstellung(date2, new BigDecimal(9), true);
-        Vorstellung testVor3 = new Vorstellung(date3, new BigDecimal(9), true);
-        Film filmT = new Film("Star Wars", "Bild", "Das ist ein neuer Film", 9, 140, 12, true, Genre.SCI_FI);
-        Film filmT2 = new Film("Harry Potter", "Bild", "Das ist ein noch neuerer Film", 8, 150, 12, true, Genre.FANTASY);
-        Kinosaal saalT = new Kinosaal(50, 5, 10);
+		Vorstellung testVor2 = new Vorstellung(date2, new BigDecimal(9), true);
+		Vorstellung testVor3 = new Vorstellung(date3, new BigDecimal(9), true);
+        Film filmT = new Film("Star Wars", "Bild", "Das ist ein neuer Film", 9, 140, 12, true, genre);
+		Film filmT2 = new Film("Harry Potter", "Bild", "Das ist ein noch neuerer Film", 8, 150, 12, true, genre);
+		Kinosaal saalT = new Kinosaal(50,5,10);
 
         filmRepository.save(filmT);
         filmRepository.save(filmT2);
