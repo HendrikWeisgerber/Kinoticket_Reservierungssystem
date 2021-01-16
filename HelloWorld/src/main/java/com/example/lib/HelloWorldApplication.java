@@ -512,7 +512,7 @@ public class HelloWorldApplication {
 
         String from = "kreative.gruppe42@gmail.com";
         String sub = "Ihre Kinotickets";
-        String msg = "Dies ist eine Probemessage";
+        String msg = "Sehr geehrte Kundin / sehr geehrter Kunde \n\nwir wünschen Ihnen viel Spaß in der Vorstellung. Anbei finden sie einen QR Code, welcher Ihre Eintrittskarte zum Film darstellt. \n\nWir freuen uns auf Ihren Besuch, \nIhr Kreative Gruppe 42 Team";
         
         //Get properties object    
         Properties props = new Properties();    
