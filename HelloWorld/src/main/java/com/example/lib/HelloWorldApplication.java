@@ -20,7 +20,16 @@ import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.concurrent.Semaphore;
+
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
@@ -496,6 +505,42 @@ public class HelloWorldApplication {
         }
 
         return new ResponseEntity<Object>("Kinosaal oder Film nicht gefunden", HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/test/sendEmail/{pw}/empfaengeradresse/{adresse}", produces = "application/json")
+    public ResponseEntity<Object> setVorstellung(@PathVariable(value = "adresse") String to, @PathVariable(value = "pw") String password) {
+
+        String from = "kreative.gruppe42@gmail.com";
+        String sub = "Ihre Kinotickets";
+        String msg = "Dies ist eine Probemessage";
+        
+        //Get properties object    
+        Properties props = new Properties();    
+        props.put("mail.smtp.host", "smtp.gmail.com");    
+        props.put("mail.smtp.socketFactory.port", "465");    
+        props.put("mail.smtp.socketFactory.class",    
+                  "javax.net.ssl.SSLSocketFactory");    
+        props.put("mail.smtp.auth", "true");    
+        props.put("mail.smtp.port", "465");    
+        //get Session   
+        Session session = Session.getDefaultInstance(props,    
+         new javax.mail.Authenticator() {    
+         protected PasswordAuthentication getPasswordAuthentication() {    
+         return new PasswordAuthentication(from,password);  
+         }    
+        });    
+        //compose message    
+        try {    
+         MimeMessage message = new MimeMessage(session);    
+         message.addRecipient(Message.RecipientType.TO,new InternetAddress(to));    
+         message.setSubject(sub);    
+         message.setText(msg);    
+         //send message  
+         Transport.send(message);    
+         System.out.println("message sent successfully");    
+        } catch (MessagingException e) {throw new RuntimeException(e);}    
+
+        return new ResponseEntity<Object>("Email soll an " + to + " gesendet werden", HttpStatus.OK);
     }
 
     public static void main(String[] args) {
