@@ -508,7 +508,7 @@ public class HelloWorldApplication {
     }
 
     @RequestMapping(value = "/test/sendEmail/{pw}/empfaengeradresse/{adresse}", produces = "application/json")
-    public ResponseEntity<Object> setVorstellung(@PathVariable(value = "adresse") String to, @PathVariable(value = "pw") String password) {
+    public ResponseEntity<Object> sendEmail(@PathVariable(value = "adresse") String to, @PathVariable(value = "pw") String password) {
 
         String from = "kreative.gruppe42@gmail.com";
         String sub = "Ihre Kinotickets";
