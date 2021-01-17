@@ -11,6 +11,7 @@ import java.util.Collections;
 public class UserDetailsServiceImpl implements UserDetailsService {
     private BenutzerRepository benutzerRepository;
 
+
     public UserDetailsServiceImpl(BenutzerRepository benutzerRepository) {
         this.benutzerRepository = benutzerRepository;
     }
@@ -21,7 +22,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         if (user == null) {
             throw new UsernameNotFoundException(username);
         }
-        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), Collections.emptyList());
+        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPasswortHash(), Collections.emptyList());
     }
 
 

@@ -30,7 +30,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
         try {
             Benutzer creds = new ObjectMapper().readValue(request.getInputStream(), Benutzer.class);
-            return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(creds.getUsername(), creds.getPassword(), new ArrayList<>()));
+            return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(creds.getUsername(), creds.getPasswortHash(), new ArrayList<>()));
         } catch (IOException e) {
             throw new RuntimeException("Could not read request" + e);
         }
@@ -43,6 +43,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
                 .signWith(SignatureAlgorithm.HS512, "SecretKeyToGenJWTs".getBytes())
                 .compact();
 
+        System.out.println("Token: " + token);
         response.addHeader("Authorization", "Bearer " + token);
     }
 }

@@ -21,8 +21,6 @@ public class Benutzer {
     private int alter;
     private String email;
     private String passwortHash;
-    @Transient
-    private String password;
     @JsonManagedReference
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "warenkorb_id", referencedColumnName = "id")
@@ -181,14 +179,6 @@ public class Benutzer {
 
     public void setPasswortHash(String passwortHash) {
         this.passwortHash = passwortHash;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public Warenkorb getWarenkorb() {
