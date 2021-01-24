@@ -32,11 +32,11 @@ public class BenutzerController {
             return new ResponseEntity<Object>("Der Benutzername ist bereits vergeben", HttpStatus.OK);
         }
 
-        if(user.getPreiskategorie() == null) {
+        if (user.getPreiskategorie() == null) {
             user.setPreiskategorie(Preiskategorie.ERWACHSENER); // Falls nicht dabei, automatisch Erwachsener
         }
 
-            user.setPasswortHash(bCryptPasswordEncoder.encode(user.getPasswortHash()));
+        user.setPasswortHash(bCryptPasswordEncoder.encode(user.getPasswortHash()));
         benutzerRepository.save(user);
         return new ResponseEntity<Object>(user, HttpStatus.OK);
     } //TODO add more checks for user

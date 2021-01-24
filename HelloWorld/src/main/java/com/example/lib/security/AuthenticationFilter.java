@@ -45,6 +45,6 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
                 .compact();
 
         System.out.println("Token: " + token);
-        response.addHeader(SecurityCons.HEADER_STRING,  SecurityCons.TOKEN_PREFIX + token);
+        response.addHeader(SecurityCons.HEADER_STRING, SecurityCons.TOKEN_PREFIX + token);
     }
 }
