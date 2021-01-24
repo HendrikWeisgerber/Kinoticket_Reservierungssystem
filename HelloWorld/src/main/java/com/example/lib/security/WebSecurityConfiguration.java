@@ -23,9 +23,16 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Autowired
     private UserDetailsService userDetailsService;
 
+    // Die frei verfügbaren Calls hier hinzufügen
     private static final String[] AUTH_WHITELIST = {
             "//",
-            "vorstellung"
+            "/reset", // TODO entfernen wenn in Production
+            "/vorstellung",
+            "/film/all",
+            "/film/{\\d+}",
+            "/vorstellung/film/{\\d+}",
+            "/kinosaal/vorstellung/{\\d+}",
+
     };
 
     public WebSecurityConfiguration(UserDetailsService userDetailsService, BCryptPasswordEncoder bCryptPasswordEncoder) {
@@ -36,7 +43,6 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.cors().and().csrf().disable().authorizeRequests()
                 .antMatchers(AUTH_WHITELIST).permitAll()
-                .antMatchers("/vorstellung").permitAll()
                 .antMatchers("/login").permitAll()
                 .antMatchers(HttpMethod.POST, "/benutzer/signup").permitAll()
                 .anyRequest().authenticated()

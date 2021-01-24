@@ -8,6 +8,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.Collections;
 
+// Die Klasse wird momentan nicht verwendet, weil es in HelloWorld direkt implementiert ist. Evtl. aber diese benutzen,
+// falls die Implementierung größer wird
 public class UserDetailsServiceImpl implements UserDetailsService {
     private BenutzerRepository benutzerRepository;
 

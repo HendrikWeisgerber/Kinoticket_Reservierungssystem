@@ -1,6 +1,7 @@
 package com.example.lib.security;
 
 import com.example.lib.Benutzer;
+import com.example.lib.SecurityCons;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -39,11 +40,11 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain, Authentication authentication) {
         String token = Jwts.builder()
                 .setSubject(((User) authentication.getPrincipal()).getUsername())
-                .setExpiration(new Date(System.currentTimeMillis() + 864_000_000))
-                .signWith(SignatureAlgorithm.HS512, "SecretKeyToGenJWTs".getBytes())
+                .setExpiration(new Date(System.currentTimeMillis() + SecurityCons.EXPIRATION_TIME))
+                .signWith(SignatureAlgorithm.HS512, SecurityCons.SECRET.getBytes())
                 .compact();
 
         System.out.println("Token: " + token);
-        response.addHeader("Authorization", "Bearer " + token);
+        response.addHeader(SecurityCons.HEADER_STRING,  SecurityCons.TOKEN_PREFIX + token);
     }
 }
