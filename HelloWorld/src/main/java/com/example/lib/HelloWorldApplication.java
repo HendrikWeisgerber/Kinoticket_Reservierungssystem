@@ -1,11 +1,9 @@
 package com.example.lib;
 
-import com.example.lib.Enum.Genre;
 import com.example.lib.Repositories.*;
 import com.example.lib.security.WebSecurityConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties.Pageable;
 import org.springframework.context.annotation.Bean;
@@ -13,7 +11,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -22,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 
-import java.net.http.HttpResponse;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
@@ -48,12 +44,12 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 public class HelloWorldApplication {
     private static Semaphore mutex;
     @Autowired
-	public SitzRepository sitzRepository;
+    public SitzRepository sitzRepository;
 
-	@Autowired
-	public SnackRepository snackRepository;
+    @Autowired
+    public SnackRepository snackRepository;
 
-	@Autowired
+    @Autowired
     public GetraenkRepository getraenkRepository;
 
     @Autowired
@@ -108,18 +104,18 @@ public class HelloWorldApplication {
         kinosaalRepository.deleteAll();
         benutzerRepository.deleteAll();
 
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-		Date date1 = sdf.parse("2020-12-26 15:30:00.000");
-		Date date2 = sdf.parse("2020-12-26 20:30:00.000");
-		Date date3 = sdf.parse("2020-12-26 21:30:00.000");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+        Date date1 = sdf.parse("2020-12-26 15:30:00.000");
+        Date date2 = sdf.parse("2020-12-26 20:30:00.000");
+        Date date3 = sdf.parse("2020-12-26 21:30:00.000");
 
-		String[] genre = {"Sci-Fi"};
+        String[] genre = {"Sci-Fi"};
         Vorstellung testVor = new Vorstellung(date1, new BigDecimal(8), true);
-		Vorstellung testVor2 = new Vorstellung(date2, new BigDecimal(9), true);
-		Vorstellung testVor3 = new Vorstellung(date3, new BigDecimal(9), true);
+        Vorstellung testVor2 = new Vorstellung(date2, new BigDecimal(9), true);
+        Vorstellung testVor3 = new Vorstellung(date3, new BigDecimal(9), true);
         Film filmT = new Film("Star Wars", "Bild", "Das ist ein neuer Film", 9, 140, 12, true, genre);
-		Film filmT2 = new Film("Harry Potter", "Bild", "Das ist ein noch neuerer Film", 8, 150, 12, true, genre);
-		Kinosaal saalT = new Kinosaal(50,5,10);
+        Film filmT2 = new Film("Harry Potter", "Bild", "Das ist ein noch neuerer Film", 8, 150, 12, true, genre);
+        Kinosaal saalT = new Kinosaal(50, 5, 10);
 
         filmRepository.save(filmT);
         filmRepository.save(filmT2);
@@ -535,38 +531,63 @@ public class HelloWorldApplication {
         return new ResponseEntity<Object>("Kinosaal oder Film nicht gefunden", HttpStatus.OK);
     }
 
+    //Mit body
+    @RequestMapping(value = "/insert/Sitz/{kinosaal_id}", produces = "application/json", method = POST)
+    public ResponseEntity<Object> setVorstellung(@RequestBody(required = true) Sitz sitz,
+                                                 @PathVariable(value = "kinosaal_id") long kinosaal_id) {
+
+        Optional<Kinosaal> optionalKinosaal = kinosaalRepository.findById((int) kinosaal_id);
+
+        if (optionalKinosaal.isPresent()) {
+            Kinosaal kinosaal = optionalKinosaal.get();
+            // Prüfen ob der Sitz in das Kinosaal passt, falls nicht Kinosaal "vergrößern"
+            if (kinosaal.getReihe() < sitz.getReihe()) kinosaal.setReihe(sitz.getReihe());
+            if (kinosaal.getSpalte() < sitz.getSpalte()) kinosaal.setSpalte(sitz.getSpalte());
+            kinosaalRepository.save(kinosaal);
+            sitz.setKinosaalId((int) kinosaal_id); //TODO ID speichern ist nicht ganz richtig, ähnlich wie beim Film, Siehe Benutzer<->Bestellung
+            sitzRepository.save(sitz);
+            return new ResponseEntity<Object>(kinosaal, HttpStatus.OK);
+        } else {
+            Kinosaal kinosaal = new Kinosaal(sitz.getReihe(), sitz.getSpalte());
+            kinosaalRepository.save(kinosaal);
+            sitz.setKinosaalId(kinosaal.getId());
+        }
+    }
+
     @RequestMapping(value = "/test/sendEmail/{pw}/empfaengeradresse/{adresse}", produces = "application/json")
     public ResponseEntity<Object> sendEmail(@PathVariable(value = "adresse") String to, @PathVariable(value = "pw") String password) {
 
         String from = "kreative.gruppe42@gmail.com";
         String sub = "Ihre Kinotickets";
         String msg = "Sehr geehrte Kundin / sehr geehrter Kunde \n\nwir wünschen Ihnen viel Spaß in der Vorstellung. Anbei finden sie einen QR Code, welcher Ihre Eintrittskarte zum Film darstellt. \n\nWir freuen uns auf Ihren Besuch, \nIhr Kreative Gruppe 42 Team";
-        
+
         //Get properties object    
-        Properties props = new Properties();    
-        props.put("mail.smtp.host", "smtp.gmail.com");    
-        props.put("mail.smtp.socketFactory.port", "465");    
-        props.put("mail.smtp.socketFactory.class",    
-                  "javax.net.ssl.SSLSocketFactory");    
-        props.put("mail.smtp.auth", "true");    
-        props.put("mail.smtp.port", "465");    
+        Properties props = new Properties();
+        props.put("mail.smtp.host", "smtp.gmail.com");
+        props.put("mail.smtp.socketFactory.port", "465");
+        props.put("mail.smtp.socketFactory.class",
+                "javax.net.ssl.SSLSocketFactory");
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.port", "465");
         //get Session   
-        Session session = Session.getDefaultInstance(props,    
-         new javax.mail.Authenticator() {    
-         protected PasswordAuthentication getPasswordAuthentication() {    
-         return new PasswordAuthentication(from,password);  
-         }    
-        });    
+        Session session = Session.getDefaultInstance(props,
+                new javax.mail.Authenticator() {
+                    protected PasswordAuthentication getPasswordAuthentication() {
+                        return new PasswordAuthentication(from, password);
+                    }
+                });
         //compose message    
-        try {    
-         MimeMessage message = new MimeMessage(session);    
-         message.addRecipient(Message.RecipientType.TO,new InternetAddress(to));    
-         message.setSubject(sub);    
-         message.setText(msg);    
-         //send message  
-         Transport.send(message);    
-         System.out.println("message sent successfully");    
-        } catch (MessagingException e) {throw new RuntimeException(e);}    
+        try {
+            MimeMessage message = new MimeMessage(session);
+            message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
+            message.setSubject(sub);
+            message.setText(msg);
+            //send message
+            Transport.send(message);
+            System.out.println("message sent successfully");
+        } catch (MessagingException e) {
+            throw new RuntimeException(e);
+        }
 
         return new ResponseEntity<Object>("Email soll an " + to + " gesendet werden", HttpStatus.OK);
     }
