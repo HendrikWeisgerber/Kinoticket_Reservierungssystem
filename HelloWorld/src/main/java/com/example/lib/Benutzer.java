@@ -32,10 +32,10 @@ public class Benutzer {
     private Preiskategorie preiskategorie;
     private Zone lieblingszone;
 
-    //private Zahlungsmethode zahlungsmethode;
+    // private Zahlungsmethode zahlungsmethode;
 
     public Benutzer(String vorname, String nachname, String username, int id, int alter, String email,
-    String passwortHash, Warenkorb warenkorb, Film[] wunschliste, Boolean newsletter) {
+            String passwortHash, Warenkorb warenkorb, Film[] wunschliste, Boolean newsletter) {
         this.vorname = vorname;
         this.nachname = nachname;
         this.username = username;
@@ -52,7 +52,8 @@ public class Benutzer {
     }
 
     public Benutzer(String vorname, String nachname, String username, int id, int alter, String email,
-    String passwortHash, Warenkorb warenkorb, Film[] wunschliste, Boolean newsletter, Preiskategorie preiskategorie) {
+            String passwortHash, Warenkorb warenkorb, Film[] wunschliste, Boolean newsletter,
+            Preiskategorie preiskategorie) {
         this.vorname = vorname;
         this.nachname = nachname;
         this.username = username;
@@ -70,7 +71,8 @@ public class Benutzer {
     }
 
     public Benutzer(String vorname, String nachname, String username, int id, int alter, String email,
-    String passwortHash, Warenkorb warenkorb, Film[] wunschliste, Boolean newsletter, Preiskategorie preiskategorie, Rechte rechte) {
+            String passwortHash, Warenkorb warenkorb, Film[] wunschliste, Boolean newsletter,
+            Preiskategorie preiskategorie, Rechte rechte) {
         this.vorname = vorname;
         this.nachname = nachname;
         this.username = username;
@@ -87,7 +89,8 @@ public class Benutzer {
     }
 
     public Benutzer(String vorname, String nachname, String username, int id, int alter, String email,
-    String passwortHash, Warenkorb warenkorb, Film[] wunschliste, Boolean newsletter, Preiskategorie preiskategorie, Rechte rechte, Zone zone) {
+            String passwortHash, Warenkorb warenkorb, Film[] wunschliste, Boolean newsletter,
+            Preiskategorie preiskategorie, Rechte rechte, Zone zone) {
         this.vorname = vorname;
         this.nachname = nachname;
         this.username = username;
@@ -104,7 +107,7 @@ public class Benutzer {
     }
 
     public Benutzer(String vorname, String nachname, String username, int id, int alter, String email,
-    String passwortHash, Warenkorb warenkorb, Boolean newsletter) {
+            String passwortHash, Warenkorb warenkorb, Boolean newsletter) {
         this.vorname = vorname;
         this.nachname = nachname;
         this.username = username;
@@ -217,7 +220,12 @@ public class Benutzer {
     }
 
     public Preiskategorie getPreiskategorie() {
-        return this.preiskategorie;
+        if (this.preiskategorie != null) {
+
+            return this.preiskategorie;
+        } else {
+            return Preiskategorie.ERWACHSENER;
+        }
     }
 
     public void setPreiskategorie(Preiskategorie preiskategorie) {
@@ -240,27 +248,26 @@ public class Benutzer {
         this.lieblingszone = lieblingszone;
     }
 
-    public BigDecimal getPreisSchluessel(){
-        switch (this.preiskategorie){
+    public BigDecimal getPreisSchluessel() {
+        switch (this.preiskategorie) {
             case STUDIEREND:
-            return new BigDecimal(0.8);
+                return new BigDecimal(0.8);
             case KIND:
-            return new BigDecimal(0.6);
+                return new BigDecimal(0.6);
             case SENIOR:
-            return new BigDecimal(0.7);
+                return new BigDecimal(0.7);
             case MENSCH_MIT_BEHINDERUNG:
-            return new BigDecimal(0.5);
+                return new BigDecimal(0.5);
             case BEGLEITPERSON:
-            return new BigDecimal(0);
+                return new BigDecimal(0);
             default:
-            return new BigDecimal(1.0);
+                return new BigDecimal(1.0);
         }
     }
 
-    public boolean istRichtigesPasswort(String passwort){
-        return ((Integer)passwort.hashCode()).toString().equals(passwortHash) ;
+    public boolean istRichtigesPasswort(String passwort) {
+        return ((Integer) passwort.hashCode()).toString().equals(passwortHash);
     }
-    //TODO Rechte
-
+    // TODO Rechte
 
 }
