@@ -495,6 +495,9 @@ public class HelloWorldApplication {
                 }
             }*/
             Bestellung bestellung = b.getWarenkorb().reservieren(ticketIds, ticketRepository);
+            for(int ticketId:ticketIds){
+                String s = sendEmail("kg42_kg42", b.getEmail() , ticketId);
+            }
             //TODO Sicherheitslücke wenn die Methode so bleibt. Der Benutzer könnte jegliche Tickets mit allen möglichen Daten selbst speichern wie er will
             bestellung.setBenutzer(b);
             bestellungRepository.save(bestellung);
@@ -502,6 +505,38 @@ public class HelloWorldApplication {
             return new ResponseEntity<Object>(bestellung, HttpStatus.OK);
         }
         return new ResponseEntity<Object>("OO", HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/bazahlen/bestellung/{bestellung_id}/iban/{iban_nummer}", produces = "application/json", method = RequestMethod.GET)
+    public ResponseEntity<Object> payBestellung(@PathVariable(value = "bestellung_id") int bestellung_id, @PathVariable(value = "iban_nummer") String iban) {
+        Optional<Bestellung> oB = bestellungRepository.findById(bestellung_id);
+        String response = "";
+        if(ibanValidation(iban)){
+            if(oB.isPresent()){
+                Bestellung bestellung = oB.get();
+                bestellung.reservierungBezahlen(ticketRepository);
+                bestellungRepository.save(bestellung);
+                for(Ticket ticket : bestellung.getTicket()){
+                    response += sendEmail("kg42_kg42", bestellung.getBenutzer().getEmail(), ticket.getId());
+                }
+            }else{
+                response = "Keine Bestellung gefunden";
+            }
+        }else{
+            response = "Ungültige Iban";
+        }
+
+        return new ResponseEntity<Object>(response, HttpStatus.OK);
+    }
+
+    public boolean ibanValidation(String iban){
+        char[] ibanChar = iban.toCharArray();
+        if(ibanChar[0] == "D".toCharArray()[0] && ibanChar[1] == "E".toCharArray()[0]){
+            if(iban.length()>=20){
+                return true;
+            }
+        }
+        return false;
     }
 
     //Mit body
@@ -568,11 +603,7 @@ public class HelloWorldApplication {
         }
     }
 
-    @RequestMapping(value = "/test/sendEmail/{pw}/ticket/{ticket_id}/empfaengeradresse/{adresse}", produces = "application/json")
-    public ResponseEntity<Object> sendEmail(@PathVariable(value = "adresse") String to,
-            @PathVariable(value = "pw") String password, @PathVariable(value = "ticket_id") int ticketId) {
-
-        
+    public String sendEmail(String password, String to, int ticketId){
 
         Optional<Ticket> oTicket = ticketRepository.findById(ticketId);
         Optional<Film> oFilm;
@@ -589,12 +620,13 @@ public class HelloWorldApplication {
             int sitzReihe = (ticket.getSitz()!= null)?ticket.getSitz().getReihe():2;
             int sitzSpalte = (ticket.getSitz()!= null)?ticket.getSitz().getSpalte():2;
             Boolean bezahlt = ticket.isBezahlt();
+            double preis = ticket.getPreis();
             String filmName = (oFilm != null)?oFilm.get().getName():"filmname";
             qrText = "KINO-TICKET\n\nFilm: " + filmName + "\nSaal: " + saal_id + "\nReihe: " + sitzReihe
                 + "\nSpalte: " + sitzSpalte + "\nUhrzeit: " + zeit + "\nPreisklasse: "
-                + gastPreiskategorie + "\nBezahlt: " + (bezahlt ? "Ja" : "Nein");
+                + gastPreiskategorie + "\nPreis: " + preis + "\nBezahlt: " + (bezahlt ? "Ja" : "Nein");
         }else{
-            return new ResponseEntity<Object>("Ticket wurde nicht gefunden. Es wurde keine E-Mail verschickt", HttpStatus.OK);
+            return "Ticket wurde nicht gefunden. Es wurde keine E-Mail verschickt";
         }
         qrText += "\nSicherheitsschlüssel: ";
         int sicherheitsschlüssel = sicherheitsschluesselGenerieren(qrText);
@@ -610,7 +642,7 @@ public class HelloWorldApplication {
 
         String from = "kreative.gruppe42@gmail.com";
         String sub = "Ihre Kinotickets";
-        String msg = "Sehr geehrte Kundin / sehr geehrter Kunde \n\nwir wünschen Ihnen viel Spaß in der Vorstellung. Anbei finden sie einen QR Code, welcher Ihre Eintrittskarte zum Film darstellt. \n\nWir freuen uns auf Ihren Besuch, \nIhr Kreative Gruppe 42 Team";
+        String msg = "Sehr geehrte Kundin / sehr geehrter Kunde \n\nwir wünschen Ihnen viel Spaß in der Vorstellung. Anbei finden sie einen QR Code, welcher Ihre Eintrittskarte zum Film darstellt. Sollten sie mehrere Tickets bestellt haben, werden diese in seperaten Emails versendet. \n\nWir freuen uns auf Ihren Besuch, \nIhr Kreative Gruppe 42 Team";
 
         // Get properties object
         Properties props = new Properties();
@@ -667,8 +699,14 @@ public class HelloWorldApplication {
             throw new RuntimeException(e);
         }
 
-        return new ResponseEntity<Object>("Email soll an " + to + " gesendet werden", HttpStatus.OK);
+        return "Email wurde an " + to + " gesendet";
     }
+
+    @RequestMapping(value = "/test/sendEmail/{pw}/ticket/{ticket_id}/empfaengeradresse/{adresse}", produces = "application/json")
+    public ResponseEntity<Object> sendEmailRequest(@PathVariable(value = "adresse") String to,
+            @PathVariable(value = "pw") String password, @PathVariable(value = "ticket_id") int ticketId){
+                return new ResponseEntity<Object>(sendEmail(password, to, ticketId), HttpStatus.OK);
+            }
 
     public static BufferedImage generateQRCodeImage(String barcodeText) throws Exception {
         QRCodeWriter barcodeWriter = new QRCodeWriter();
