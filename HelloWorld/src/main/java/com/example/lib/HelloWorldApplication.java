@@ -2,13 +2,21 @@ package com.example.lib;
 
 import com.example.lib.Enum.Genre;
 import com.example.lib.Repositories.*;
+import com.example.lib.security.WebSecurityConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties.Pageable;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -49,6 +57,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 @CrossOrigin(origins = "*")
 @SpringBootApplication
 @RestController
+@Import({WebSecurityConfiguration.class})
 public class HelloWorldApplication {
     private static Semaphore mutex;
     @Autowired
@@ -80,6 +89,25 @@ public class HelloWorldApplication {
 
     @Autowired
     KinosaalRepository kinosaalRepository;
+
+    @Bean
+    public UserDetailsService userDetailsService() {
+        return new UserDetailsService() {
+            @Override
+            public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+                Benutzer user = benutzerRepository.findByUsername(username);
+                if (user == null) {
+                    throw new UsernameNotFoundException(username);
+                }
+                return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPasswortHash(), Collections.emptyList());
+            }
+        };
+    }
+
+    @Bean
+    public BCryptPasswordEncoder bCryptPasswordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
     @RequestMapping(value = "/reset", produces = "application/json")
     public ResponseEntity<Object> home() throws ParseException {
