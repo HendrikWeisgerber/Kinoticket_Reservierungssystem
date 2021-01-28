@@ -9,5 +9,6 @@ public enum Genre {
     FANTASY,
     DRAMA,
     DOCUMENTARY,
-    HISTORY
+    HISTORY,
+    NO_GENRE
 }

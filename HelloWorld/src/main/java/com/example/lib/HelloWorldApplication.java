@@ -5,7 +5,6 @@ import com.example.lib.Repositories.*;
 import com.example.lib.security.WebSecurityConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties.Pageable;
 import org.springframework.context.annotation.Bean;
@@ -31,13 +30,27 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.Semaphore;
 
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
+import javax.activation.DataHandler;
+import javax.imageio.ImageIO;
 import javax.mail.Message;
 import javax.mail.MessagingException;
+import javax.mail.Multipart;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
+import javax.mail.util.ByteArrayDataSource;
 
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
@@ -113,10 +126,11 @@ public class HelloWorldApplication {
 		Date date2 = sdf.parse("2020-12-26 20:30:00.000");
 		Date date3 = sdf.parse("2020-12-26 21:30:00.000");
 
-		String[] genre = {"Sci-Fi"};
+        Genre genre = Genre.SCI_FI;
+
         Vorstellung testVor = new Vorstellung(date1, new BigDecimal(8), true);
-		Vorstellung testVor2 = new Vorstellung(date2, new BigDecimal(9), true);
-		Vorstellung testVor3 = new Vorstellung(date3, new BigDecimal(9), true);
+        Vorstellung testVor2 = new Vorstellung(date2, new BigDecimal(9), true);
+        Vorstellung testVor3 = new Vorstellung(date3, new BigDecimal(9), true);
         Film filmT = new Film("Star Wars", "Bild", "Das ist ein neuer Film", 9, 140, 12, true, genre);
 		Film filmT2 = new Film("Harry Potter", "Bild", "Das ist ein noch neuerer Film", 8, 150, 12, true, genre);
 		Kinosaal saalT = new Kinosaal(50,5,10);
@@ -481,6 +495,9 @@ public class HelloWorldApplication {
                 }
             }*/
             Bestellung bestellung = b.getWarenkorb().reservieren(ticketIds, ticketRepository);
+            for(int ticketId:ticketIds){
+                String s = sendEmail("kg42_kg42", b.getEmail() , ticketId);
+            }
             //TODO Sicherheitslücke wenn die Methode so bleibt. Der Benutzer könnte jegliche Tickets mit allen möglichen Daten selbst speichern wie er will
             bestellung.setBenutzer(b);
             bestellungRepository.save(bestellung);
@@ -488,6 +505,38 @@ public class HelloWorldApplication {
             return new ResponseEntity<Object>(bestellung, HttpStatus.OK);
         }
         return new ResponseEntity<Object>("OO", HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/bazahlen/bestellung/{bestellung_id}/iban/{iban_nummer}", produces = "application/json", method = RequestMethod.GET)
+    public ResponseEntity<Object> payBestellung(@PathVariable(value = "bestellung_id") int bestellung_id, @PathVariable(value = "iban_nummer") String iban) {
+        Optional<Bestellung> oB = bestellungRepository.findById(bestellung_id);
+        String response = "";
+        if(ibanValidation(iban)){
+            if(oB.isPresent()){
+                Bestellung bestellung = oB.get();
+                bestellung.reservierungBezahlen(ticketRepository);
+                bestellungRepository.save(bestellung);
+                for(Ticket ticket : bestellung.getTicket()){
+                    response += sendEmail("kg42_kg42", bestellung.getBenutzer().getEmail(), ticket.getId());
+                }
+            }else{
+                response = "Keine Bestellung gefunden";
+            }
+        }else{
+            response = "Ungültige Iban";
+        }
+
+        return new ResponseEntity<Object>(response, HttpStatus.OK);
+    }
+
+    public boolean ibanValidation(String iban){
+        char[] ibanChar = iban.toCharArray();
+        if(ibanChar[0] == "D".toCharArray()[0] && ibanChar[1] == "E".toCharArray()[0]){
+            if(iban.length()>=20){
+                return true;
+            }
+        }
+        return false;
     }
 
     //Mit body
@@ -534,41 +583,136 @@ public class HelloWorldApplication {
 
         return new ResponseEntity<Object>("Kinosaal oder Film nicht gefunden", HttpStatus.OK);
     }
+    public int sicherheitsschluesselGenerieren(String text){
+        int length = text.length();
+        text += length;
+        return text.hashCode();
+    }
 
-    @RequestMapping(value = "/test/sendEmail/{pw}/empfaengeradresse/{adresse}", produces = "application/json")
-    public ResponseEntity<Object> sendEmail(@PathVariable(value = "adresse") String to, @PathVariable(value = "pw") String password) {
+    public boolean validerTicketText(String text){
+        String[] textParts = text.split(">>>>>");
+        if(textParts.length ==2){
+            String erwarteterSchluessel = "" + sicherheitsschluesselGenerieren(textParts[0]);
+            if(erwarteterSchluessel.equals(textParts[1])){
+                return true;
+            }else{
+                return false;
+            }
+        }else{
+            return false;
+        }
+    }
+
+    public String sendEmail(String password, String to, int ticketId){
+
+        Optional<Ticket> oTicket = ticketRepository.findById(ticketId);
+        Optional<Film> oFilm;
+        String qrText = "Fehler beim Ticket erzeugen";
+        //Ticket ticket;
+        if (oTicket != null) {
+            Ticket ticket = oTicket.get();
+            int filmId = ticket.getVorstellung().getFilmId();
+            oFilm = filmRepository.findById(filmId);
+
+            String gastPreiskategorie = ticket.getGast().getPreiskategorie().toString();
+            int saal_id = (ticket.getVorstellung().getSaal() != null)?ticket.getVorstellung().getSaal().getId():5;
+            Date zeit = ticket.getVorstellung().getStartZeit();
+            int sitzReihe = (ticket.getSitz()!= null)?ticket.getSitz().getReihe():2;
+            int sitzSpalte = (ticket.getSitz()!= null)?ticket.getSitz().getSpalte():2;
+            Boolean bezahlt = ticket.isBezahlt();
+            double preis = ticket.getPreis();
+            String filmName = (oFilm != null)?oFilm.get().getName():"filmname";
+            qrText = "KINO-TICKET\n\nFilm: " + filmName + "\nSaal: " + saal_id + "\nReihe: " + sitzReihe
+                + "\nSpalte: " + sitzSpalte + "\nUhrzeit: " + zeit + "\nPreisklasse: "
+                + gastPreiskategorie + "\nPreis: " + preis + "\nBezahlt: " + (bezahlt ? "Ja" : "Nein");
+        }else{
+            return "Ticket wurde nicht gefunden. Es wurde keine E-Mail verschickt";
+        }
+        qrText += "\nSicherheitsschlüssel: ";
+        int sicherheitsschlüssel = sicherheitsschluesselGenerieren(qrText);
+        qrText += ">>>>>"+sicherheitsschlüssel;
+        BufferedImage img = null;
+        try {
+            img = generateQRCodeImage(qrText);
+        } catch (Exception e) {
+            System.out.println("ERROR: QR-Code imgage generation threw Exception. Stack Trace as follows: \n\n");
+            e.printStackTrace();
+            System.out.println("\n\n End of Stack Trace \n\n");
+        }
 
         String from = "kreative.gruppe42@gmail.com";
         String sub = "Ihre Kinotickets";
-        String msg = "Sehr geehrte Kundin / sehr geehrter Kunde \n\nwir wünschen Ihnen viel Spaß in der Vorstellung. Anbei finden sie einen QR Code, welcher Ihre Eintrittskarte zum Film darstellt. \n\nWir freuen uns auf Ihren Besuch, \nIhr Kreative Gruppe 42 Team";
-        
-        //Get properties object    
-        Properties props = new Properties();    
-        props.put("mail.smtp.host", "smtp.gmail.com");    
-        props.put("mail.smtp.socketFactory.port", "465");    
-        props.put("mail.smtp.socketFactory.class",    
-                  "javax.net.ssl.SSLSocketFactory");    
-        props.put("mail.smtp.auth", "true");    
-        props.put("mail.smtp.port", "465");    
-        //get Session   
-        Session session = Session.getDefaultInstance(props,    
-         new javax.mail.Authenticator() {    
-         protected PasswordAuthentication getPasswordAuthentication() {    
-         return new PasswordAuthentication(from,password);  
-         }    
-        });    
-        //compose message    
-        try {    
-         MimeMessage message = new MimeMessage(session);    
-         message.addRecipient(Message.RecipientType.TO,new InternetAddress(to));    
-         message.setSubject(sub);    
-         message.setText(msg);    
-         //send message  
-         Transport.send(message);    
-         System.out.println("message sent successfully");    
-        } catch (MessagingException e) {throw new RuntimeException(e);}    
+        String msg = "Sehr geehrte Kundin / sehr geehrter Kunde \n\nwir wünschen Ihnen viel Spaß in der Vorstellung. Anbei finden sie einen QR Code, welcher Ihre Eintrittskarte zum Film darstellt. Sollten sie mehrere Tickets bestellt haben, werden diese in seperaten Emails versendet. \n\nWir freuen uns auf Ihren Besuch, \nIhr Kreative Gruppe 42 Team";
 
-        return new ResponseEntity<Object>("Email soll an " + to + " gesendet werden", HttpStatus.OK);
+        // Get properties object
+        Properties props = new Properties();
+        props.put("mail.smtp.host", "smtp.gmail.com");
+        props.put("mail.smtp.socketFactory.port", "465");
+        props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.port", "465");
+        // get Session
+        Session session = Session.getDefaultInstance(props, new javax.mail.Authenticator() {
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(from, password);
+            }
+        });
+        // compose message
+
+        Message message = new MimeMessage(session);
+        Multipart multiPart = new MimeMultipart("alternative");
+
+        try {
+
+            MimeBodyPart textPart = new MimeBodyPart();
+            textPart.setText(msg, "utf-8");
+            MimeBodyPart att = new MimeBodyPart();
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+            byte[] imageBytes = new byte[0];
+            try {
+
+                ImageIO.write(img, "png", baos);
+                baos.flush();
+                imageBytes = baos.toByteArray();
+                baos.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            ByteArrayDataSource bds = new ByteArrayDataSource(imageBytes, "image/png");
+            att.setDataHandler(new DataHandler(bds));
+            att.setFileName("./kinotickets.png");
+            att.setHeader("Content-ID", "<image>");
+
+            multiPart.addBodyPart(textPart);
+            multiPart.addBodyPart(att);
+
+            message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
+            message.setSubject(sub);
+            message.setContent(multiPart);
+
+            // send message
+            Transport.send(message);
+            System.out.println("message sent successfully");
+        } catch (MessagingException e) {
+            throw new RuntimeException(e);
+        }
+
+        return "Email wurde an " + to + " gesendet";
+    }
+
+    @RequestMapping(value = "/test/sendEmail/{pw}/ticket/{ticket_id}/empfaengeradresse/{adresse}", produces = "application/json")
+    public ResponseEntity<Object> sendEmailRequest(@PathVariable(value = "adresse") String to,
+            @PathVariable(value = "pw") String password, @PathVariable(value = "ticket_id") int ticketId){
+                return new ResponseEntity<Object>(sendEmail(password, to, ticketId), HttpStatus.OK);
+            }
+
+    public static BufferedImage generateQRCodeImage(String barcodeText) throws Exception {
+        QRCodeWriter barcodeWriter = new QRCodeWriter();
+        BitMatrix bitMatrix = barcodeWriter.encode(barcodeText, BarcodeFormat.QR_CODE, 200, 200);
+
+        return MatrixToImageWriter.toBufferedImage(bitMatrix);
     }
 
     public static void main(String[] args) {

@@ -20,7 +20,7 @@ public class TestBenutzer {
     static void setUpAll(){
         Warenkorb warenkorb = new Warenkorb(benutzer, new Ticket[0]);
         Film[] wunschliste = new Film[1];
-        String[] genre = {"Sci-Fi"};
+        Genre genre = Genre.SCI_FI;
         Film film = new Film("Star Wars", "Bild", "Das ist ein neuer Film", 9, 140, 12, true, genre);
         wunschliste[0] = film;
         passwort = ((Integer)(int)(Math.random() * 100000000)).toString();
@@ -34,7 +34,7 @@ public class TestBenutzer {
         int alteLaenge = benutzer.getWunschliste().length;
         
         Film[] alteWunschliste = benutzer.getWunschliste();
-        String[] genre = {"Sci-Fi"};
+        Genre genre = Genre.FANTASY;
         Film film = new Film("Harry Potter", "Bild", "Das ist ein noch neuerer Film", 8, 150, 12, true, genre);
         benutzer.derWunschlisteHinzufuegen(film);
 
