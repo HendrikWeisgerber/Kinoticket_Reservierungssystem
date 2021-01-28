@@ -187,6 +187,53 @@ public class FilmController {
                         genres[genreCounter] = Genre.HISTORY;
                         genreCounter++;
                         break;
+                    case "Animation":
+                    case "ANIMATION":
+                    case "animation":
+                        genres[genreCounter] = Genre.ANIMATION;
+                        genreCounter++;
+                        break;
+                    case "Family":
+                    case "FAMILY":
+                    case "family":
+                        genres[genreCounter] = Genre.FAMILY;
+                        genreCounter++;
+                        break;
+                    case "Musical":
+                    case "MUSICAL":
+                    case "musical":
+                    case "Music":
+                    case "MUSIC":
+                    case "music":
+                        genres[genreCounter] = Genre.MUSICAL;
+                        genreCounter++;
+                        break;
+                    case "Short":
+                    case "SHORT":
+                    case "short":
+                        genres[genreCounter] = Genre.SHORT;
+                        genreCounter++;
+                        break;
+                    case "Romance":
+                    case "ROMANCE":
+                    case "romance":
+                        genres[genreCounter] = Genre.ROMANCE;
+                        genreCounter++;
+                        break;
+                    case "Superhero":
+                    case "SUPERHERO":
+                    case "superhero":
+                        genres[genreCounter] = Genre.SUPERHERO;
+                        genreCounter++;
+                        break;
+                    case "Western":
+                    case "WESTERN":
+                    case "western":
+                        genres[genreCounter] = Genre.WESTERN;
+                        genreCounter++;
+                        break;
+                    default:
+                        genres[genreCounter] = Genre.SONSTIGE;
 
                 }
 
