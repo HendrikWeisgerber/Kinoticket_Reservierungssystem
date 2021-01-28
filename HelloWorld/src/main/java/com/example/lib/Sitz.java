@@ -1,27 +1,29 @@
 package com.example.lib;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.*;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import java.math.BigDecimal;
 
 @Entity
 public class Sitz {
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
     private int reihe;
     private int spalte;
     private boolean barriereFrei;
     private BigDecimal preisschluessel;
-    private int kinosaalId;
+    @JsonBackReference
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "kinosaal_id", referencedColumnName = "id")
+    private Kinosaal kinosaal;
     /*@ManyToOne
     @JoinColumn(name = "kinosaal_id")
     private Kinosaal meinKinosaal;*/
     //private ArrayList<Ticket> meineTickets;
-    
+
     // @Autowired
     // public Sitz(int id, int reihe, int spalte, boolean barriereFrei, BigDecimal preisschluessel, Kinosaal meinKinosaal) {
     //     this.id = id;
@@ -32,7 +34,7 @@ public class Sitz {
     //     this.meinKinosaal = meinKinosaal;
     // }
     @Autowired
-    public Sitz(){
+    public Sitz() {
 
     }
 
@@ -91,11 +93,11 @@ public class Sitz {
         this.preisschluessel = preisschluessel;
     }
 
-    public int getKinosaalId() {
-        return kinosaalId;
+    public Kinosaal getKinosaal() {
+        return kinosaal;
     }
 
-    public void setKinosaalId(int kinosaalId) {
-        this.kinosaalId = kinosaalId;
+    public void setKinosaal(Kinosaal kinosaal) {
+        this.kinosaal = kinosaal;
     }
 }

@@ -17,8 +17,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.mail.*;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import java.math.BigDecimal;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
@@ -26,14 +28,6 @@ import java.util.Date;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.Semaphore;
-
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
 
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
@@ -123,7 +117,7 @@ public class HelloWorldApplication {
         for (int i = 1; i < 3; i++) {
             for (int k = 1; k < 3; k++) {
                 Sitz sitz = new Sitz(i, k, false, new BigDecimal(1));
-                sitz.setKinosaalId(saalT.getId());
+                sitz.setKinosaal(saalT);
                 sitzRepository.save(sitz);
             }
         }
@@ -544,13 +538,14 @@ public class HelloWorldApplication {
             if (kinosaal.getReihe() < sitz.getReihe()) kinosaal.setReihe(sitz.getReihe());
             if (kinosaal.getSpalte() < sitz.getSpalte()) kinosaal.setSpalte(sitz.getSpalte());
             kinosaalRepository.save(kinosaal);
-            sitz.setKinosaalId((int) kinosaal_id); //TODO ID speichern ist nicht ganz richtig, ähnlich wie beim Film, Siehe Benutzer<->Bestellung
+            sitz.setKinosaal(kinosaal); //TODO ID speichern ist nicht ganz richtig, ähnlich wie beim Film, Siehe Benutzer<->Bestellung
             sitzRepository.save(sitz);
             return new ResponseEntity<Object>(kinosaal, HttpStatus.OK);
         } else {
             Kinosaal kinosaal = new Kinosaal(sitz.getReihe(), sitz.getSpalte());
             kinosaalRepository.save(kinosaal);
-            sitz.setKinosaalId(kinosaal.getId());
+            sitz.setKinosaal(kinosaal);
+            return new ResponseEntity<Object>(kinosaal, HttpStatus.OK);
         }
     }
 
