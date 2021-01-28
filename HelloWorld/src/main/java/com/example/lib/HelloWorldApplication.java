@@ -520,6 +520,25 @@ public class HelloWorldApplication {
 
         return new ResponseEntity<Object>("Kinosaal oder Film nicht gefunden", HttpStatus.OK);
     }
+    public int sicherheitsschluesselGenerieren(String text){
+        int length = text.length();
+        text += length;
+        return text.hashCode();
+    }
+
+    public boolean validerTicketText(String text){
+        String[] textParts = text.split(">>>>>");
+        if(textParts.length ==2){
+            String erwarteterSchluessel = "" + sicherheitsschluesselGenerieren(textParts[0]);
+            if(erwarteterSchluessel.equals(textParts[1])){
+                return true;
+            }else{
+                return false;
+            }
+        }else{
+            return false;
+        }
+    }
 
     @RequestMapping(value = "/test/sendEmail/{pw}/ticket/{ticket_id}/empfaengeradresse/{adresse}", produces = "application/json")
     public ResponseEntity<Object> sendEmail(@PathVariable(value = "adresse") String to,
@@ -548,7 +567,10 @@ public class HelloWorldApplication {
                 + gastPreiskategorie + "\nBezahlt: " + (bezahlt ? "Ja" : "Nein");
         }else{
             return new ResponseEntity<Object>("Ticket wurde nicht gefunden. Es wurde keine E-Mail verschickt", HttpStatus.OK);
-        }     
+        }
+        qrText += "\nSicherheitsschlüssel: ";
+        int sicherheitsschlüssel = sicherheitsschluesselGenerieren(qrText);
+        qrText += ">>>>>"+sicherheitsschlüssel;
         BufferedImage img = null;
         try {
             img = generateQRCodeImage(qrText);

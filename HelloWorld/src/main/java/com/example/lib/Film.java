@@ -1,7 +1,6 @@
 package com.example.lib;
 
 import java.sql.Date;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import javax.persistence.*;
@@ -9,8 +8,6 @@ import javax.persistence.*;
 import com.example.lib.Enum.Genre;
 
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.ArrayList;
 
 
 @Entity
