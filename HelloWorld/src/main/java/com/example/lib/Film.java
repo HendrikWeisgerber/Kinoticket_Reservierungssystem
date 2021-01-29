@@ -1,13 +1,10 @@
 package com.example.lib;
 
-import java.sql.Date;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-
-import javax.persistence.*;
-
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.persistence.*;
+import java.sql.Date;
 import java.util.ArrayList;
 
 
@@ -26,6 +23,7 @@ public class Film {
     private boolean aktiv;
 //TODO Genre enum statt string
     private String[] genre;
+    @JsonManagedReference
     @Transient
     private ArrayList<Vorstellung> vorstellung;
 
