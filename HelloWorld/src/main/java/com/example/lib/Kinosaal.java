@@ -1,5 +1,6 @@
 package com.example.lib;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.*;
@@ -9,11 +10,12 @@ import java.util.ArrayList;
 @Entity
 public class Kinosaal {
     //private int anzahlSitze;
-    private int spalte;
-    private int reihe;
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
-    private int id;
+    private int id;private int spalte;
+    private int reihe;
+    private String name;
+    @JsonManagedReference
     @Transient
     private ArrayList<Sitz> meineSitze;
     @Transient
@@ -93,6 +95,14 @@ public class Kinosaal {
 
     public void setMeineVorstellungen(ArrayList<Vorstellung> meineVorstellungen) {
         this.meineVorstellungen = meineVorstellungen;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public float zuschauerStundenAuslastungBerechnen(SimpleDateFormat startZeit, SimpleDateFormat endZeit) {

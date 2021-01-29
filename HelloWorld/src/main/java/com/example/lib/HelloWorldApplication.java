@@ -3,25 +3,36 @@ package com.example.lib;
 import com.example.lib.Enum.Genre;
 import com.example.lib.Repositories.*;
 import com.example.lib.security.WebSecurityConfiguration;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties.Pageable;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.activation.DataHandler;
+import javax.imageio.ImageIO;
+import javax.mail.*;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
+import javax.mail.util.ByteArrayDataSource;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.math.BigDecimal;
-
-import java.net.http.HttpResponse;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
@@ -29,28 +40,6 @@ import java.util.Date;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.Semaphore;
-
-import com.google.zxing.BarcodeFormat;
-import com.google.zxing.client.j2se.MatrixToImageWriter;
-import com.google.zxing.common.BitMatrix;
-import com.google.zxing.qrcode.QRCodeWriter;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-
-import javax.activation.DataHandler;
-import javax.imageio.ImageIO;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Multipart;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
-import javax.mail.util.ByteArrayDataSource;
 
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
@@ -61,12 +50,12 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 public class HelloWorldApplication {
     private static Semaphore mutex;
     @Autowired
-	public SitzRepository sitzRepository;
+    public SitzRepository sitzRepository;
 
-	@Autowired
-	public SnackRepository snackRepository;
+    @Autowired
+    public SnackRepository snackRepository;
 
-	@Autowired
+    @Autowired
     public GetraenkRepository getraenkRepository;
 
     @Autowired
@@ -121,10 +110,10 @@ public class HelloWorldApplication {
         kinosaalRepository.deleteAll();
         benutzerRepository.deleteAll();
 
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-		Date date1 = sdf.parse("2020-12-26 15:30:00.000");
-		Date date2 = sdf.parse("2020-12-26 20:30:00.000");
-		Date date3 = sdf.parse("2020-12-26 21:30:00.000");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+        Date date1 = sdf.parse("2020-12-26 15:30:00.000");
+        Date date2 = sdf.parse("2020-12-26 20:30:00.000");
+        Date date3 = sdf.parse("2020-12-26 21:30:00.000");
 
         Genre genre = Genre.SCI_FI;
 
@@ -132,8 +121,8 @@ public class HelloWorldApplication {
         Vorstellung testVor2 = new Vorstellung(date2, new BigDecimal(9), true);
         Vorstellung testVor3 = new Vorstellung(date3, new BigDecimal(9), true);
         Film filmT = new Film("Star Wars", "Bild", "Das ist ein neuer Film", 9, 140, 12, true, genre);
-		Film filmT2 = new Film("Harry Potter", "Bild", "Das ist ein noch neuerer Film", 8, 150, 12, true, genre);
-		Kinosaal saalT = new Kinosaal(50,5,10);
+        Film filmT2 = new Film("Harry Potter", "Bild", "Das ist ein noch neuerer Film", 8, 150, 12, true, genre);
+        Kinosaal saalT = new Kinosaal(50, 5, 10);
 
         filmRepository.save(filmT);
         filmRepository.save(filmT2);
@@ -141,15 +130,15 @@ public class HelloWorldApplication {
         for (int i = 1; i < 3; i++) {
             for (int k = 1; k < 3; k++) {
                 Sitz sitz = new Sitz(i, k, false, new BigDecimal(1));
-                sitz.setKinosaalId(saalT.getId());
+                sitz.setKinosaal(saalT);
                 sitzRepository.save(sitz);
             }
         }
-        testVor.setFilmId(filmT.getId());
+        testVor.setFilm(filmT);
         testVor.setSaal(saalT);
-        testVor2.setFilmId(filmT.getId());
+        testVor2.setFilm(filmT);
         testVor2.setSaal(saalT);
-        testVor3.setFilmId(filmT2.getId());
+        testVor3.setFilm(filmT2);
         testVor3.setSaal(saalT);
         vorstellungRepository.save(testVor);
         vorstellungRepository.save(testVor2);
@@ -201,7 +190,7 @@ public class HelloWorldApplication {
     }
 
     @RequestMapping(value = "/crud/ticket/{vorstellung_id}", produces = "application/json")
-    public ResponseEntity<Object> getAllTickets(@PathVariable(value = "vorstellung_id") long vorstellung_id, Pageable pageable) {
+    public ResponseEntity<Object> getAllTickets(@PathVariable(value = "vorstellung_id") long vorstellung_id) {
 
         Ticket testT = new Ticket();
         Vorstellung testV = new Vorstellung();
@@ -235,9 +224,9 @@ public class HelloWorldApplication {
     }
 
     @RequestMapping(value = "/bestellung/nutzer/{nutzer_id}", produces = "application/json")
-    public ResponseEntity<Object> getAllTicketsInBestellung(@PathVariable(value = "nutzer_id") long nutzer_id, Pageable pageable) {
+    public ResponseEntity<Object> getAllTicketsInBestellung(@PathVariable(value = "nutzer_id") long nutzer_id) {
 
-        Optional<Benutzer> oB = benutzerRepository.findById((Integer) (int) nutzer_id);
+        Optional<Benutzer> oB = benutzerRepository.findById((int) nutzer_id);
         Benutzer b;
         if (!oB.isEmpty()) {
             b = oB.get();
@@ -261,7 +250,7 @@ public class HelloWorldApplication {
     }
 
     @RequestMapping(value = "/warenkorb/nutzer/{nutzer_id}", produces = "application/json")
-    public ResponseEntity<Object> getAllTicketsInWarenkorb(@PathVariable(value = "nutzer_id") long nutzer_id, Pageable pageable) {
+    public ResponseEntity<Object> getAllTicketsInWarenkorb(@PathVariable(value = "nutzer_id") long nutzer_id) {
 
 		/*
 		Ticket testT = new Ticket();
@@ -290,7 +279,7 @@ public class HelloWorldApplication {
 		int b_id = testBenutzer.getId();
 		*/
 
-        Optional<Benutzer> oB = benutzerRepository.findById((Integer) (int) nutzer_id);
+        Optional<Benutzer> oB = benutzerRepository.findById((int) nutzer_id);
         Benutzer b;
         if (!oB.isEmpty()) {
             b = oB.get();
@@ -316,7 +305,7 @@ public class HelloWorldApplication {
 
     // TODO implement MappingMethods
     @RequestMapping(value = "/vorstellung", produces = "application/json")
-    public ResponseEntity<Object> getVorstellung(Pageable pageable) {
+    public ResponseEntity<Object> getVorstellung() {
 
         Iterable<Kinosaal> alleSaeale = kinosaalRepository.findAll();
         for (Kinosaal saal : alleSaeale) {
@@ -340,7 +329,7 @@ public class HelloWorldApplication {
     }
 
     @RequestMapping(value = "/vorstellung/film/{film_id}", produces = "application/json")
-    public ResponseEntity<Object> getVorstellungByFilm(@PathVariable(value = "film_id") int film_id, Pageable pageable) {
+    public ResponseEntity<Object> getVorstellungByFilm(@PathVariable(value = "film_id") int film_id) {
 
         Iterable<Kinosaal> alleSaeale = kinosaalRepository.findAll();
         for (Kinosaal saal : alleSaeale) {
@@ -357,7 +346,7 @@ public class HelloWorldApplication {
     }
 
     @RequestMapping(value = "/kinosaal/vorstellung/{vorstellung_id}", produces = "application/json")
-    public ResponseEntity<Object> getSaalByVorstellung(@PathVariable(value = "vorstellung_id") int vorstellung_id, Pageable pageable) {
+    public ResponseEntity<Object> getSaalByVorstellung(@PathVariable(value = "vorstellung_id") int vorstellung_id) {
 
         Iterable<Kinosaal> alleSaeale = kinosaalRepository.findAll();
         for (Kinosaal saal : alleSaeale) {
@@ -502,9 +491,9 @@ public class HelloWorldApplication {
             bestellung.setBenutzer(b);
             bestellungRepository.save(bestellung);
 
-            return new ResponseEntity<Object>(bestellung, HttpStatus.OK);
+            return new ResponseEntity<>(bestellung, HttpStatus.OK);
         }
-        return new ResponseEntity<Object>("OO", HttpStatus.OK);
+        return new ResponseEntity<>("OO", HttpStatus.OK);
     }
 
     @RequestMapping(value = "/bazahlen/bestellung/{bestellung_id}/iban/{iban_nummer}", produces = "application/json", method = RequestMethod.GET)
@@ -541,9 +530,9 @@ public class HelloWorldApplication {
 
     //Mit body
     @RequestMapping(value = "/insert/vorstellung", produces = "application/json", method = POST)
-    public ResponseEntity<Object> setVorstellung(@RequestBody(required = true) Vorstellung vorstellung) {
+    public ResponseEntity<Object> setVorstellung(@RequestBody() Vorstellung vorstellung) {
         Optional<Kinosaal> kinosaal = kinosaalRepository.findById(vorstellung.getSaal().getId());
-        Optional<Film> film = filmRepository.findById(vorstellung.getFilmId());
+        Optional<Film> film = filmRepository.findById(vorstellung.getFilm().getId());
 
         String response = "";
         vorstellungRepository.save(vorstellung);
@@ -554,7 +543,7 @@ public class HelloWorldApplication {
             response += "Kinosaal nicht gefunden, wurde erstellt";
         } //TODO Das gleiche für Film wenn ohne ID!
 
-        return new ResponseEntity<Object>(response, HttpStatus.OK);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/insert/vorstellung/film/{film_id}/kinosaal/{kinosaal_id}/startzeit/{startzeit}/grundpreis/{grundpreis}/aktiv/{aktiv]", produces = "application/json", method = POST)
@@ -569,19 +558,43 @@ public class HelloWorldApplication {
 
         if (kinosaal.isPresent() && film.isPresent()) {
             Vorstellung vorstellung = new Vorstellung();
-            vorstellung.setFilmId((int) film_id);
+            vorstellung.setFilm(film.get());
             vorstellung.setSaal(kinosaal.get());
             vorstellung.setStartZeit(startzeit);
             vorstellung.setGrundpreis(grundpreis);
-            Boolean istAktiv = false;
+            boolean istAktiv = false;
             istAktiv = (aktiv != 0);
             vorstellung.setAktiv(istAktiv);
             vorstellungRepository.save(vorstellung);
 
-            return new ResponseEntity<Object>(vorstellung, HttpStatus.OK);
+            return new ResponseEntity<>(vorstellung, HttpStatus.OK);
         }
 
-        return new ResponseEntity<Object>("Kinosaal oder Film nicht gefunden", HttpStatus.OK);
+        return new ResponseEntity<>("Kinosaal oder Film nicht gefunden", HttpStatus.OK);
+    }
+
+    //Mit body
+    @RequestMapping(value = "/insert/Sitz/{kinosaal_id}", produces = "application/json", method = POST)
+    public ResponseEntity<Object> setVorstellung(@RequestBody() Sitz sitz,
+                                                 @PathVariable(value = "kinosaal_id") long kinosaal_id) {
+
+        Optional<Kinosaal> optionalKinosaal = kinosaalRepository.findById((int) kinosaal_id);
+
+        if (optionalKinosaal.isPresent()) {
+            Kinosaal kinosaal = optionalKinosaal.get();
+            // Prüfen ob der Sitz in das Kinosaal passt, falls nicht Kinosaal "vergrößern"
+            if (kinosaal.getReihe() < sitz.getReihe()) kinosaal.setReihe(sitz.getReihe());
+            if (kinosaal.getSpalte() < sitz.getSpalte()) kinosaal.setSpalte(sitz.getSpalte());
+            kinosaalRepository.save(kinosaal);
+            sitz.setKinosaal(kinosaal); //TODO ID speichern ist nicht ganz richtig, ähnlich wie beim Film, Siehe Benutzer<->Bestellung
+            sitzRepository.save(sitz);
+            return new ResponseEntity<>(kinosaal, HttpStatus.OK);
+        } else {
+            Kinosaal kinosaal = new Kinosaal(sitz.getReihe(), sitz.getSpalte());
+            kinosaalRepository.save(kinosaal);
+            sitz.setKinosaal(kinosaal);
+            return new ResponseEntity<>(kinosaal, HttpStatus.OK);
+        }
     }
     public int sicherheitsschluesselGenerieren(String text){
         int length = text.length();
@@ -611,7 +624,7 @@ public class HelloWorldApplication {
         //Ticket ticket;
         if (oTicket != null) {
             Ticket ticket = oTicket.get();
-            int filmId = ticket.getVorstellung().getFilmId();
+            int filmId = ticket.getVorstellung().getFilm().getId();
             oFilm = filmRepository.findById(filmId);
 
             String gastPreiskategorie = ticket.getGast().getPreiskategorie().toString();
@@ -702,6 +715,7 @@ public class HelloWorldApplication {
         return "Email wurde an " + to + " gesendet";
     }
 
+    // return new ResponseEntity<>("Email soll an " + to + " gesendet werden", HttpStatus.OK);
     @RequestMapping(value = "/test/sendEmail/{pw}/ticket/{ticket_id}/empfaengeradresse/{adresse}", produces = "application/json")
     public ResponseEntity<Object> sendEmailRequest(@PathVariable(value = "adresse") String to,
             @PathVariable(value = "pw") String password, @PathVariable(value = "ticket_id") int ticketId){
@@ -724,9 +738,7 @@ public class HelloWorldApplication {
     }
 
     // Diese Methode darf nur in einem Semaphor aufgerufen werden!!!
-    private ResponseEntity<Object> makeTicket(@PathVariable(value = "sitz_id") long sitz_id,
-                                              @PathVariable(value = "vorstellung_id") long vorstellung_id,
-                                              @PathVariable(value = "benutzer_id") long kaeufer_id) {
+    private ResponseEntity<Object> makeTicket(long sitz_id, long vorstellung_id, long kaeufer_id) {
         Ticket ticket = new Ticket();
         Sitz sitz = new Sitz();
         Vorstellung vorstellung = new Vorstellung();

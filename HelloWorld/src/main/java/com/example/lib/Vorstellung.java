@@ -1,11 +1,10 @@
 package com.example.lib;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 
 @Entity
@@ -16,7 +15,10 @@ public class Vorstellung {
     private Date startZeit;
     private BigDecimal grundpreis;
     private boolean aktiv;
-    private int filmId;
+    @JsonBackReference
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "film_id", referencedColumnName = "id")
+    private Film film;
     @ManyToOne
     @JoinColumn(name = "kinosaal_id")
     private Kinosaal saal;
@@ -59,12 +61,12 @@ public class Vorstellung {
         this.grundpreis = grundpreis;
     }
 
-    public int getFilmId() {
-        return filmId;
+    public Film getFilm() {
+        return film;
     }
 
-    public void setFilmId(Integer filmId) {
-        this.filmId = filmId;
+    public void setFilm(Film film) {
+        this.film = film;
     }
 
     public Date getStartZeit() {

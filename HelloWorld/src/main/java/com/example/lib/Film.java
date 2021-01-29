@@ -1,5 +1,9 @@
 package com.example.lib;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.persistence.*;
 import java.sql.Date;
 import java.util.ArrayList;
 
@@ -106,23 +110,23 @@ public class Film {
     public Genre getGenre1() {
         return this.genre1;
     }
-    
+
     public void setGenre1(Genre genre1) {
         this.genre1 = genre1;
     }
-    
+
     public Genre getGenre2() {
         return this.genre2;
     }
-    
+
     public void setGenre2(Genre genre2) {
         this.genre2 = genre2;
     }
-    
+
     public Genre getGenre3() {
         return this.genre3;
     }
-    
+
     public void setGenre3(Genre genre3) {
         this.genre3 = genre3;
     }
