@@ -3,6 +3,10 @@ package com.example.lib;
 import com.example.lib.Enum.Genre;
 import com.example.lib.Repositories.*;
 import com.example.lib.security.WebSecurityConfiguration;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -17,10 +21,17 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.activation.DataHandler;
+import javax.imageio.ImageIO;
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
+import javax.mail.util.ByteArrayDataSource;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -104,7 +115,6 @@ public class HelloWorldApplication {
         Date date2 = sdf.parse("2020-12-26 20:30:00.000");
         Date date3 = sdf.parse("2020-12-26 21:30:00.000");
 
-        String[] genre = {"Sci-Fi"};
         Genre genre = Genre.SCI_FI;
 
         Vorstellung testVor = new Vorstellung(date1, new BigDecimal(8), true);
@@ -614,7 +624,7 @@ public class HelloWorldApplication {
         //Ticket ticket;
         if (oTicket != null) {
             Ticket ticket = oTicket.get();
-            int filmId = ticket.getVorstellung().getFilmId();
+            int filmId = ticket.getVorstellung().getFilm().getId();
             oFilm = filmRepository.findById(filmId);
 
             String gastPreiskategorie = ticket.getGast().getPreiskategorie().toString();
@@ -705,7 +715,7 @@ public class HelloWorldApplication {
         return "Email wurde an " + to + " gesendet";
     }
 
-        return new ResponseEntity<>("Email soll an " + to + " gesendet werden", HttpStatus.OK);
+    // return new ResponseEntity<>("Email soll an " + to + " gesendet werden", HttpStatus.OK);
     @RequestMapping(value = "/test/sendEmail/{pw}/ticket/{ticket_id}/empfaengeradresse/{adresse}", produces = "application/json")
     public ResponseEntity<Object> sendEmailRequest(@PathVariable(value = "adresse") String to,
             @PathVariable(value = "pw") String password, @PathVariable(value = "ticket_id") int ticketId){
