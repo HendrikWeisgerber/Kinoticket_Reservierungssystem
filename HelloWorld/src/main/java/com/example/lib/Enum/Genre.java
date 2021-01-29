@@ -9,5 +9,14 @@ public enum Genre {
     FANTASY,
     DRAMA,
     DOCUMENTARY,
-    HISTORY
+    HISTORY,
+    ANIMATION,
+    FAMILY,
+    MUSICAL,
+    SHORT,
+    ROMANCE,
+    SUPERHERO,
+    WESTERN,
+    SONSTIGE,
+    NO_GENRE
 }

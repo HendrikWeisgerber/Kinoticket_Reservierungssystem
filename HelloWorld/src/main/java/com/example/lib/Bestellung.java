@@ -2,6 +2,8 @@ package com.example.lib;
 
 import javax.persistence.*;
 
+import com.example.lib.Repositories.TicketRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Entity
@@ -70,9 +72,11 @@ public class Bestellung {
         ticket=null;
     }
 
-    public void reservierungBezahlen(){
+    public void reservierungBezahlen(TicketRepository ticketRepository){
+        setTicket(ticketRepository.findByBestellung(this));
         for (Ticket einTicket : ticket){
             einTicket.setBezahlt(true);
+            ticketRepository.save(einTicket);
         }
         this.bezahlt= true; //TODO bezahl möglichkeiten müssen implementiert werden
     }
@@ -84,9 +88,9 @@ public class Bestellung {
         return bezahlt;
     }
 
-    public void setBezahlt(boolean bezahlt) {
+    public void setBezahlt(boolean bezahlt, TicketRepository ticketRepository) {
         this.bezahlt = bezahlt;
-        if(bezahlt)this.reservierungBezahlen();
+        if(bezahlt)this.reservierungBezahlen(ticketRepository);
     }
 
 }

@@ -7,6 +7,12 @@ import javax.persistence.*;
 import java.sql.Date;
 import java.util.ArrayList;
 
+import javax.persistence.*;
+
+import com.example.lib.Enum.Genre;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
 
 @Entity
 public class Film {
@@ -21,9 +27,11 @@ public class Film {
     private int laenge;
     private int mindestAlter;
     private boolean aktiv;
-//TODO Genre enum statt string
-    private String[] genre;
-    @JsonManagedReference
+    // TODO Genre enum statt string
+    private Genre genre1;
+    private Genre genre2;
+    private Genre genre3;
+
     @Transient
     private ArrayList<Vorstellung> vorstellung;
 
@@ -99,13 +107,33 @@ public class Film {
         this.vorstellung = new ArrayList<Vorstellung>();
     }
 
-    public String[] getGenre() {
-        return this.genre;
+    public Genre getGenre1() {
+        return this.genre1;
+    }
+
+    public void setGenre1(Genre genre1) {
+        this.genre1 = genre1;
+    }
+
+    public Genre getGenre2() {
+        return this.genre2;
+    }
+
+    public void setGenre2(Genre genre2) {
+        this.genre2 = genre2;
+    }
+
+    public Genre getGenre3() {
+        return this.genre3;
+    }
+
+    public void setGenre3(Genre genre3) {
+        this.genre3 = genre3;
     }
 
     @Autowired
     public Film(String name, String bild, String beschreibung, int bewertung, int laenge, int mindestAlter,
-            boolean aktiv, String[] genre) {
+            boolean aktiv, Genre genre1) {
         this.name = name;
         this.bild = bild;
         this.beschreibung = beschreibung;
@@ -113,7 +141,37 @@ public class Film {
         this.laenge = laenge;
         this.mindestAlter = mindestAlter;
         this.aktiv = aktiv;
-        this.genre = genre;
+        this.genre1 = genre1;
+        this.genre2 = Genre.NO_GENRE;
+        this.genre3 = Genre.NO_GENRE;
+    }
+
+    public Film(String name, String bild, String beschreibung, int bewertung, int laenge, int mindestAlter,
+            boolean aktiv, Genre genre1, Genre genre2) {
+        this.name = name;
+        this.bild = bild;
+        this.beschreibung = beschreibung;
+        this.bewertung = bewertung;
+        this.laenge = laenge;
+        this.mindestAlter = mindestAlter;
+        this.aktiv = aktiv;
+        this.genre1 = genre1;
+        this.genre2 = genre2;
+        this.genre3 = Genre.NO_GENRE;
+    }
+
+    public Film(String name, String bild, String beschreibung, int bewertung, int laenge, int mindestAlter,
+            boolean aktiv, Genre genre1, Genre genre2, Genre genre3) {
+        this.name = name;
+        this.bild = bild;
+        this.beschreibung = beschreibung;
+        this.bewertung = bewertung;
+        this.laenge = laenge;
+        this.mindestAlter = mindestAlter;
+        this.aktiv = aktiv;
+        this.genre1 = genre1;
+        this.genre2 = genre2;
+        this.genre3 = genre2;
     }
 
     public Film() {
