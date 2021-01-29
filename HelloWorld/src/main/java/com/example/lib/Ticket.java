@@ -42,7 +42,6 @@ public class Ticket {
     private Getraenk getraenk;
 
 
-    
     //TODO: implementiere Essen und trinken funktionen
 
     @Autowired

@@ -49,7 +49,7 @@ public class FilmController {
 
         Iterable<Kinosaal> alleSaeale =  kinosaalRepository.findAll();
         for(Kinosaal saal: alleSaeale) {
-            Sitz[] sitze = sitzRepository.findByKinosaalId(saal.getId());
+            Sitz[] sitze = sitzRepository.findByKinosaal(saal);
             for(Sitz sitz : sitze) {
                 if(saal.getMeineSitze() == null) {
                     saal.setMeineSitze();
@@ -78,7 +78,7 @@ public class FilmController {
 
         Iterable<Kinosaal> alleSaeale =  kinosaalRepository.findAll();
         for(Kinosaal saal: alleSaeale) {
-            Sitz[] sitze = sitzRepository.findByKinosaalId(saal.getId());
+            Sitz[] sitze = sitzRepository.findByKinosaal(saal);
             for(Sitz sitz : sitze) {
                 if(saal.getMeineSitze() == null) {
                     saal.setMeineSitze();
