@@ -116,7 +116,7 @@ public class FilmController {
             String[] genreString = String.valueOf(hashGenre.entrySet().toArray()[1]).split("=");
             genre[i] = genreString[1];
         }
-        Film film = new Film(name, bild, beschreibung, 9, laenge, 12, true, genre);
+        Film film = new Film(name, bild, beschreibung, 9, laenge, 6, true, genre);
         filmRepository.save(film);
         return new ResponseEntity<>("Der Film wurde hinzugefügt!", HttpStatus.OK);
     }
