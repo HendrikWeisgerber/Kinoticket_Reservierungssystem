@@ -10,11 +10,10 @@ import java.util.ArrayList;
 @Entity
 public class Kinosaal {
     //private int anzahlSitze;
-    private int spalte;
-    private int reihe;
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
-    private int id;
+    private int id;private int spalte;
+    private int reihe;
     private String name;
     @JsonManagedReference
     @Transient
