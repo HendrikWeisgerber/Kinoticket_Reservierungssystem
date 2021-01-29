@@ -147,7 +147,7 @@ public class HelloWorldApplication {
 
         Iterable<Kinosaal> alleSaeale = kinosaalRepository.findAll();
         for (Kinosaal saal : alleSaeale) {
-            Sitz[] sitze = sitzRepository.findByKinosaalId(saal.getId());
+            Sitz[] sitze = sitzRepository.findByKinosaal(saal);
             for (Sitz sitz : sitze) {
                 if (saal.getMeineSitze() == null) {
                     saal.setMeineSitze();
@@ -221,6 +221,34 @@ public class HelloWorldApplication {
 
 
         return new ResponseEntity<>(ticketRepository.findByVorstellungId((int) vorstellung_id), HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/sitze/vorstellung/{vorstellung_id}", produces = "application/json")
+    public ResponseEntity<Object> getAllSitzeBelegt(@PathVariable(value = "vorstellung_id") int vorstellung_id) {
+        Optional<Vorstellung> oV = vorstellungRepository.findById(vorstellung_id);
+        if (oV.isPresent()) {
+            Vorstellung vorstellung = oV.get();
+            Kinosaal kinosaal = vorstellung.getSaal();
+            Ticket[] tickets = ticketRepository.findByVorstellung(vorstellung);
+            Sitz[] sitze = sitzRepository.findByKinosaal(kinosaal);
+            VorstellungsSitz[] vSitze = new VorstellungsSitz[sitze.length];
+            int index = 0;
+            boolean isBesetzt;
+            for (Sitz sitz : sitze) {
+                isBesetzt = false;
+                for (Ticket ticket : tickets) {
+                    if (ticket.getIstValide() && ticket.getSitz() == sitz) {
+                        isBesetzt = true;
+                    }
+                }
+                vSitze[index] = new VorstellungsSitz(sitz, isBesetzt);
+                index++;
+            }
+            return new ResponseEntity<>(vSitze, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("Vorstellung nicht gefunden", HttpStatus.OK);
+        }
+
     }
 
     @RequestMapping(value = "/bestellung/nutzer/{nutzer_id}", produces = "application/json")
@@ -309,7 +337,7 @@ public class HelloWorldApplication {
 
         Iterable<Kinosaal> alleSaeale = kinosaalRepository.findAll();
         for (Kinosaal saal : alleSaeale) {
-            Sitz[] sitze = sitzRepository.findByKinosaalId(saal.getId());
+            Sitz[] sitze = sitzRepository.findByKinosaal(saal);
             for (Sitz sitz : sitze) {
                 if (saal.getMeineSitze() == null) {
                     saal.setMeineSitze();
@@ -333,7 +361,7 @@ public class HelloWorldApplication {
 
         Iterable<Kinosaal> alleSaeale = kinosaalRepository.findAll();
         for (Kinosaal saal : alleSaeale) {
-            Sitz[] sitze = sitzRepository.findByKinosaalId(saal.getId());
+            Sitz[] sitze = sitzRepository.findByKinosaal(saal);
             for (Sitz sitz : sitze) {
                 if (saal.getMeineSitze() == null) {
                     saal.setMeineSitze();
@@ -350,7 +378,7 @@ public class HelloWorldApplication {
 
         Iterable<Kinosaal> alleSaeale = kinosaalRepository.findAll();
         for (Kinosaal saal : alleSaeale) {
-            Sitz[] sitze = sitzRepository.findByKinosaalId(saal.getId());
+            Sitz[] sitze = sitzRepository.findByKinosaal(saal);
             for (Sitz sitz : sitze) {
                 if (saal.getMeineSitze() == null) {
                     saal.setMeineSitze();
