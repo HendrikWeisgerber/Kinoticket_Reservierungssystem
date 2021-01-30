@@ -12,7 +12,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -414,6 +413,8 @@ public class HelloWorldApplication {
 
     }
 
+    /*
+
     // Copied
     @RequestMapping(value = "/ticket/sitz/{sitz_id}/vorstellung/{vorstellung_id}/benutzer/{benutzer_id}", produces = "application/json", method = POST)
     public ResponseEntity<Object> setTicketOhneGast(@PathVariable(value = "sitz_id") long sitz_id,
@@ -467,6 +468,8 @@ public class HelloWorldApplication {
         mutex.release();
         return new ResponseEntity<>(o, HttpStatus.OK);
     }
+
+     */
 
     @RequestMapping(value = "warenkorb/benutzer/{benutzer_id}/ticket/{ticket_id}", produces = "appliation/json")
     public ResponseEntity<Object> saveTicketInWarenkorb(@PathVariable(value = "benutzer_id") long benutzer_id,
@@ -558,6 +561,7 @@ public class HelloWorldApplication {
     }
 
     //Mit body
+    /*
     @RequestMapping(value = "/insert/vorstellung", produces = "application/json", method = POST)
     public ResponseEntity<Object> setVorstellung(@RequestBody() Vorstellung vorstellung) {
         Optional<Kinosaal> kinosaal = kinosaalRepository.findById(vorstellung.getSaal().getId());
@@ -602,9 +606,10 @@ public class HelloWorldApplication {
         return new ResponseEntity<>("Kinosaal oder Film nicht gefunden", HttpStatus.OK);
     }
 
+    */
     //Mit body
     @RequestMapping(value = "/insert/Sitz/{kinosaal_id}", produces = "application/json", method = POST)
-    public ResponseEntity<Object> setVorstellung(@RequestBody() Sitz sitz,
+    public ResponseEntity<Object> setSitzImKinosaal(@RequestBody() Sitz sitz,
                                                  @PathVariable(value = "kinosaal_id") long kinosaal_id) {
 
         Optional<Kinosaal> optionalKinosaal = kinosaalRepository.findById((int) kinosaal_id);
@@ -619,12 +624,14 @@ public class HelloWorldApplication {
             sitzRepository.save(sitz);
             return new ResponseEntity<>(kinosaal, HttpStatus.OK);
         } else {
+            // falls kein Kinosaal da wird erstellt
             Kinosaal kinosaal = new Kinosaal(sitz.getReihe(), sitz.getSpalte());
             kinosaalRepository.save(kinosaal);
             sitz.setKinosaal(kinosaal);
             return new ResponseEntity<>(kinosaal, HttpStatus.OK);
         }
     }
+
     public int sicherheitsschluesselGenerieren(String text){
         int length = text.length();
         text += length;
@@ -768,6 +775,7 @@ public class HelloWorldApplication {
 
     // Diese Methode darf nur in einem Semaphor aufgerufen werden!!!
     // Copied
+    /*
     private ResponseEntity<Object> makeTicket(long sitz_id, long vorstellung_id, long kaeufer_id) {
         Ticket ticket = new Ticket();
         Sitz sitz = new Sitz();
@@ -797,7 +805,7 @@ public class HelloWorldApplication {
             kinosaalRepository.save(kinosaal);
             sitz.setKinosaalId(kinosaal.getId());
             sitzRepository.save(sitz);
-            ticket.setSitz(sitz);*/
+            ticket.setSitz(sitz); // COmment
             System.out.println("Kein Sitz gefunden");
             return new ResponseEntity<>("Kein Sitz gefunden", HttpStatus.OK);
         }
@@ -855,5 +863,5 @@ public class HelloWorldApplication {
         }
         return false;
 
-    }
+    }*/
 }

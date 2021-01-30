@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import static org.springframework.web.bind.annotation.RequestMethod.POST;
+
 @CrossOrigin(origins = "*", allowedHeaders = "*") //TODO für localhost React einstellen, Sicherheit
 @RestController
 @RequestMapping(value = "/benutzer")
@@ -40,4 +42,20 @@ public class BenutzerController {
         benutzerRepository.save(user);
         return new ResponseEntity<Object>(user, HttpStatus.OK);
     } //TODO add more checks for user
+
+    @RequestMapping(value = "update", produces = "application/json", method = POST)
+    public ResponseEntity<Object> updateUser(@RequestBody Benutzer user) {
+        Benutzer b = benutzerRepository.findByUsername(user.getUsername()); // TODO Benutzername mit JWT bekommen
+        if (b == null) {
+            return new ResponseEntity<>("Kein Benutzer mit dem Benutzernamen", HttpStatus.OK);
+        }
+
+        b.setVorname(user.getVorname());
+        b.setNachname(user.getNachname());
+        b.setEmail(user.getEmail());
+        b.setNewsletter(user.getNewsletter());
+        benutzerRepository.save(b);
+
+        return new ResponseEntity<>(b, HttpStatus.OK);
+    }
 }

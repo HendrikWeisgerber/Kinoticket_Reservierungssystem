@@ -120,13 +120,13 @@ public class FilmController {
         }
         Genre[] genres = new Genre[3];
         genres[0] = Genre.NO_GENRE;
-        genres[0] = Genre.NO_GENRE;
+        genres[0] = Genre.NO_GENRE; // TODO 0 ist falsch oder??
         genres[0] = Genre.NO_GENRE;
         int genreCounter = 0;
 
         for (String genreName : genreArray) {
             if (genreCounter < genres.length) {
-                switch (genreName) {
+                switch (genreName) { // TODO besser toLowerCase() verwenden, wäre auch weniger Arbeit XD
                     case "Action":
                     case "ACTION":
                     case "action":
