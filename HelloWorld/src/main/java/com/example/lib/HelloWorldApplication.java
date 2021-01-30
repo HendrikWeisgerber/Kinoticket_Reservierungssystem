@@ -414,6 +414,7 @@ public class HelloWorldApplication {
 
     }
 
+    // Copied
     @RequestMapping(value = "/ticket/sitz/{sitz_id}/vorstellung/{vorstellung_id}/benutzer/{benutzer_id}", produces = "application/json", method = POST)
     public ResponseEntity<Object> setTicketOhneGast(@PathVariable(value = "sitz_id") long sitz_id,
                                                     @PathVariable(value = "vorstellung_id") long vorstellung_id,
@@ -766,6 +767,7 @@ public class HelloWorldApplication {
     }
 
     // Diese Methode darf nur in einem Semaphor aufgerufen werden!!!
+    // Copied
     private ResponseEntity<Object> makeTicket(long sitz_id, long vorstellung_id, long kaeufer_id) {
         Ticket ticket = new Ticket();
         Sitz sitz = new Sitz();
