@@ -31,7 +31,7 @@ public class WarenkorbController {
     TicketRepository ticketRepository;
 
     //Nutzer wird zu benutzer
-    @RequestMapping(value = "/warenkorb/benutzer/{benutzer_id}", produces = "application/json")
+    @RequestMapping(value = "/benutzer/{benutzer_id}", produces = "application/json")
     public ResponseEntity<Object> getAllTicketsInWarenkorb(@PathVariable(value = "benutzer_id") long benutzer_id) {
 
         Optional<Benutzer> oB = benutzerRepository.findById((int) benutzer_id);
@@ -57,7 +57,7 @@ public class WarenkorbController {
         return new ResponseEntity<>(t, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "warenkorb/benutzer/{benutzer_id}/ticket/{ticket_id}", produces = "appliation/json")
+    @RequestMapping(value = "/benutzer/{benutzer_id}/ticket/{ticket_id}", produces = "appliation/json")
     public ResponseEntity<Object> saveTicketInWarenkorb(@PathVariable(value = "benutzer_id") long benutzer_id,
                                                         @PathVariable(value = "ticket_id") long ticket_id) {
         Optional<Benutzer> optionalBenutzer = benutzerRepository.findById((int) benutzer_id);

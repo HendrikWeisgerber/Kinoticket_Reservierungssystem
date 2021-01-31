@@ -31,7 +31,7 @@ public class SitzController {
     @Autowired
     TicketRepository ticketRepository;
 
-    @RequestMapping(value = "/sitze/vorstellung/{vorstellung_id}", produces = "application/json")
+    @RequestMapping(value = "/vorstellung/{vorstellung_id}", produces = "application/json")
     public ResponseEntity<Object> getAllSitzeBelegt(@PathVariable(value = "vorstellung_id") int vorstellung_id) {
         Optional<Vorstellung> oV = vorstellungRepository.findById(vorstellung_id);
         if (oV.isPresent()) {
