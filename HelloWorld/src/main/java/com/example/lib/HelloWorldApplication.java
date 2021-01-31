@@ -82,10 +82,12 @@ public class HelloWorldApplication {
         return new UserDetailsService() {
             @Override
             public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-                Benutzer user = benutzerRepository.findByUsername(username);
-                if (user == null) {
+                Optional<Benutzer> userOptional = benutzerRepository.findByUsername(username);
+                Benutzer user;
+                if (userOptional.isEmpty()) {
                     throw new UsernameNotFoundException(username);
                 }
+                user = userOptional.get();
                 return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPasswortHash(), Collections.emptyList());
             }
         };

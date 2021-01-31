@@ -9,6 +9,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
+import java.util.Optional;
+
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*") //TODO für localhost React einstellen, Sicherheit
@@ -30,7 +33,7 @@ public class BenutzerController {
             return new ResponseEntity<Object>("Der Benutzername oder das Passwort sind leer", HttpStatus.OK);
         }
 
-        if (benutzerRepository.findByUsername(user.getUsername()) != null) {
+        if (benutzerRepository.findByUsername(user.getUsername()).isPresent()) {
             return new ResponseEntity<Object>("Der Benutzername ist bereits vergeben", HttpStatus.OK);
         }
 
@@ -44,12 +47,15 @@ public class BenutzerController {
     } //TODO add more checks for user
 
     @RequestMapping(value = "update", produces = "application/json", method = POST)
-    public ResponseEntity<Object> updateUser(@RequestBody Benutzer user) {
-        Benutzer b = benutzerRepository.findByUsername(user.getUsername()); // TODO Benutzername mit JWT bekommen
-        if (b == null) {
+    public ResponseEntity<Object> updateUser(@RequestBody Benutzer user,
+                                             Principal principal) {
+        Optional<Benutzer> benutzerOptional = benutzerRepository.findByUsername(principal.getName());
+        Benutzer b;
+        if (benutzerOptional.isEmpty()) {
             return new ResponseEntity<>("Kein Benutzer mit dem Benutzernamen", HttpStatus.OK);
         }
 
+        b = benutzerOptional.get();
         b.setVorname(user.getVorname());
         b.setNachname(user.getNachname());
         b.setEmail(user.getEmail());
