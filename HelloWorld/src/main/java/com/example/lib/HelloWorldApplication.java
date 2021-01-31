@@ -190,10 +190,10 @@ public class HelloWorldApplication {
     }
 
     //TODO In den Controller verschieben
-    @RequestMapping(value = "/ticket/bestellung/benutzer/{benutzer_id}", produces = "application/json", method = POST)
+    @RequestMapping(value = "/ticket/bestellung", produces = "application/json", method = POST)
     public ResponseEntity<Object> setBestellung(@RequestBody(required = true) int[] ticketIds,
-                                                @PathVariable(value = "benutzer_id") long benutzer_id) {
-        Optional<Benutzer> optionalBenutzer = benutzerRepository.findById((int) benutzer_id);
+                                                Principal principal) {
+        Optional<Benutzer> optionalBenutzer = benutzerRepository.findByUsername(principal.getName());
         if (optionalBenutzer.isPresent()) {
             Benutzer b = optionalBenutzer.get();
             if (b.getWarenkorb() == null) {
@@ -213,7 +213,6 @@ public class HelloWorldApplication {
             for (int ticketId : ticketIds) {
                 String s = sendEmail("kg42_kg42", b.getEmail(), ticketId);
             }
-            //TODO Sicherheitslücke wenn die Methode so bleibt. Der Benutzer könnte jegliche Tickets mit allen möglichen Daten selbst speichern wie er will
             bestellung.setBenutzer(b);
             bestellungRepository.save(bestellung);
 
@@ -225,6 +224,9 @@ public class HelloWorldApplication {
     //TODO in den Controller verschieben
     @RequestMapping(value = "/bazahlen/bestellung/{bestellung_id}/iban/{iban_nummer}", produces = "application/json", method = RequestMethod.GET)
     public ResponseEntity<Object> payBestellung(@PathVariable(value = "bestellung_id") int bestellung_id, @PathVariable(value = "iban_nummer") String iban) {
+
+        // TODO checken ob man die eigene Bestellung bestellt oder die Id evtl. falsch ist
+
         Optional<Bestellung> oB = bestellungRepository.findById(bestellung_id);
         String response = "";
         if (ibanValidation(iban)) {

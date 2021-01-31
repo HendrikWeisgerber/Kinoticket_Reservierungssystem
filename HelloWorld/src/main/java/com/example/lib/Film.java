@@ -21,7 +21,6 @@ public class Film {
     private int laenge;
     private int mindestAlter;
     private boolean aktiv;
-    // TODO Genre enum statt string
     private Genre genre1;
     private Genre genre2;
     private Genre genre3;

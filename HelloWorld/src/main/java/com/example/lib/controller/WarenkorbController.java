@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.Principal;
 import java.util.Optional;
 
 @RestController
@@ -31,12 +32,12 @@ public class WarenkorbController {
     TicketRepository ticketRepository;
 
     //Nutzer wird zu benutzer
-    @RequestMapping(value = "/benutzer/{benutzer_id}", produces = "application/json")
-    public ResponseEntity<Object> getAllTicketsInWarenkorb(@PathVariable(value = "benutzer_id") long benutzer_id) {
+    @RequestMapping(value = "/", produces = "application/json")
+    public ResponseEntity<Object> getAllTicketsInWarenkorb(Principal principal) {
 
-        Optional<Benutzer> oB = benutzerRepository.findById((int) benutzer_id);
+        Optional<Benutzer> oB = benutzerRepository.findByUsername(principal.getName());
         Benutzer b;
-        if (!oB.isEmpty()) {
+        if (!oB.isEmpty()) { // TODO Umschreiben? Falls Benutzer nicht gefunden wird -> Fehlermeldung?
             b = oB.get();
         } else {
             b = null;
@@ -57,10 +58,10 @@ public class WarenkorbController {
         return new ResponseEntity<>(t, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/benutzer/{benutzer_id}/ticket/{ticket_id}", produces = "appliation/json")
-    public ResponseEntity<Object> saveTicketInWarenkorb(@PathVariable(value = "benutzer_id") long benutzer_id,
-                                                        @PathVariable(value = "ticket_id") long ticket_id) {
-        Optional<Benutzer> optionalBenutzer = benutzerRepository.findById((int) benutzer_id);
+    @RequestMapping(value = "ticket/{ticket_id}", produces = "appliation/json")
+    public ResponseEntity<Object> saveTicketInWarenkorb(@PathVariable(value = "ticket_id") long ticket_id,
+                                                        Principal principal) {
+        Optional<Benutzer> optionalBenutzer = benutzerRepository.findByUsername(principal.getName());
         if (optionalBenutzer.isPresent()) {
             Benutzer benutzer = optionalBenutzer.get();
             if (benutzer.getWarenkorb() == null) {

@@ -49,7 +49,7 @@ public class VorstellungController {
                 }
                 saal.getMeineSitze().add(sitz);
             }
-        }
+        } // TODO getrennte Methoden und Analog bei anderen Klassen oder unnötig und mit API Calls ersetzen?
         /*Vorstellung testVor = new Vorstellung();
         Film filmT = new Film();
         filmRepository.save(filmT);
@@ -90,7 +90,7 @@ public class VorstellungController {
         if (kinosaal.isEmpty()) {
             kinosaalRepository.save(vorstellung.getSaal());
             response += "Kinosaal nicht gefunden, wurde erstellt";
-        } //TODO Das gleiche für Film wenn ohne ID!
+        }
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

@@ -11,10 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.Principal;
 import java.util.Optional;
 
 @RestController
@@ -34,12 +34,12 @@ public class BestellungController {
     @Autowired
     WarenkorbRepository warenkorbRepository;
 
-    @RequestMapping(value = "/nutzer/{nutzer_id}", produces = "application/json")
-    public ResponseEntity<Object> getAllTicketsInBestellung(@PathVariable(value = "nutzer_id") long nutzer_id) {
+    @RequestMapping(value = "", produces = "application/json")
+    public ResponseEntity<Object> getAllTicketsInBestellung(Principal principal) {
 
-        Optional<Benutzer> oB = benutzerRepository.findById((int) nutzer_id);
+        Optional<Benutzer> oB = benutzerRepository.findByUsername(principal.getName());
         Benutzer b;
-        if (!oB.isEmpty()) {
+        if (!oB.isEmpty()) { // TODO Umschreiben? Falls Benutzer nicht gefunden wird -> Fehlermeldung?
             b = oB.get();
         } else {
             b = null;
