@@ -188,40 +188,7 @@ public class HelloWorldApplication {
         return new ResponseEntity<>("Die Datenbank wurde erfolgreich resettet!", HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/crud/ticket/{vorstellung_id}", produces = "application/json")
-    public ResponseEntity<Object> getAllTickets(@PathVariable(value = "vorstellung_id") long vorstellung_id) {
-
-        Ticket testT = new Ticket();
-        Vorstellung testV = new Vorstellung();
-        Sitz testSitz = new Sitz(3, 5, true, new BigDecimal(2));
-        Benutzer testBenutzer = new Benutzer();
-        vorstellungRepository.save(testV);
-        sitzRepository.save(testSitz);
-        benutzerRepository.save(testBenutzer);
-
-        testT.setSitz(testSitz);
-        testT.setVorstellung(testV);
-        testT.setKaeufer(testBenutzer);
-        testT.setGast(testBenutzer);
-        testT.setBezahlt(true);
-        testT.setIstValide(false);
-
-        ticketRepository.save(testT);
-
-        Ticket testT2 = new Ticket();
-        testT2.setSitz(testSitz);
-        testT2.setVorstellung(testV);
-        testT2.setKaeufer(testBenutzer);
-        testT2.setGast(testBenutzer);
-        testT2.setBezahlt(false);
-        testT2.setIstValide(false);
-
-        ticketRepository.save(testT2);
-
-
-        return new ResponseEntity<>(ticketRepository.findByVorstellungId((int) vorstellung_id), HttpStatus.OK);
-    }
-
+    /*
     @RequestMapping(value = "/sitze/vorstellung/{vorstellung_id}", produces = "application/json")
     public ResponseEntity<Object> getAllSitzeBelegt(@PathVariable(value = "vorstellung_id") int vorstellung_id) {
         Optional<Vorstellung> oV = vorstellungRepository.findById(vorstellung_id);
@@ -247,8 +214,8 @@ public class HelloWorldApplication {
         } else {
             return new ResponseEntity<>("Vorstellung nicht gefunden", HttpStatus.OK);
         }
-
     }
+    */
 
     @RequestMapping(value = "/bestellung/nutzer/{nutzer_id}", produces = "application/json")
     public ResponseEntity<Object> getAllTicketsInBestellung(@PathVariable(value = "nutzer_id") long nutzer_id) {
@@ -394,31 +361,6 @@ public class HelloWorldApplication {
     }
 
      */
-
-    // TODO enfternen, da die Methode nicht gebraucht wird
-    @RequestMapping(value = "/crud/benutzer/all", produces = "application/json")
-    public ResponseEntity<Object> getAllBenutzer() {
-
-        Warenkorb testW = new Warenkorb();
-        Benutzer testB = new Benutzer();
-        testW.setBenutzer(testB);
-        warenkorbRepository.save(testW);
-        testB.setVorname("Max");
-        testB.setNachname("Mustermann");
-        testB.setUsername("Mustermann_Max");
-        testB.setAlter(25);
-        testB.setEmail("max.mustermann@gmail.com");
-        testB.setPasswortHash("KFIWN");
-        testB.setWarenkorb(new Warenkorb());
-
-        //testB.setNewsletter(false);
-        //testB.derWunschlisteHinzufuegen(new Film("Star Wars", "hier ist das Bild", "das passiert", 10, 200, 12, true, "Sci-Fi"));
-
-        benutzerRepository.save(testB);
-
-        return new ResponseEntity<>(benutzerRepository.findAll(), HttpStatus.OK);
-
-    }
 
     /*
 
@@ -617,6 +559,7 @@ public class HelloWorldApplication {
 
     */
     //Mit body
+    /*
     @RequestMapping(value = "/insert/Sitz/{kinosaal_id}", produces = "application/json", method = POST)
     public ResponseEntity<Object> setSitzImKinosaal(@RequestBody() Sitz sitz,
                                                  @PathVariable(value = "kinosaal_id") long kinosaal_id) {
@@ -640,6 +583,7 @@ public class HelloWorldApplication {
             return new ResponseEntity<>(kinosaal, HttpStatus.OK);
         }
     }
+     */
 
     public int sicherheitsschluesselGenerieren(String text){
         int length = text.length();

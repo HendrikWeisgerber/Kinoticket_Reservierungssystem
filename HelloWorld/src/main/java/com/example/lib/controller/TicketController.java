@@ -26,7 +26,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 @RequestMapping("/ticket")
 public class TicketController {
 
-    private static Semaphore mutex;
+    private static Semaphore mutex = new Semaphore(1, true);;
 
     @Autowired
     TicketRepository ticketRepository;
