@@ -164,7 +164,7 @@ public class HelloWorldApplication {
         testBenutzer.setUsername("Mustermann_Max");
         testBenutzer.setAlter(25);
         testBenutzer.setEmail("max.mustermann@gmail.com");
-        testBenutzer.setPasswortHash("KFIWN");
+        testBenutzer.setPasswortHash(bCryptPasswordEncoder().encode("KFIWN"));
         testBenutzer.setWarenkorb(testWarenkorb);
         testWarenkorb.setBenutzer(testBenutzer);
         Bestellung testBestellung = new Bestellung();
