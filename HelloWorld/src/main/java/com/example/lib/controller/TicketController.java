@@ -63,6 +63,37 @@ public class TicketController {
 
     }
 
+    @RequestMapping(value = "/ticket/sitz/{sitz_id}/vorstellung/{vorstellung_id}/benutzer/{benutzer_id}/gast/{gast_id}", produces = "application/json", method = POST)
+    public ResponseEntity<Object> setTicketMitGast(@PathVariable(value = "sitz_id") long sitz_id,
+                                                   @PathVariable(value = "vorstellung_id") long vorstellung_id,
+                                                   @PathVariable(value = "benutzer_id") long kaeufer_id,
+                                                   @PathVariable(value = "gast_id") long gast_id) {
+        try {
+            mutex.acquire();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        Benutzer gast = new Benutzer();
+
+        Object o = makeTicket(sitz_id, vorstellung_id, kaeufer_id).getBody();
+        if (o instanceof Ticket) {
+            Ticket ticket = (Ticket) o;
+            Optional<Benutzer> gastOptional = benutzerRepository.findById((int) gast_id);
+            if (gastOptional.isPresent()) {
+                gast = gastOptional.get();
+                ticket.setGast(gast);
+            } else {
+                System.out.println("Kein Gast gefunden");
+                return new ResponseEntity<>("Kein Gast gefunden", HttpStatus.OK);
+            }
+            ticketRepository.save(ticket);
+            mutex.release();
+            return new ResponseEntity<>("Ticket wurde gespeichert, der Besteller entspricht dem Gast", HttpStatus.OK);
+        }
+        mutex.release();
+        return new ResponseEntity<>(o, HttpStatus.OK);
+    }
+
     // Diese Methode darf nur in einem Semaphor aufgerufen werden!!!
     private ResponseEntity<Object> makeTicket(long sitz_id, long vorstellung_id, long kaeufer_id) {
         Ticket ticket = new Ticket();
