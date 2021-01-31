@@ -44,14 +44,14 @@ public class FilmController {
     SitzRepository sitzRepository;
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
-    @RequestMapping(value= "/all", produces ="application/json")
-    public ResponseEntity<Object> getAllFilms(){
+    @RequestMapping(value = "/all", produces = "application/json")
+    public ResponseEntity<Object> getAllFilms() {
 
-        Iterable<Kinosaal> alleSaeale =  kinosaalRepository.findAll();
-        for(Kinosaal saal: alleSaeale) {
+        Iterable<Kinosaal> alleSaeale = kinosaalRepository.findAll();
+        for (Kinosaal saal : alleSaeale) {
             Sitz[] sitze = sitzRepository.findByKinosaal(saal);
-            for(Sitz sitz : sitze) {
-                if(saal.getMeineSitze() == null) {
+            for (Sitz sitz : sitze) {
+                if (saal.getMeineSitze() == null) {
                     saal.setMeineSitze();
                 }
                 saal.getMeineSitze().add(sitz);
@@ -59,10 +59,10 @@ public class FilmController {
         }
 
         Iterable<Film> alleFilme = filmRepository.findAll();
-        for(Film film: alleFilme) {
+        for (Film film : alleFilme) {
             Vorstellung[] vorstellungen = vorstellungRepository.findByFilmId(film.getId());
-            for(Vorstellung vorstellung : vorstellungen) {
-                if(film.getVorstellung() == null) {
+            for (Vorstellung vorstellung : vorstellungen) {
+                if (film.getVorstellung() == null) {
                     film.setVorstellung();
                 }
                 film.getVorstellung().add(vorstellung);
@@ -74,13 +74,13 @@ public class FilmController {
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @RequestMapping(value = "/{film_id}", produces = "application/json")
-    public ResponseEntity<Object> getFilmbyID(@PathVariable(value = "film_id")int film_id, SpringDataWebProperties.Pageable pageable){
+    public ResponseEntity<Object> getFilmbyID(@PathVariable(value = "film_id") int film_id, SpringDataWebProperties.Pageable pageable) {
 
-        Iterable<Kinosaal> alleSaeale =  kinosaalRepository.findAll();
-        for(Kinosaal saal: alleSaeale) {
+        Iterable<Kinosaal> alleSaeale = kinosaalRepository.findAll();
+        for (Kinosaal saal : alleSaeale) {
             Sitz[] sitze = sitzRepository.findByKinosaal(saal);
-            for(Sitz sitz : sitze) {
-                if(saal.getMeineSitze() == null) {
+            for (Sitz sitz : sitze) {
+                if (saal.getMeineSitze() == null) {
                     saal.setMeineSitze();
                 }
                 saal.getMeineSitze().add(sitz);
@@ -88,12 +88,12 @@ public class FilmController {
         }
 
         Optional<Film> film = filmRepository.findById(film_id);
-        if(film.isEmpty()) {
+        if (film.isEmpty()) {
             return new ResponseEntity<Object>("Kein Film mit der Id: " + film_id, HttpStatus.OK);
         }
         Vorstellung[] vorstellungen = vorstellungRepository.findByFilmId(film.get().getId());
-        for(Vorstellung vorstellung : vorstellungen) {
-            if(film.get().getVorstellung() == null) {
+        for (Vorstellung vorstellung : vorstellungen) {
+            if (film.get().getVorstellung() == null) {
                 film.get().setVorstellung();
             }
             film.get().getVorstellung().add(vorstellung);
@@ -101,9 +101,10 @@ public class FilmController {
 
         return new ResponseEntity<Object>(film, HttpStatus.OK);
     }
+
     @CrossOrigin(origins = "*", allowedHeaders = "*")
-    @RequestMapping(value= "/", produces ="application/json", method = POST)
-    public ResponseEntity<String> postNewFilm(@RequestBody HashMap object){
+    @RequestMapping(value = "/", produces = "application/json", method = POST)
+    public ResponseEntity<String> postNewFilm(@RequestBody HashMap object) {
 
         HashMap hashFilm = object;
         String name = ((String) hashFilm.get("title"));

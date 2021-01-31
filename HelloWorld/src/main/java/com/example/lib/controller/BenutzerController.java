@@ -34,7 +34,7 @@ public class BenutzerController {
             return new ResponseEntity<Object>("Der Benutzername ist bereits vergeben", HttpStatus.OK);
         }
 
-        if (user.getPreiskategorie() == null || user.getPreiskategorie().toString().isEmpty())  {
+        if (user.getPreiskategorie() == null || user.getPreiskategorie().toString().isEmpty()) {
             user.setPreiskategorie(Preiskategorie.ERWACHSENER); // Falls nicht dabei, automatisch Erwachsener
         }
 
