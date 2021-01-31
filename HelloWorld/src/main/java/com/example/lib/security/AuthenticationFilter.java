@@ -1,7 +1,6 @@
 package com.example.lib.security;
 
 import com.example.lib.Benutzer;
-import com.example.lib.SecurityCons;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;

@@ -1,5 +1,5 @@
 
-package com.example.lib;
+package com.example.lib.security;
 
 public class SecurityCons {
     public static final String SECRET = "WIE_OFT_DARF_MAN_BEI_NOTWEHR_NACHLADEN";

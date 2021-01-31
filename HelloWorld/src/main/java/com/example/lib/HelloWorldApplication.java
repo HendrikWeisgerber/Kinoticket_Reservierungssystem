@@ -276,6 +276,7 @@ public class HelloWorldApplication {
         return new ResponseEntity<>(t, HttpStatus.OK);
     }
 
+    /*
     @RequestMapping(value = "/warenkorb/nutzer/{nutzer_id}", produces = "application/json")
     public ResponseEntity<Object> getAllTicketsInWarenkorb(@PathVariable(value = "nutzer_id") long nutzer_id) {
 
@@ -304,7 +305,7 @@ public class HelloWorldApplication {
 
 		ticketRepository.save(testT);
 		int b_id = testBenutzer.getId();
-		*/
+
 
         Optional<Benutzer> oB = benutzerRepository.findById((int) nutzer_id);
         Benutzer b;
@@ -329,7 +330,8 @@ public class HelloWorldApplication {
         return new ResponseEntity<>(t, HttpStatus.OK);
 
     }
-
+    */
+    /*
     // TODO implement MappingMethods
     @RequestMapping(value = "/vorstellung", produces = "application/json")
     public ResponseEntity<Object> getVorstellung() {
@@ -349,7 +351,7 @@ public class HelloWorldApplication {
         filmRepository.save(filmT);
 
         testVor.setFilm(filmT);
-        vorstellungRepository.save(testVor);*/
+        vorstellungRepository.save(testVor);
 
         return new ResponseEntity<>(vorstellungRepository.findAll(), HttpStatus.OK);
         //return new ResponseEntity<>(vorstellungRepository.findByFilmId((int)film_id),HttpStatus.OK);
@@ -371,7 +373,9 @@ public class HelloWorldApplication {
 
         return new ResponseEntity<>(vorstellungRepository.findByFilmId(film_id), HttpStatus.OK);
     }
+    */
 
+    /*
     @RequestMapping(value = "/kinosaal/vorstellung/{vorstellung_id}", produces = "application/json")
     public ResponseEntity<Object> getSaalByVorstellung(@PathVariable(value = "vorstellung_id") int vorstellung_id) {
 
@@ -389,6 +393,9 @@ public class HelloWorldApplication {
         return new ResponseEntity<>(vorstellungRepository.findById(vorstellung_id).get().getSaal(), HttpStatus.OK);
     }
 
+     */
+
+    // TODO enfternen, da die Methode nicht gebraucht wird
     @RequestMapping(value = "/crud/benutzer/all", produces = "application/json")
     public ResponseEntity<Object> getAllBenutzer() {
 
@@ -471,6 +478,7 @@ public class HelloWorldApplication {
 
      */
 
+    /*
     @RequestMapping(value = "warenkorb/benutzer/{benutzer_id}/ticket/{ticket_id}", produces = "appliation/json")
     public ResponseEntity<Object> saveTicketInWarenkorb(@PathVariable(value = "benutzer_id") long benutzer_id,
                                                         @PathVariable(value = "ticket_id") long ticket_id) {
@@ -494,6 +502,7 @@ public class HelloWorldApplication {
         }
         return new ResponseEntity<Object>("", HttpStatus.OK);
     }
+    */
 
     @RequestMapping(value = "/ticket/bestellung/benutzer/{benutzer_id}", produces = "application/json", method = POST)
     public ResponseEntity<Object> setBestellung(@RequestBody(required = true) int[] ticketIds,

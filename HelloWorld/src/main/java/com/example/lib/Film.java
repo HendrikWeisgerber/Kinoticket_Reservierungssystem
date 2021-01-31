@@ -1,17 +1,11 @@
 package com.example.lib;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.example.lib.Enum.Genre;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.*;
 import java.sql.Date;
 import java.util.ArrayList;
-
-import javax.persistence.*;
-
-import com.example.lib.Enum.Genre;
-
-import org.springframework.beans.factory.annotation.Autowired;
 
 
 @Entity
