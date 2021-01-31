@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.Principal;
 import java.util.Optional;
 import java.util.concurrent.Semaphore;
 
@@ -27,7 +28,6 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 public class TicketController {
 
     private static Semaphore mutex = new Semaphore(1, true);
-    ;
 
     @Autowired
     TicketRepository ticketRepository;
@@ -41,17 +41,18 @@ public class TicketController {
     @Autowired
     VorstellungRepository vorstellungRepository;
 
-    @RequestMapping(value = "/sitz/{sitz_id}/vorstellung/{vorstellung_id}/benutzer/{benutzer_id}", produces = "application/json", method = POST)
+    @RequestMapping(value = "/sitz/{sitz_id}/vorstellung/{vorstellung_id}", produces = "application/json", method = POST)
     public ResponseEntity<Object> setTicketOhneGast(@PathVariable(value = "sitz_id") long sitz_id,
                                                     @PathVariable(value = "vorstellung_id") long vorstellung_id,
-                                                    @PathVariable(value = "benutzer_id") long kaeufer_id) {
+                                                    Principal principal) {
 
         try {
             mutex.acquire();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        Object o = makeTicket(sitz_id, vorstellung_id, kaeufer_id).getBody();
+        String username = principal.getName();
+        Object o = makeTicket(sitz_id, vorstellung_id, username).getBody();
         if (o instanceof Ticket) {
             Ticket ticket = (Ticket) o;
             ticketRepository.save(ticket);
@@ -63,22 +64,22 @@ public class TicketController {
 
     }
 
-    @RequestMapping(value = "/ticket/sitz/{sitz_id}/vorstellung/{vorstellung_id}/benutzer/{benutzer_id}/gast/{gast_id}", produces = "application/json", method = POST)
+    @RequestMapping(value = "sitz/{sitz_id}/vorstellung/{vorstellung_id}/gast/{gast_username}", produces = "application/json", method = POST)
     public ResponseEntity<Object> setTicketMitGast(@PathVariable(value = "sitz_id") long sitz_id,
                                                    @PathVariable(value = "vorstellung_id") long vorstellung_id,
-                                                   @PathVariable(value = "benutzer_id") long kaeufer_id,
-                                                   @PathVariable(value = "gast_id") long gast_id) {
+                                                   @PathVariable(value = "gast_username") String gast_username,
+                                                   Principal principal) {
         try {
             mutex.acquire();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        Benutzer gast = new Benutzer();
-
-        Object o = makeTicket(sitz_id, vorstellung_id, kaeufer_id).getBody();
+        Benutzer gast;
+        String kaeuferUsername = principal.getName();
+        Object o = makeTicket(sitz_id, vorstellung_id, kaeuferUsername).getBody();
         if (o instanceof Ticket) {
             Ticket ticket = (Ticket) o;
-            Optional<Benutzer> gastOptional = benutzerRepository.findById((int) gast_id);
+            Optional<Benutzer> gastOptional = benutzerRepository.findByUsername(gast_username);
             if (gastOptional.isPresent()) {
                 gast = gastOptional.get();
                 ticket.setGast(gast);
@@ -95,14 +96,13 @@ public class TicketController {
     }
 
     // Diese Methode darf nur in einem Semaphor aufgerufen werden!!!
-    private ResponseEntity<Object> makeTicket(long sitz_id, long vorstellung_id, long kaeufer_id) {
+    private ResponseEntity<Object> makeTicket(long sitz_id, long vorstellung_id, String kaeuferUsername) {
         Ticket ticket = new Ticket();
-        Sitz sitz = new Sitz();
-        Vorstellung vorstellung = new Vorstellung();
-        Benutzer kaeufer = new Benutzer();
+        Sitz sitz;
+        Vorstellung vorstellung;
+        Benutzer kaeufer;
 
         // Prüfe ob das Ticket bereits existiert
-        Ticket[] ticketsByVorstellung = ticketRepository.findByVorstellungId((int) vorstellung_id);
         if (ticketExistiertBereits(sitz_id, vorstellung_id)) {
             return new ResponseEntity<>("Das Ticket ist leider nicht mehr verfügbar", HttpStatus.OK);
         }
@@ -138,7 +138,7 @@ public class TicketController {
             return new ResponseEntity<>("Keine Vorstellung gefunden", HttpStatus.OK);
         }
 
-        Optional<Benutzer> kaeuferOptional = benutzerRepository.findById((int) kaeufer_id);
+        Optional<Benutzer> kaeuferOptional = benutzerRepository.findByUsername(kaeuferUsername);
         if (kaeuferOptional.isPresent()) {
             kaeufer = kaeuferOptional.get();
             ticket.setKaeufer(kaeufer);
