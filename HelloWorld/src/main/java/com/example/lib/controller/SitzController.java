@@ -71,7 +71,7 @@ public class SitzController {
             if (kinosaal.getReihe() < sitz.getReihe()) kinosaal.setReihe(sitz.getReihe());
             if (kinosaal.getSpalte() < sitz.getSpalte()) kinosaal.setSpalte(sitz.getSpalte());
             kinosaalRepository.save(kinosaal);
-            sitz.setKinosaal(kinosaal); //TODO ID speichern ist nicht ganz richtig, ähnlich wie beim Film, Siehe Benutzer<->Bestellung
+            sitz.setKinosaal(kinosaal);
             sitzRepository.save(sitz);
             return new ResponseEntity<>(kinosaal, HttpStatus.OK);
         } else {
