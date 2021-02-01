@@ -127,108 +127,70 @@ public class FilmController {
 
         for (String genreName : genreArray) {
             if (genreCounter < genres.length) {
-                switch (genreName) { // TODO besser toLowerCase() verwenden, wäre auch weniger Arbeit XD
-                    case "Action":
-                    case "ACTION":
+                switch (genreName.toLowerCase()) { // TODO besser toLowerCase() verwenden, wäre auch weniger Arbeit XD
                     case "action":
                         genres[genreCounter] = Genre.ACTION;
                         genreCounter++;
                         break;
-                    case "Comedy":
-                    case "COMEDY":
                     case "comedy":
                         genres[genreCounter] = Genre.COMEDY;
                         genreCounter++;
                         break;
-                    case "Horror":
-                    case "HORROR":
                     case "horror":
                         genres[genreCounter] = Genre.HORROR;
                         genreCounter++;
                         break;
-                    case "Sci-Fi":
-                    case "SCI-FI":
                     case "sci-fi":
-                    case "Sci_Fi":
-                    case "SCI_FI":
                     case "sci_fi":
-                    case "SciFi":
-                    case "SCIFI":
                     case "scifi":
                         genres[genreCounter] = Genre.SCI_FI;
                         genreCounter++;
                         break;
-                    case "Thriller":
-                    case "THRILLER":
                     case "thriller":
                         genres[genreCounter] = Genre.THRILLER;
                         genreCounter++;
                         break;
-                    case "Fantasy":
-                    case "FANTASY":
                     case "fantasy":
                         genres[genreCounter] = Genre.FANTASY;
                         genreCounter++;
                         break;
-                    case "Drama":
-                    case "DRAMA":
                     case "drama":
                         genres[genreCounter] = Genre.DRAMA;
                         genreCounter++;
                         break;
-                    case "Documentary":
-                    case "DOCUMENTARY":
                     case "documentary":
                         genres[genreCounter] = Genre.DOCUMENTARY;
                         genreCounter++;
                         break;
-                    case "History":
-                    case "HISTORY":
                     case "history":
                         genres[genreCounter] = Genre.HISTORY;
                         genreCounter++;
                         break;
-                    case "Animation":
-                    case "ANIMATION":
                     case "animation":
                         genres[genreCounter] = Genre.ANIMATION;
                         genreCounter++;
                         break;
-                    case "Family":
-                    case "FAMILY":
                     case "family":
                         genres[genreCounter] = Genre.FAMILY;
                         genreCounter++;
                         break;
-                    case "Musical":
-                    case "MUSICAL":
                     case "musical":
-                    case "Music":
-                    case "MUSIC":
                     case "music":
                         genres[genreCounter] = Genre.MUSICAL;
                         genreCounter++;
                         break;
-                    case "Short":
-                    case "SHORT":
                     case "short":
                         genres[genreCounter] = Genre.SHORT;
                         genreCounter++;
                         break;
-                    case "Romance":
-                    case "ROMANCE":
                     case "romance":
                         genres[genreCounter] = Genre.ROMANCE;
                         genreCounter++;
                         break;
-                    case "Superhero":
-                    case "SUPERHERO":
                     case "superhero":
                         genres[genreCounter] = Genre.SUPERHERO;
                         genreCounter++;
                         break;
-                    case "Western":
-                    case "WESTERN":
                     case "western":
                         genres[genreCounter] = Genre.WESTERN;
                         genreCounter++;
