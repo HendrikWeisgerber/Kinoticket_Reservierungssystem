@@ -1,6 +1,5 @@
 package com.example.lib.security;
 
-import com.example.lib.SecurityCons;
 import io.jsonwebtoken.Jwts;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -34,7 +33,7 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
     private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest request) {
         String token = request.getHeader(SecurityCons.HEADER_STRING);
         if (token != null) {
-            String user = Jwts.parser().setSigningKey("SecretKeyToGenJWTs".getBytes())
+            String user = Jwts.parser().setSigningKey(SecurityCons.SECRET.getBytes())
                     .parseClaimsJws(token.replace("Bearer", ""))
                     .getBody()
                     .getSubject();
