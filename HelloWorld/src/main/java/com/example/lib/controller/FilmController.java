@@ -121,8 +121,8 @@ public class FilmController {
         }
         Genre[] genres = new Genre[3];
         genres[0] = Genre.NO_GENRE;
-        genres[0] = Genre.NO_GENRE; // TODO 0 ist falsch oder??
-        genres[0] = Genre.NO_GENRE;
+        genres[1] = Genre.NO_GENRE; // TODO 0 ist falsch oder??
+        genres[2] = Genre.NO_GENRE;
         int genreCounter = 0;
 
         for (String genreName : genreArray) {
