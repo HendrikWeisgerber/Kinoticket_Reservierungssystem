@@ -74,6 +74,12 @@ public class WarenkorbController {
             Optional<Ticket> optionalTicket = ticketRepository.findById((int) ticket_id);
             if (optionalTicket.isPresent()) {
                 Ticket t = optionalTicket.get();
+                if (t.getWarenkorb() != null) {
+                    return new ResponseEntity<Object>("Ticket liegt bereits im Warenkorb", HttpStatus.OK);
+                }
+                if (t.getKaeufer() != null) {
+                    return new ResponseEntity<Object>("Ticket hat bereits einen anderen Käufer", HttpStatus.OK);
+                }
                 t.setWarenkorb(benutzer.getWarenkorb());
                 ticketRepository.save(t);
                 return new ResponseEntity<Object>(t, HttpStatus.OK);
