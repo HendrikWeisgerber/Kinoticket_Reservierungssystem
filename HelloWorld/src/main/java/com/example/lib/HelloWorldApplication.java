@@ -390,9 +390,7 @@ public class HelloWorldApplication {
         return benutzerRepository.findByUsername(principal.getName());
     }
 
-    public static boolean isUserAdminOrOwner(Optional<Benutzer> optionalBenutzer) {
-        if (optionalBenutzer.isEmpty()) return false;
-        Benutzer benutzer = optionalBenutzer.get();
+    public static boolean isUserAdminOrOwner(Benutzer benutzer) {
         return benutzer.getRechte().toString().toLowerCase().equals(Rechte.ADMIN.toString().toLowerCase()) ||
                 benutzer.getRechte().toString().toLowerCase().equals(Rechte.OWNER.toString().toLowerCase());
     }

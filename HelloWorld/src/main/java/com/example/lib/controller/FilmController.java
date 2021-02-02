@@ -100,7 +100,10 @@ public class FilmController {
     public ResponseEntity<String> postNewFilm(@RequestBody HashMap object, Principal principal) {
 
         Optional<Benutzer> optionalBenutzer = benutzerRepository.findByUsername(principal.getName());
-        if (!isUserAdminOrOwner(optionalBenutzer)) return new ResponseEntity<>("Keine Admin Berechtigung", HttpStatus.FORBIDDEN);
+        if (optionalBenutzer.isEmpty()) return new ResponseEntity<>("Keine Benutzer gefunden", HttpStatus.FORBIDDEN);
+        Benutzer benutzer = optionalBenutzer.get();
+        if (!isUserAdminOrOwner(benutzer))
+            return new ResponseEntity<>("Keine Admin Berechtigung", HttpStatus.FORBIDDEN);
 
         HashMap hashFilm = object;
         String name = ((String) hashFilm.get("title"));
