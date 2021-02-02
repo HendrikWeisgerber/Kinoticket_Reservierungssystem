@@ -1,6 +1,7 @@
 package com.example.lib;
 
 import com.example.lib.Enum.Genre;
+import com.example.lib.Enum.Rechte;
 import com.example.lib.Repositories.*;
 import com.example.lib.security.WebSecurityConfiguration;
 import com.google.zxing.BarcodeFormat;
@@ -385,8 +386,15 @@ public class HelloWorldApplication {
         return MatrixToImageWriter.toBufferedImage(bitMatrix);
     }
 
-    private static Optional<Benutzer> getCurrentUser(Principal principal, BenutzerRepository benutzerRepository) {
+    public static Optional<Benutzer> getCurrentUser(Principal principal, BenutzerRepository benutzerRepository) {
         return benutzerRepository.findByUsername(principal.getName());
+    }
+
+    public static boolean isUserAdminOrOwner(Optional<Benutzer> optionalBenutzer) {
+        if (optionalBenutzer.isEmpty()) return false;
+        Benutzer benutzer = optionalBenutzer.get();
+        return benutzer.getRechte().toString().toLowerCase().equals(Rechte.ADMIN.toString().toLowerCase()) ||
+                benutzer.getRechte().toString().toLowerCase().equals(Rechte.OWNER.toString().toLowerCase());
     }
 
     public static void main(String[] args) {

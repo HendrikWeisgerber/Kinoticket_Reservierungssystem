@@ -1,29 +1,19 @@
 package com.example.lib.controller;
 
-import com.example.lib.Film;
-import com.example.lib.Kinosaal;
-import com.example.lib.Repositories.FilmRepository;
-import com.example.lib.Repositories.KinosaalRepository;
-import com.example.lib.Repositories.SitzRepository;
-import com.example.lib.Repositories.VorstellungRepository;
-import com.example.lib.Sitz;
-import com.example.lib.Vorstellung;
+import com.example.lib.*;
 import com.example.lib.Enum.Genre;
-
+import com.example.lib.Repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Optional;
 
+import static com.example.lib.HelloWorldApplication.isUserAdminOrOwner;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 @RestController
@@ -42,6 +32,9 @@ public class FilmController {
 
     @Autowired
     SitzRepository sitzRepository;
+
+    @Autowired
+    BenutzerRepository benutzerRepository;
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @RequestMapping(value = "/all", produces = "application/json")
@@ -74,7 +67,7 @@ public class FilmController {
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @RequestMapping(value = "/{film_id}", produces = "application/json")
-    public ResponseEntity<Object> getFilmbyID(@PathVariable(value = "film_id") int film_id, SpringDataWebProperties.Pageable pageable) {
+    public ResponseEntity<Object> getFilmbyID(@PathVariable(value = "film_id") int film_id) {
 
         Iterable<Kinosaal> alleSaeale = kinosaalRepository.findAll();
         for (Kinosaal saal : alleSaeale) {
@@ -104,7 +97,10 @@ public class FilmController {
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @RequestMapping(value = "/", produces = "application/json", method = POST)
-    public ResponseEntity<String> postNewFilm(@RequestBody HashMap object) {
+    public ResponseEntity<String> postNewFilm(@RequestBody HashMap object, Principal principal) {
+
+        Optional<Benutzer> optionalBenutzer = benutzerRepository.findByUsername(principal.getName());
+        if (!isUserAdminOrOwner(optionalBenutzer)) return new ResponseEntity<>("Keine Admin Berechtigung", HttpStatus.FORBIDDEN);
 
         HashMap hashFilm = object;
         String name = ((String) hashFilm.get("title"));
@@ -121,7 +117,7 @@ public class FilmController {
         }
         Genre[] genres = new Genre[3];
         genres[0] = Genre.NO_GENRE;
-        genres[1] = Genre.NO_GENRE; // TODO 0 ist falsch oder??
+        genres[1] = Genre.NO_GENRE;
         genres[2] = Genre.NO_GENRE;
         int genreCounter = 0;
 

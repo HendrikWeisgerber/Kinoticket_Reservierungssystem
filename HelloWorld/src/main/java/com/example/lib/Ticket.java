@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.text.SimpleDateFormat;
+import java.util.Date;
 
 @Entity
 public class Ticket {
@@ -33,7 +33,7 @@ public class Ticket {
     @ManyToOne
     @JoinColumn(name="bestellung_id", referencedColumnName = "id")
     private Bestellung bestellung;
-    private SimpleDateFormat kaufdatum;
+    private Date kaufdatum;
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "snack_id", referencedColumnName = "id")
     private Snack snack;
@@ -124,11 +124,11 @@ public class Ticket {
 		this.istValide = istValide;
     }
 
-    public SimpleDateFormat getKaufdatum() {
+    public Date getKaufdatum() {
         return this.kaufdatum;
     }
 
-    public void setKaufdatum(SimpleDateFormat kaufdatum) {
+    public void setKaufdatum(Date kaufdatum) {
         this.kaufdatum = kaufdatum;
     }
 
@@ -170,7 +170,7 @@ public class Ticket {
     }
 
     public Ticket(int id, Sitz sitz, Vorstellung vorstellung, Benutzer gast, Benutzer kaeufer, boolean bezahlt,
-            boolean istValide, SimpleDateFormat kaufdatum) {
+            boolean istValide, Date kaufdatum) {
         this.id = id;
         this.sitz = sitz;
         this.vorstellung = vorstellung;

@@ -2,6 +2,7 @@ package com.example.lib.controller;
 
 import com.example.lib.Benutzer;
 import com.example.lib.Enum.Preiskategorie;
+import com.example.lib.Enum.Rechte;
 import com.example.lib.Repositories.BenutzerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -46,7 +47,7 @@ public class BenutzerController {
         return new ResponseEntity<Object>(user, HttpStatus.OK);
     } //TODO add more checks for user
 
-    @RequestMapping(value = "update", produces = "application/json", method = POST)
+    @RequestMapping(value = "/update", produces = "application/json", method = POST)
     public ResponseEntity<Object> updateUser(@RequestBody Benutzer user,
                                              Principal principal) {
         Optional<Benutzer> benutzerOptional = benutzerRepository.findByUsername(principal.getName());
@@ -63,5 +64,17 @@ public class BenutzerController {
         benutzerRepository.save(b);
 
         return new ResponseEntity<>(b, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/role", produces = "application/json", method = POST)
+    public ResponseEntity<Object> getUserRole(Principal principal) {
+        Optional<Benutzer> benutzerOptional = benutzerRepository.findByUsername(principal.getName());
+        Benutzer b;
+        if (benutzerOptional.isEmpty()) {
+            return new ResponseEntity<>("Kein Benutzer mit dem Benutzernamen", HttpStatus.OK);
+        }
+        b = benutzerOptional.get();
+        String response = b.getRechte() != null ? b.getRechte().toString() : Rechte.USER.toString();
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
