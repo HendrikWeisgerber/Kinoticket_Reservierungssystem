@@ -74,7 +74,7 @@ public class FilmController {
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @RequestMapping(value = "/{film_id}", produces = "application/json")
-    public ResponseEntity<Object> getFilmbyID(@PathVariable(value = "film_id") int film_id, SpringDataWebProperties.Pageable pageable) {
+    public ResponseEntity<Object> getFilmByID(@PathVariable(value = "film_id") int film_id, SpringDataWebProperties.Pageable pageable) {
 
         Iterable<Kinosaal> alleSaeale = kinosaalRepository.findAll();
         for (Kinosaal saal : alleSaeale) {
@@ -110,6 +110,7 @@ public class FilmController {
         String name = ((String) hashFilm.get("title"));
         String bild = ((String) hashFilm.get("image"));
         String beschreibung = ((String) hashFilm.get("plotLocal"));
+        beschreibung = beschreibung.substring(0,254); //TODO change db sceme to support larger Strings
         int bewertung = 9;
         int laenge = (Integer.parseInt((String) hashFilm.get("runTime")));
         ArrayList genreList = (ArrayList) hashFilm.get("genreList");

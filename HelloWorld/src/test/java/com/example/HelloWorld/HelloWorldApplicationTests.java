@@ -3,6 +3,8 @@ package com.example.HelloWorld;
 import com.example.lib.Bestellung;
 import com.example.lib.Repositories.*;
 import com.example.lib.Ticket;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,6 +21,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Optional;
 
 import com.example.lib.Benutzer;
@@ -60,6 +64,21 @@ class HelloWorldApplicationTests {
 
 	public static final MediaType APPLICATION_JSON_UTF8 = new MediaType(MediaType.APPLICATION_JSON.getType(),
 			MediaType.APPLICATION_JSON.getSubtype(), Charset.forName("utf8"));
+
+	public static HashMap<String,String> jsonToMap(String t) throws JSONException {
+
+		HashMap<String, String> map = new HashMap<String, String>();
+		JSONObject jObject = new JSONObject(t);
+		Iterator<?> keys = jObject.keys();
+
+		while( keys.hasNext() ){
+			String key = (String)keys.next();
+			String value = jObject.getString(key);
+			map.put(key, value);
+
+		}
+		return map;
+	}
 
 	public static String asJsonString(final Object obj) {
 		try {
@@ -186,6 +205,7 @@ class HelloWorldApplicationTests {
 	}
 
 	//End BestellungController Tests
+	//FilmController Tests
 	@Test
 	public void getAllFilms() throws Exception {
 		// this.mockMvc.perform(MockMvcRequestBuilders.get("/bazahlen/bestellung/151/iban/DE-12345678901234567890"))
@@ -206,7 +226,7 @@ class HelloWorldApplicationTests {
 	}
 
 	@Test
-	public void getAFilm(){
+	public void getFilmById(){
 		// this.mockMvc.perform(MockMvcRequestBuilders.get("/bazahlen/bestellung/151/iban/DE-12345678901234567890"))
 		ArrayList<Film> filme = new ArrayList<Film>();
 		filmrepository.findAll().forEach(f -> {
@@ -217,15 +237,64 @@ class HelloWorldApplicationTests {
 			try {
 				mockMvc.perform(MockMvcRequestBuilders.get(call)).andDo(print()).andExpect(status().isOk())
 						.andExpect(content().string(containsString(f.getName())))
-						.andExpect(content().string(containsString(f.getBeschreibung())))
+						.andExpect(content().string(containsString(f.getBeschreibung().split("[Ä,ä,Ö,ö,Ü,ü,ß]")[0])))
 						.andExpect(content().string(containsString(((Integer)f.getBewertung()).toString())))
 						.andExpect(content().string(containsString(f.getGenre1().toString())));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		});
-
 	}
+
+	@Test
+	public void postNewFilm() throws Exception {
+
+		filmrepository.findAll().forEach(f -> {
+			if (f.getName().equals("Finding Nemo")) {
+				filmrepository.delete(f);
+			}
+		});
+		long counter = filmrepository.count();
+		HashMap<String, String> hashFilm = new HashMap<>();
+		String body = "{\n" +
+				"        \"Filmid\": \"tt0266543\",\n" +
+				"        \"actor0\": \"Albert Brooks\",\n" +
+				"        \"actor0Cara\": \"Marlin (voice)\",\n" +
+				"        \"actor1\": \"Ellen DeGeneres\",\n" +
+				"        \"actor1Cara\": \"Dory (voice)\",\n" +
+				"        \"actor2\": \"Alexander Gould\",\n" +
+				"        \"actor2Cara\": \"Nemo (voice)\",\n" +
+				"        \"awards\": \"Top Rated Movies #170 | Won 1 Oscar. Another 49 wins & 62 nominations.\",\n" +
+				"        \"directors\": \"Andrew Stanton, Lee Unkrich\",\n" +
+				"        \"genreList\": [\n" +
+				"                    {\n" +
+				"                        \"key\": \"Animation\",\n" +
+				"                        \"value\": \"Animation\"\n" +
+				"                    },\n" +
+				"                    {\n" +
+				"                        \"key\": \"Adventure\",\n" +
+				"                        \"value\": \"Adventure\"\n" +
+				"                    },\n" +
+				"                    {\n" +
+				"                        \"key\": \"Comedy\",\n" +
+				"                        \"value\": \"Comedy\"\n" +
+				"                    },\n" +
+				"                {\n" +
+				"                        \"key\": \"Family\",\n" +
+				"                        \"value\": \"Family\"\n" +
+				"                    }\n" +
+				"                ],\n" +
+				"        \"image\": \"https://imdb-api.com/images/original/MV5BZTAzNWZlNmUtZDEzYi00ZjA5LWIwYjEtZGM1NWE1MjE4YWRhXkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_Ratio0.6791_AL_.jpg\",\n" +
+				"        \"plotLocal\": \"Im Schutze eines großen Riffs lebt die Familie von Clownsfisch Marlin relativ sicher und trotzdem werden seine Frau und nahezu alle seine Kinder Opfer eines gefräßigen Räubers. Das einzige ihm verbleibende Kind ist der kleine Nemo, der von da an besonders behütet wird. Doch die Neugier ist zu groß und prompt wird Nemo gefangen und zu den Menschen als Zierfisch gebracht. Durch ein paar Möwen erfährt Marlin alsbald, wo Nemo gelandet ist: im Aquarium eines Zahnarztes in Sydney. Mutig macht sich der Clownsfish mit seiner Freundin Dory, die allerdings ständig an Gedächtnisverlust leidet auf den Weg dorthin, wobei an Haien, Quallen und anderen Gefahren. Währenddessen ist Nemo nicht untätig und plant mit den anderen Aquariumsfischen einen gewagten Ausbruch aus ihrem Gefängnis...\",\n" +
+				"        \"runTime\": \"100\",\n" +
+				"        \"title\": \"Finding Nemo\"\n" +
+				"    }";
+		hashFilm = jsonToMap(body);
+		mockMvc.perform(MockMvcRequestBuilders.post("/film/").header("Authorization", token).contentType(APPLICATION_JSON_UTF8).content(body)).andExpect(status().isOk()).andReturn().getResponse().getContentAsString().equals("Der Film wurde hinzugefügt!");
+		Assertions.assertEquals(counter + 1, filmrepository.count());
+	}
+	//End FilmController Tests
+	//
 /*
 	@Test
 	public void addTicket() throws Exception {
