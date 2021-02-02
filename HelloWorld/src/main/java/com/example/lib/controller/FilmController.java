@@ -121,13 +121,13 @@ public class FilmController {
         }
         Genre[] genres = new Genre[3];
         genres[0] = Genre.NO_GENRE;
-        genres[1] = Genre.NO_GENRE; // TODO 0 ist falsch oder??
+        genres[1] = Genre.NO_GENRE;
         genres[2] = Genre.NO_GENRE;
         int genreCounter = 0;
 
         for (String genreName : genreArray) {
             if (genreCounter < genres.length) {
-                switch (genreName.toLowerCase()) { // TODO besser toLowerCase() verwenden, wäre auch weniger Arbeit XD
+                switch (genreName.toLowerCase()) {
                     case "action":
                         genres[genreCounter] = Genre.ACTION;
                         genreCounter++;
@@ -202,7 +202,7 @@ public class FilmController {
 
             }
         }
-        Film film = new Film(name, bild, beschreibung, 9, laenge, 12, true, genres[0], genres[1], genres[2]);
+        Film film = new Film(name, bild, beschreibung, bewertung, laenge, 12, true, genres[0], genres[1], genres[2]);
         filmRepository.save(film);
         return new ResponseEntity<>("Der Film wurde hinzugefügt!", HttpStatus.OK);
     }

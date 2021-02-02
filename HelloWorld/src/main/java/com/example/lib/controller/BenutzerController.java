@@ -46,7 +46,7 @@ public class BenutzerController {
         return new ResponseEntity<Object>(user, HttpStatus.OK);
     } //TODO add more checks for user
 
-    @RequestMapping(value = "update", produces = "application/json", method = POST)
+    @RequestMapping(value = "/update", produces = "application/json", method = POST)
     public ResponseEntity<Object> updateUser(@RequestBody Benutzer user,
                                              Principal principal) {
         Optional<Benutzer> benutzerOptional = benutzerRepository.findByUsername(principal.getName());

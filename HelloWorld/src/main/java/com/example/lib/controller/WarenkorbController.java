@@ -74,8 +74,15 @@ public class WarenkorbController {
             Optional<Ticket> optionalTicket = ticketRepository.findById((int) ticket_id);
             if (optionalTicket.isPresent()) {
                 Ticket t = optionalTicket.get();
+                if(t.getWarenkorb()!= null) {
+                    return new ResponseEntity<Object>("Ticket ist bereits in einem Warenkorb", HttpStatus.OK);
+                }
+                if(t.getKaeufer().getId() != benutzer.getId()){
+                    return new ResponseEntity<Object>("Ticket ist von einem anderern Kunden reserviert", HttpStatus.OK);
+                }
                 t.setWarenkorb(benutzer.getWarenkorb());
-                ticketRepository.save(t);
+                //ticketRepository.save(t);
+                //TODO throws error 500
                 return new ResponseEntity<Object>(t, HttpStatus.OK);
             }
         }

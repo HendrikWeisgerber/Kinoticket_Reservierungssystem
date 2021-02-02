@@ -248,7 +248,7 @@ public class Benutzer {
         this.lieblingszone = lieblingszone;
     }
 
-    public BigDecimal getPreisSchluessel() {
+    public BigDecimal preisschluesselBerechnen() {
         switch (this.preiskategorie) {
             case STUDIEREND:
                 return new BigDecimal(0.8);

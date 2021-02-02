@@ -181,6 +181,17 @@ public class Ticket {
         this.kaufdatum = kaufdatum;
         this.updatePreis();
     }
+    public Ticket(Sitz sitz, Vorstellung vorstellung, Benutzer gast, Benutzer kaeufer, boolean bezahlt,
+                  boolean istValide, SimpleDateFormat kaufdatum) {
+        this.sitz = sitz;
+        this.vorstellung = vorstellung;
+        this.gast = gast;
+        //this.kaeufer = kaeufer;
+        this.bezahlt = bezahlt;
+        this.istValide = istValide;
+        this.kaufdatum = kaufdatum;
+        this.updatePreis();
+    }
 
     public void updatePreis(){
         BigDecimal neuerPreis = new BigDecimal(0.0);
@@ -188,7 +199,7 @@ public class Ticket {
             neuerPreis = neuerPreis.add(this.vorstellung.getGrundpreis());
         }
         if(this.gast != null){
-            neuerPreis = neuerPreis.multiply(this.gast.getPreisSchluessel());
+            neuerPreis = neuerPreis.multiply(this.gast.preisschluesselBerechnen());
         }
         if (this.snack != null) {
 
