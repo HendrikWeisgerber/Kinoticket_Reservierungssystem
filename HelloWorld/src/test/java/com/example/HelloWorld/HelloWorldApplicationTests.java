@@ -1,8 +1,7 @@
 package com.example.HelloWorld;
 
-import com.example.lib.Bestellung;
+import com.example.lib.*;
 import com.example.lib.Repositories.*;
-import com.example.lib.Ticket;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Assertions;
@@ -13,7 +12,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -23,15 +21,9 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Optional;
 
-import com.example.lib.Benutzer;
-import com.example.lib.Film;
 import com.example.lib.Enum.Preiskategorie;
-import com.example.lib.Enum.Rechte;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 import static org.hamcrest.Matchers.containsString;
@@ -44,7 +36,7 @@ class HelloWorldApplicationTests {
 	private MockMvc mockMvc;
 
 	@Autowired
-	private FilmRepository filmrepository;
+	private FilmRepository filmRepository;
 
 	@Autowired
 	private BenutzerRepository benutzerRepository;
@@ -57,6 +49,12 @@ class HelloWorldApplicationTests {
 
 	@Autowired
 	private BestellungRepository bestellungRepository;
+
+	@Autowired
+	private KinosaalRepository kinosaalRepository;
+
+	@Autowired
+	private VorstellungRepository vorstellungRepository;
 
 	private Benutzer benutzer;
 
@@ -210,9 +208,9 @@ class HelloWorldApplicationTests {
 	public void getAllFilms() throws Exception {
 		// this.mockMvc.perform(MockMvcRequestBuilders.get("/bazahlen/bestellung/151/iban/DE-12345678901234567890"))
 		ArrayList<String> filmNamen = new ArrayList<String>();
-		long size = filmrepository.count();
+		long size = filmRepository.count();
 		filmNamen.add("name");
-		filmrepository.findAll().forEach(f -> {
+		filmRepository.findAll().forEach(f -> {
 			filmNamen.add(f.getName());
 		});
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/film/all")).andDo(print()).andExpect(status().isOk())
@@ -229,7 +227,7 @@ class HelloWorldApplicationTests {
 	public void getFilmById(){
 		// this.mockMvc.perform(MockMvcRequestBuilders.get("/bazahlen/bestellung/151/iban/DE-12345678901234567890"))
 		ArrayList<Film> filme = new ArrayList<Film>();
-		filmrepository.findAll().forEach(f -> {
+		filmRepository.findAll().forEach(f -> {
 			filme.add(f);
 		});
 		filme.stream().forEach(f -> {
@@ -249,12 +247,12 @@ class HelloWorldApplicationTests {
 	@Test
 	public void postNewFilm() throws Exception {
 
-		filmrepository.findAll().forEach(f -> {
+		filmRepository.findAll().forEach(f -> {
 			if (f.getName().equals("Finding Nemo but only for testpurposes")) {
-				filmrepository.delete(f);
+				filmRepository.delete(f);
 			}
 		});
-		long counter = filmrepository.count();
+		long counter = filmRepository.count();
 		HashMap<String, String> hashFilm = new HashMap<>();
 		String body = "{\n" +
 				"        \"Filmid\": \"tt0266543\",\n" +
@@ -291,15 +289,32 @@ class HelloWorldApplicationTests {
 				"    }";
 		hashFilm = jsonToMap(body);
 		mockMvc.perform(MockMvcRequestBuilders.post("/film/").header("Authorization", token).contentType(APPLICATION_JSON_UTF8).content(body)).andExpect(status().isOk()).andReturn().getResponse().getContentAsString().equals("Der Film wurde hinzugefügt!");
-		Assertions.assertEquals(counter + 1, filmrepository.count());
-		filmrepository.findAll().forEach(f -> {
+		Assertions.assertEquals(counter + 1, filmRepository.count());
+		filmRepository.findAll().forEach(f -> {
 			if (f.getName().equals("Finding Nemo but only for testpurposes")) {
-				filmrepository.delete(f);
+				filmRepository.delete(f);
 			}
 		});
 	}
 	//End FilmController Tests
 	//KinosaalController Tests
+	@Test
+	public void getSaalByVorstellung() throws Exception {
+
+		Vorstellung vorstellung = new Vorstellung();
+		Kinosaal saal = new Kinosaal();
+		saal.setReihe(10);
+		saal.setSpalte(10);
+		saal.setName("Kinosaal for UnitTesting only");
+		vorstellung.setSaal(saal);
+		kinosaalRepository.save(saal);
+		vorstellungRepository.save(vorstellung);
+		String call = "/kinosaal/vorstellung/" + vorstellung.getId();
+		mockMvc.perform(MockMvcRequestBuilders.get(call).header("Authorization", token)).andExpect(status().isOk()).andReturn().getResponse().getContentAsString().contains("Kinosaal for UnitTesting only");
+		vorstellungRepository.delete(vorstellung);
+		kinosaalRepository.delete(saal);
+	}
+	//End KinosaalController Tests
 
 /*
 	@Test
