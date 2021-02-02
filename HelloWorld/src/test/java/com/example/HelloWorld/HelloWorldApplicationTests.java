@@ -250,7 +250,7 @@ class HelloWorldApplicationTests {
 	public void postNewFilm() throws Exception {
 
 		filmrepository.findAll().forEach(f -> {
-			if (f.getName().equals("Finding Nemo")) {
+			if (f.getName().equals("Finding Nemo but only for testpurposes")) {
 				filmrepository.delete(f);
 			}
 		});
@@ -287,14 +287,20 @@ class HelloWorldApplicationTests {
 				"        \"image\": \"https://imdb-api.com/images/original/MV5BZTAzNWZlNmUtZDEzYi00ZjA5LWIwYjEtZGM1NWE1MjE4YWRhXkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_Ratio0.6791_AL_.jpg\",\n" +
 				"        \"plotLocal\": \"Im Schutze eines großen Riffs lebt die Familie von Clownsfisch Marlin relativ sicher und trotzdem werden seine Frau und nahezu alle seine Kinder Opfer eines gefräßigen Räubers. Das einzige ihm verbleibende Kind ist der kleine Nemo, der von da an besonders behütet wird. Doch die Neugier ist zu groß und prompt wird Nemo gefangen und zu den Menschen als Zierfisch gebracht. Durch ein paar Möwen erfährt Marlin alsbald, wo Nemo gelandet ist: im Aquarium eines Zahnarztes in Sydney. Mutig macht sich der Clownsfish mit seiner Freundin Dory, die allerdings ständig an Gedächtnisverlust leidet auf den Weg dorthin, wobei an Haien, Quallen und anderen Gefahren. Währenddessen ist Nemo nicht untätig und plant mit den anderen Aquariumsfischen einen gewagten Ausbruch aus ihrem Gefängnis...\",\n" +
 				"        \"runTime\": \"100\",\n" +
-				"        \"title\": \"Finding Nemo\"\n" +
+				"        \"title\": \"Finding Nemo but only for testpurposes\"\n" +
 				"    }";
 		hashFilm = jsonToMap(body);
 		mockMvc.perform(MockMvcRequestBuilders.post("/film/").header("Authorization", token).contentType(APPLICATION_JSON_UTF8).content(body)).andExpect(status().isOk()).andReturn().getResponse().getContentAsString().equals("Der Film wurde hinzugefügt!");
 		Assertions.assertEquals(counter + 1, filmrepository.count());
+		filmrepository.findAll().forEach(f -> {
+			if (f.getName().equals("Finding Nemo but only for testpurposes")) {
+				filmrepository.delete(f);
+			}
+		});
 	}
 	//End FilmController Tests
-	//
+	//KinosaalController Tests
+
 /*
 	@Test
 	public void addTicket() throws Exception {
