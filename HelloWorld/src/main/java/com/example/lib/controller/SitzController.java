@@ -1,17 +1,16 @@
 package com.example.lib.controller;
 
 import com.example.lib.*;
-import com.example.lib.Repositories.KinosaalRepository;
-import com.example.lib.Repositories.SitzRepository;
-import com.example.lib.Repositories.TicketRepository;
-import com.example.lib.Repositories.VorstellungRepository;
+import com.example.lib.Repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.Optional;
 
+import static com.example.lib.HelloWorldApplication.isUserAdminOrOwner;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 @RestController
@@ -30,6 +29,9 @@ public class SitzController {
 
     @Autowired
     TicketRepository ticketRepository;
+
+    @Autowired
+    BenutzerRepository benutzerRepository;
 
     @RequestMapping(value = "/vorstellung/{vorstellung_id}", produces = "application/json")
     public ResponseEntity<Object> getAllSitzeBelegt(@PathVariable(value = "vorstellung_id") int vorstellung_id) {
@@ -61,7 +63,13 @@ public class SitzController {
 
     @RequestMapping(value = "/insert/Sitz/{kinosaal_id}", produces = "application/json", method = POST)
     public ResponseEntity<Object> setSitzImKinosaal(@RequestBody() Sitz sitz,
-                                                    @PathVariable(value = "kinosaal_id") long kinosaal_id) {
+                                                    @PathVariable(value = "kinosaal_id") long kinosaal_id, Principal principal) {
+
+        Optional<Benutzer> optionalBenutzer = benutzerRepository.findByUsername(principal.getName());
+        if (optionalBenutzer.isEmpty()) return new ResponseEntity<>("Keine Benutzer gefunden", HttpStatus.FORBIDDEN);
+        Benutzer benutzer = optionalBenutzer.get();
+        if (!isUserAdminOrOwner(benutzer))
+            return new ResponseEntity<>("Keine Admin Berechtigung", HttpStatus.FORBIDDEN);
 
         Optional<Kinosaal> optionalKinosaal = kinosaalRepository.findById((int) kinosaal_id);
 

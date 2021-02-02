@@ -4,6 +4,8 @@ import com.example.lib.Benutzer;
 import com.example.lib.Enum.Preiskategorie;
 import com.example.lib.Enum.Rechte;
 import com.example.lib.Repositories.BenutzerRepository;
+import com.example.lib.Repositories.WarenkorbRepository;
+import com.example.lib.Warenkorb;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +25,9 @@ public class BenutzerController {
 
     @Autowired
     private BenutzerRepository benutzerRepository;
+
+    @Autowired
+    private WarenkorbRepository warenkorbRepository;
 
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -47,6 +52,7 @@ public class BenutzerController {
             if (!owner.getRechte().toString().toLowerCase().equals(Rechte.OWNER.toString()))
                 return new ResponseEntity<>("Sie haben keine Admin Berechtigung", HttpStatus.FORBIDDEN);
         } else {
+            //Standard
             user.setRechte(Rechte.USER);
         }
 
@@ -54,8 +60,12 @@ public class BenutzerController {
             user.setPreiskategorie(Preiskategorie.ERWACHSENER); // Falls nicht dabei, automatisch Erwachsener
         }
 
+        Warenkorb w = new Warenkorb();
+        w.setBenutzer(user);
+
         user.setPasswortHash(bCryptPasswordEncoder.encode(user.getPasswortHash()));
         benutzerRepository.save(user);
+        warenkorbRepository.save(w);
         return new ResponseEntity<>(user, HttpStatus.OK);
     } //TODO add more checks for user
 
