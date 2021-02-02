@@ -1,6 +1,7 @@
 package com.example.HelloWorld;
 
-import com.example.lib.Repositories.TicketRepository;
+import com.example.lib.Bestellung;
+import com.example.lib.Repositories.*;
 import com.example.lib.Ticket;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,9 +25,6 @@ import com.example.lib.Benutzer;
 import com.example.lib.Film;
 import com.example.lib.Enum.Preiskategorie;
 import com.example.lib.Enum.Rechte;
-import com.example.lib.Repositories.BenutzerRepository;
-import com.example.lib.Repositories.FilmRepository;
-import com.example.lib.Repositories.WarenkorbRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
@@ -53,6 +51,9 @@ class HelloWorldApplicationTests {
 	@Autowired
 	private TicketRepository ticketRepository;
 
+	@Autowired
+	private BestellungRepository bestellungRepository;
+
 	private Benutzer benutzer;
 
 	private String token;
@@ -69,11 +70,7 @@ class HelloWorldApplicationTests {
 	}
 
 	@BeforeEach
-	void setUp() {
-		/*Optional<Benutzer> oBenutzer = benutzerRepository.findByUsername("Moritz");
-		if (oBenutzer.isPresent()) {
-			benutzer = oBenutzer.get();
-		}*/
+	void setUp() throws Exception {
 		benutzer = new Benutzer();
 		benutzer.setUsername("Moritz");
 		benutzer.setPasswortHash("123456");
@@ -83,17 +80,9 @@ class HelloWorldApplicationTests {
 		mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
 		String requestJson = asJsonString(benutzer);
 		Assertions.assertFalse(requestJson.equals(""));
-		try {
-			//System.out.println(requestJson);
-			MvcResult result = this.mockMvc.perform(
-					MockMvcRequestBuilders.post("/login").contentType(APPLICATION_JSON_UTF8).content(requestJson))
-					.andExpect(status().isOk()).andReturn();
-			this.token = result.getResponse().getContentAsString();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		//System.out.println(token);
+		this.token = this.mockMvc.perform(
+				MockMvcRequestBuilders.post("/login").contentType(APPLICATION_JSON_UTF8).content(requestJson))
+				.andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 		Assertions.assertEquals("Bearer", this.token.split(" ")[0]);
 
 	}
@@ -146,6 +135,57 @@ class HelloWorldApplicationTests {
 		Assertions.assertTrue(benutzer.getNewsletter());
 	}
 	//Ende Benutzercontroller Tests
+	//BestellungController Tests
+
+	@Test
+	void getAllTicketsInBestellung() throws Exception {
+		benutzer = benutzerRepository.findByUsername("Moritz").get();
+		Assertions.assertFalse(benutzer == null);
+		Bestellung bestellung1 = new Bestellung();
+		bestellungRepository.save(bestellung1);
+		bestellung1.setBenutzer(benutzer);
+
+
+		Bestellung bestellung2 = new Bestellung();
+		bestellungRepository.save(bestellung2);
+		bestellung2.setBenutzer(benutzer);
+
+
+		Ticket t1 = new Ticket();
+		ticketRepository.save(t1);
+		t1.setKaeufer(benutzer);
+		t1.setGast(benutzer);
+		t1.setBestellung(bestellung1);
+
+		Ticket t2 = new Ticket();
+		ticketRepository.save(t2);
+		t2.setKaeufer(benutzer);
+		t2.setGast(benutzer);
+		t2.setBestellung(bestellung1);
+
+		Ticket t3 = new Ticket();
+		ticketRepository.save(t3);
+		t3.setKaeufer(benutzer);
+		t3.setGast(benutzer);
+		t3.setBestellung(bestellung2);
+
+		Ticket t4 = new Ticket();
+		ticketRepository.save(t4);
+		t4.setKaeufer(benutzer);
+		t4.setGast(benutzer);
+		t4.setBestellung(bestellung2);
+
+
+		ticketRepository.save(t1);
+		ticketRepository.save(t2);
+		ticketRepository.save(t3);
+		ticketRepository.save(t4);
+		bestellungRepository.save(bestellung1);
+		bestellungRepository.save(bestellung2);
+		mockMvc.perform(MockMvcRequestBuilders.get("/bestellung").header("Authorization", token)).andExpect(status().isOk()).andExpect(content().string(containsString(""+t1.getId())));
+	}
+
+	//End BestellungController Tests
 	@Test
 	public void getAllFilms() throws Exception {
 		// this.mockMvc.perform(MockMvcRequestBuilders.get("/bazahlen/bestellung/151/iban/DE-12345678901234567890"))

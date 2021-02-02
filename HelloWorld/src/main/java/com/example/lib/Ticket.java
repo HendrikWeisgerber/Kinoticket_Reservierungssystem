@@ -195,7 +195,7 @@ public class Ticket {
 
     public void updatePreis(){
         BigDecimal neuerPreis = new BigDecimal(0.0);
-        if(this.vorstellung.getGrundpreis() != null){
+        if(this.vorstellung!= null && this.vorstellung.getGrundpreis() != null){
             neuerPreis = neuerPreis.add(this.vorstellung.getGrundpreis());
         }
         if(this.gast != null){
