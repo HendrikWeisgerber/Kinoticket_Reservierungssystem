@@ -135,7 +135,7 @@ public class VorstellungController {
         return new ResponseEntity<>("Kinosaal oder Film nicht gefunden", HttpStatus.OK);
     }
 
-    @RequestMapping(value = "{vorstellung_id}/aktiv/{aktiv}", produces = "application/json", method = POST)
+    @RequestMapping(value = "/{vorstellung_id}/aktiv/{aktiv}", produces = "application/json", method = POST)
     public ResponseEntity<Object> setVorstellungAktiv(@PathVariable(value = "vorstellung_id") long vorstelung_id,
                                                       @PathVariable(value = "aktiv") long aktiv,
                                                       Principal principal) {

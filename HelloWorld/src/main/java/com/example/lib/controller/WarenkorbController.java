@@ -50,7 +50,7 @@ public class WarenkorbController {
         return new ResponseEntity<>(tickets, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "ticket/{ticket_id}", produces = "appliation/json")
+    @RequestMapping(value = "/ticket/{ticket_id}", produces = "appliation/json")
     public ResponseEntity<Object> saveTicketInWarenkorb(@PathVariable(value = "ticket_id") long ticket_id,
                                                         Principal principal) {
         Optional<Benutzer> optionalBenutzer = benutzerRepository.findByUsername(principal.getName());
