@@ -36,7 +36,7 @@ public class VorstellungController {
     @Autowired
     BenutzerRepository benutzerRepository;
 
-    @RequestMapping(value = "/", produces = "application/json")
+    @RequestMapping(value = "", produces = "application/json")
     public ResponseEntity<Object> getVorstellung() {
 
         Iterable<Kinosaal> alleSaeale = kinosaalRepository.findAll();
