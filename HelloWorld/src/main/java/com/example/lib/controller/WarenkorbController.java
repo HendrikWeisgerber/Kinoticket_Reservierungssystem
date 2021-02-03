@@ -73,7 +73,7 @@ public class WarenkorbController {
                     return new ResponseEntity<>("Ticket hat bereits einen anderen Käufer", HttpStatus.OK);
                 }
                 t.setWarenkorb(benutzer.getWarenkorb());
-                ticketRepository.save(t);
+                ticketRepository.save(t); // TODO debug Internal error 500
                 return new ResponseEntity<>(t, HttpStatus.OK);
             }
         }
