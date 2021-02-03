@@ -64,7 +64,7 @@ public class TicketController {
 
     }
 
-    @RequestMapping(value = "sitz/{sitz_id}/vorstellung/{vorstellung_id}/gast/{gast_username}", produces = "application/json", method = POST)
+    @RequestMapping(value = "/sitz/{sitz_id}/vorstellung/{vorstellung_id}/gast/{gast_username}", produces = "application/json", method = POST)
     public ResponseEntity<Object> setTicketMitGast(@PathVariable(value = "sitz_id") long sitz_id,
                                                    @PathVariable(value = "vorstellung_id") long vorstellung_id,
                                                    @PathVariable(value = "gast_username") String gast_username,
