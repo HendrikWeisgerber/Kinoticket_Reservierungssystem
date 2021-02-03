@@ -389,6 +389,7 @@ class HelloWorldApplicationTests {
         }
         kinosaalRepository.delete(saal);
     }
+
     //End SitzController Tests
     //TicketController Tests
     @Test
@@ -425,6 +426,49 @@ class HelloWorldApplicationTests {
         sitzRepository.delete(sitz);
         kinosaalRepository.delete(saal);
     }
+
+    @Test
+    public void setTicketMitGast() throws Exception {
+        benutzer = benutzerRepository.findByUsername("Moritz").get();
+        Vorstellung vorstellung = new Vorstellung();
+        Kinosaal saal = new Kinosaal();
+        Sitz sitz = new Sitz(5, 5, false, new BigDecimal(1.0));
+        sitz.setKinosaal(saal);
+        kinosaalRepository.save(saal);
+        sitzRepository.save(sitz);
+        vorstellung.setSaal(saal);
+        vorstellungRepository.save(vorstellung);
+        Benutzer gast = new Benutzer();
+        gast.setUsername("UnittestGast");
+        gast.setPasswortHash("justForUnittesting");
+        benutzerRepository.save(gast);
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/ticket/sitz/" + sitz.getId() + "/vorstellung/" + vorstellung.getId() + "/gast/" + gast.getUsername())
+                        .header("Authorization", token)
+                        .contentType(APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(result -> {
+                            result.getResponse().getContentAsString().equals("Ticket wurde gespeichert, der Besteller entspricht dem Gast");
+                        }
+                );
+
+        Ticket[] tickets = ticketRepository.findByKaeufer(benutzer);
+        for (Ticket ticket : tickets) {
+            if (ticket.getVorstellung() != null && ticket.getVorstellung().getId() == vorstellung.getId()) {
+                Assertions.assertTrue(ticket.getSitz().getId() == sitz.getId());
+                Assertions.assertTrue(ticket.getGast().getId() == gast.getId());
+                ticketRepository.delete(ticket);
+
+            }
+        }
+        benutzerRepository.delete(gast);
+        vorstellungRepository.delete(vorstellung);
+        sitzRepository.delete(sitz);
+        kinosaalRepository.delete(saal);
+    }
+
+    //End ticketController Test
 
 /*
 	@Test
