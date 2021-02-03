@@ -103,13 +103,13 @@ public class HelloWorldApplication {
     public ResponseEntity<Object> home() throws ParseException {
         ticketRepository.deleteAll();
 
-        sitzRepository.deleteAll();
+        /*sitzRepository.deleteAll();
         warenkorbRepository.deleteAll();
         vorstellungRepository.deleteAll();
         bestellungRepository.deleteAll();
         filmRepository.deleteAll();
         kinosaalRepository.deleteAll();
-        benutzerRepository.deleteAll();
+        benutzerRepository.deleteAll();*/
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
         Date date1 = sdf.parse("2020-12-26 15:30:00.000");
