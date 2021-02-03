@@ -134,4 +134,25 @@ public class VorstellungController {
 
         return new ResponseEntity<>("Kinosaal oder Film nicht gefunden", HttpStatus.OK);
     }
+
+    @RequestMapping(value = "{vorstellung_id}/aktiv/{aktiv}", produces = "application/json", method = POST)
+    public ResponseEntity<Object> setVorstellungAktiv(@PathVariable(value = "vorstellung_id") long vorstelung_id,
+                                                      @PathVariable(value = "aktiv") long aktiv,
+                                                      Principal principal) {
+
+        Optional<Benutzer> optionalBenutzer = benutzerRepository.findByUsername(principal.getName());
+        if (optionalBenutzer.isEmpty()) return new ResponseEntity<>("Keine Benutzer gefunden", HttpStatus.FORBIDDEN);
+        Benutzer benutzer = optionalBenutzer.get();
+        if (!isUserAdminOrOwner(benutzer))
+            return new ResponseEntity<>("Keine Admin Berechtigung", HttpStatus.FORBIDDEN);
+
+        Optional<Vorstellung> optionalVorstellung = vorstellungRepository.findById((int) vorstelung_id);
+        if (optionalVorstellung.isEmpty()) return new ResponseEntity<>("Keine Vorstellung", HttpStatus.OK);
+        Vorstellung vorstellung = optionalVorstellung.get();
+        boolean isAktiv = aktiv == 1;
+        vorstellung.setAktiv(isAktiv);
+        vorstellungRepository.save(vorstellung);
+
+        return new ResponseEntity<>(vorstellung, HttpStatus.OK);
+    }
 }
