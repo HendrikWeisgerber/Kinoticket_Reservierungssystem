@@ -390,6 +390,41 @@ class HelloWorldApplicationTests {
         kinosaalRepository.delete(saal);
     }
     //End SitzController Tests
+    //TicketController Tests
+    @Test
+    public void setTicketOhneGast() throws Exception {
+        benutzer = benutzerRepository.findByUsername("Moritz").get();
+        Vorstellung vorstellung = new Vorstellung();
+        Kinosaal saal = new Kinosaal();
+        Sitz sitz = new Sitz(5, 5, false, new BigDecimal(1.0));
+        sitz.setKinosaal(saal);
+        kinosaalRepository.save(saal);
+        sitzRepository.save(sitz);
+        vorstellung.setSaal(saal);
+        vorstellungRepository.save(vorstellung);
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/ticket/sitz/" + sitz.getId() + "/vorstellung/" + vorstellung.getId())
+                        .header("Authorization", token)
+                        .contentType(APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(result -> {
+                            result.getResponse().getContentAsString().equals("Ticket wurde gespeichert, Kaeufer entspricht dem Gast");
+                        }
+                );
+
+        Ticket[] tickets = ticketRepository.findByKaeufer(benutzer);
+        for (Ticket ticket : tickets) {
+            if (ticket.getVorstellung() != null && ticket.getVorstellung().getId() == vorstellung.getId()) {
+                Assertions.assertTrue(ticket.getSitz().getId() == sitz.getId());
+                ticketRepository.delete(ticket);
+
+            }
+        }
+        vorstellungRepository.delete(vorstellung);
+        sitzRepository.delete(sitz);
+        kinosaalRepository.delete(saal);
+    }
 
 /*
 	@Test
