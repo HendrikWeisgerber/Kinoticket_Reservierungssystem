@@ -1,19 +1,14 @@
 package com.example.HelloWorld;
 
-import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
-import com.example.lib.Benutzer;
-import com.example.lib.Bestellung;
-import com.example.lib.Film;
-import com.example.lib.Sitz;
-import com.example.lib.Ticket;
-import com.example.lib.Vorstellung;
-import com.example.lib.Warenkorb;
+import com.example.lib.*;
 import com.example.lib.Enum.Genre;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import org.junit.jupiter.api.*;
+import java.math.BigDecimal;
+import java.util.Date;
 
 public class TestBestellung {
 
@@ -32,7 +27,7 @@ public class TestBestellung {
         benutzer.getWarenkorb().setBenutzer(benutzer);
 
         Vorstellung vorstellung = new Vorstellung();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+        Date sdf = new Date();
         
         Sitz sitz1 = new Sitz(2, 4, false, new BigDecimal(10.0));
         Sitz sitz2 = new Sitz(2, 5, false, new BigDecimal(10.0));
@@ -66,7 +61,7 @@ public class TestBestellung {
         Sitz sitz1 = new Sitz(2, 4, false, new BigDecimal(10.0));
         Sitz sitz2 = new Sitz(2, 5, false, new BigDecimal(10.0));
         Sitz sitz3 = new Sitz(2, 6, false, new BigDecimal(10.0));
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+        Date sdf = new Date();
         Ticket ticket1 = new Ticket(1, sitz1, vorstellung, benutzer, benutzer, false, true, sdf);
         Ticket ticket2 = new Ticket(1, sitz2, vorstellung, benutzer, benutzer, false, true, sdf);
         Ticket ticket3 = new Ticket(1, sitz3, vorstellung, benutzer, benutzer, false, true, sdf);
