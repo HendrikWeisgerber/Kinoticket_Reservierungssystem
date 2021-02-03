@@ -20,7 +20,7 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Optional;
 
-import static org.springframework.web.bind.annotation.RequestMethod.POST;
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 @RestController
 @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -39,9 +39,15 @@ public class SnackController {
     @Autowired
     TicketRepository ticketRepository;
 
-    @RequestMapping(value = "/ticket/{ticket_id}", produces = "application/json", method = POST)
+    @RequestMapping(value = "/}", produces = "application/json", method = GET)
+    public ResponseEntity<Object> getAllSnacks() {
+        return snackRepository.findAll() == null ? new ResponseEntity<>("Keine Snacks", HttpStatus.OK)
+                : new ResponseEntity<>(snackRepository.findAll(), HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/ticket/{ticket_id}", produces = "application/json", method = GET)
     public ResponseEntity<Object> getSnackByTicket(@PathVariable(value = "ticket_id") long ticket_id,
-                                                    Principal principal) {
+                                                   Principal principal) {
         Optional<Benutzer> optionalBenutzer = benutzerRepository.findByUsername(principal.getName());
         if (optionalBenutzer.isEmpty()) return new ResponseEntity<>("Kein Beutzer", HttpStatus.OK);
         Benutzer benutzer = optionalBenutzer.get();
@@ -50,12 +56,13 @@ public class SnackController {
         if (optionalTicket.isEmpty()) return new ResponseEntity<>("Kein Ticket", HttpStatus.OK);
         Ticket ticket = optionalTicket.get();
 
-        if (ticket.getKaeufer().getId() != benutzer.getId()) return new ResponseEntity<>("Anderer Käufer", HttpStatus.OK);
+        if (ticket.getKaeufer().getId() != benutzer.getId())
+            return new ResponseEntity<>("Anderer Käufer", HttpStatus.OK);
 
         return new ResponseEntity<>(ticket.getSnack(), HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/warenkorb}", produces = "application/json", method = POST)
+    @RequestMapping(value = "/warenkorb}", produces = "application/json", method = GET)
     public ResponseEntity<Object> getSnackByWarenkorn(Principal principal) {
         Optional<Benutzer> optionalBenutzer = benutzerRepository.findByUsername(principal.getName());
         if (optionalBenutzer.isEmpty()) return new ResponseEntity<>("Kein Beutzer", HttpStatus.OK);
@@ -65,12 +72,13 @@ public class SnackController {
         if (optionalWarenkorb.isEmpty()) return new ResponseEntity<>("Kein Warenkorb", HttpStatus.OK);
         Warenkorb warenkorb = optionalWarenkorb.get();
 
-        if (warenkorb.getBenutzer().getId() != benutzer.getId()) return new ResponseEntity<>("Anderer Käufer", HttpStatus.OK);
+        if (warenkorb.getBenutzer().getId() != benutzer.getId())
+            return new ResponseEntity<>("Anderer Käufer", HttpStatus.OK);
 
         Ticket[] tickets = ticketRepository.findByWarenkorb(warenkorb);
         if (tickets.length < 1) return new ResponseEntity<>("Warenkorb leer", HttpStatus.OK);
         ArrayList<Snack> snacks = new ArrayList<>();
-        for (Ticket ticket: tickets) {
+        for (Ticket ticket : tickets) {
             snacks.add(ticket.getSnack());
         }
 
