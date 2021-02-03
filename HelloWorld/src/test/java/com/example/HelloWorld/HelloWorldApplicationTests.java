@@ -469,6 +469,39 @@ class HelloWorldApplicationTests {
     }
 
     //End ticketController Test
+    //VorstellungController Test
+    @Test
+    public void getVorstellung() throws Exception {
+        String call = "/vorstellung/";
+        Vorstellung vorstellung = new Vorstellung();
+        vorstellungRepository.save(vorstellung);
+
+        mockMvc.perform(MockMvcRequestBuilders.get(call).header("Authorization", token))
+                .andExpect(status().isOk())
+                .andExpect(result -> {
+                    result.getResponse().getContentAsString().contains("" + vorstellung.getId());
+                });
+        vorstellungRepository.delete(vorstellung);
+    }
+
+    @Test
+    public void getVorstellungByFilm() throws Exception {
+        Film film = new Film();
+        filmRepository.save(film);
+        Vorstellung vorstellung = new Vorstellung();
+        vorstellung.setFilm(film);
+        vorstellungRepository.save(vorstellung);
+
+        String call = "/vorstellung/film/" + film.getId();
+        mockMvc.perform(MockMvcRequestBuilders.get(call).header("Authorization", token))
+                .andExpect(status().isOk())
+                .andExpect(result -> {
+                    result.getResponse().getContentAsString().contains("" + vorstellung.getId());
+                });
+
+        vorstellungRepository.delete(vorstellung);
+        filmRepository.delete(film);
+    }
 
 /*
 	@Test
