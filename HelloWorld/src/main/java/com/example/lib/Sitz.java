@@ -16,7 +16,7 @@ public class Sitz {
     private boolean barriereFrei;
     private BigDecimal preisschluessel;
     @JsonBackReference
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name = "kinosaal_id", referencedColumnName = "id")
     private Kinosaal kinosaal;
     /*@ManyToOne

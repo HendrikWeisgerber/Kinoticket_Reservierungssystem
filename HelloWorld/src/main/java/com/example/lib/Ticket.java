@@ -34,10 +34,10 @@ public class Ticket {
     @JoinColumn(name="bestellung_id", referencedColumnName = "id")
     private Bestellung bestellung;
     private SimpleDateFormat kaufdatum;
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name = "snack_id", referencedColumnName = "id")
     private Snack snack;
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name = "getraenk_id", referencedColumnName = "id")
     private Getraenk getraenk;
 

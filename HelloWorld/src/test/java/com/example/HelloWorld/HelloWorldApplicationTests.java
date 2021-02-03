@@ -1,6 +1,9 @@
 package com.example.HelloWorld;
 
 import com.example.lib.*;
+import com.example.lib.Enum.EssenSorte;
+import com.example.lib.Enum.GetraenkeSorte;
+import com.example.lib.Enum.Groesse;
 import com.example.lib.Repositories.*;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -17,7 +20,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.math.BigDecimal;
 import java.nio.charset.Charset;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -55,6 +60,15 @@ class HelloWorldApplicationTests {
 
 	@Autowired
 	private VorstellungRepository vorstellungRepository;
+
+	@Autowired
+	private SitzRepository sitzRepository;
+
+	@Autowired
+	private SnackRepository snackRepository;
+
+	@Autowired
+	private GetraenkRepository getraenkRepository;
 
 	private Benutzer benutzer;
 
@@ -315,6 +329,46 @@ class HelloWorldApplicationTests {
 		kinosaalRepository.delete(saal);
 	}
 	//End KinosaalController Tests
+	//SitzController Tests
+	@Test
+	public void getAllSitzeBelegt() throws Exception {
+		//benutzerRepository.save(benutzer);
+		benutzer = benutzerRepository.findByUsername("Moritz").get();
+		Vorstellung vorstellung = new Vorstellung();
+		Kinosaal saal = new Kinosaal((int) (Math.random() * 10 + 1), (int) (Math.random() * 10 + 1));
+		saal.setName("Unittest saal");
+
+		Sitz[][] sitze = new Sitz[saal.getReihe()][saal.getSpalte()];
+		kinosaalRepository.save(saal);
+		vorstellung.setSaal(saal);
+		vorstellungRepository.save(vorstellung);
+		for (int i = 0; i < saal.getReihe(); i++) {
+			for (int j = 0; j < saal.getSpalte(); j++) {
+				sitze[i][j] = new Sitz();
+				sitze[i][j].setKinosaal(saal);
+				sitze[i][j].setReihe(i);
+				sitze[i][j].setSpalte(j);
+				sitze[i][j].setPreisschluessel(new BigDecimal(1));
+				sitze[i][j].setBarriereFrei(false);
+				sitzRepository.save(sitze[i][j]);
+			}
+		}
+
+		String call = "/sitz/vorstellung/" + vorstellung.getId();
+		String content = mockMvc.perform(MockMvcRequestBuilders.get(call).header("Authorization", token)).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+		for (Sitz[] reihe : sitze) {
+			for (Sitz sitz : reihe) {
+				Assertions.assertTrue(content.contains("" + sitz.getId()));
+			}
+		}
+		for (Sitz[] reihe : sitze) {
+			for (Sitz sitz : reihe) {
+				sitzRepository.delete(sitz);
+			}
+		}
+		vorstellungRepository.delete(vorstellung);
+		kinosaalRepository.delete(saal);
+	}
 
 /*
 	@Test
