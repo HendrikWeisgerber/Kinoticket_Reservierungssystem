@@ -245,7 +245,7 @@ public class FilmController {
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
-    @RequestMapping(value = "/{film_id}/aktiv/{aktiv}", produces = "application/json")
+    @RequestMapping(value = "/{film_id}/aktiv/{aktiv}", produces = "application/json", method = POST)
     public ResponseEntity<Object> setFilmAktiv(@PathVariable(value = "film_id") int film_id,
                                                @PathVariable(value = "aktiv") int aktiv,
                                                Principal principal) {
@@ -265,10 +265,12 @@ public class FilmController {
         boolean isAktiv = aktiv == 1;
         String aktivString = isAktiv ? "aktiv" : "inaktiv";
         film.setAktiv(isAktiv);
+        filmRepository.save(film);
         Vorstellung[] vorstellungen = vorstellungRepository.findByFilmId(film.getId());
         if (vorstellungen == null) return new ResponseEntity<>("Film auf " + aktivString + " gesetzt", HttpStatus.OK);
         for (Vorstellung vorstellung : vorstellungen) {
             vorstellung.setAktiv(isAktiv);
+            vorstellungRepository.save(vorstellung);
         }
 
         return new ResponseEntity<>("Film und alle dazugehörigen Vorstellungen wurden auf " + aktivString + "gesetzt", HttpStatus.OK);
