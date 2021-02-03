@@ -6,5 +6,5 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 public interface WarenkorbRepository extends CrudRepository<Warenkorb, Integer> {
-    Warenkorb[] findByBenutzer(@Param("benutzer_id")Benutzer benutzer);
+    Warenkorb findByBenutzer(@Param("benutzer_id")Benutzer benutzer);
 }

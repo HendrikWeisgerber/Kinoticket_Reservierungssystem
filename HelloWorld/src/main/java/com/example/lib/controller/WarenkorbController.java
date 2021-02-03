@@ -34,28 +34,12 @@ public class WarenkorbController {
     //Nutzer wird zu benutzer
     @RequestMapping(value = "/", produces = "application/json")
     public ResponseEntity<Object> getAllTicketsInWarenkorb(Principal principal) {
-
         Optional<Benutzer> oB = benutzerRepository.findByUsername(principal.getName());
-        Benutzer b;
-        if (!oB.isEmpty()) { // TODO Umschreiben? Falls Benutzer nicht gefunden wird -> Fehlermeldung?
-            b = oB.get();
+        if (oB.isEmpty()) {
+            return new ResponseEntity<>("Kein Benutzer unter diesem Nutzernamen gefunden", HttpStatus.OK);
         } else {
-            b = null;
+            return new ResponseEntity<>(ticketRepository.findByWarenkorb(warenkorbRepository.findByBenutzer(oB.get())), HttpStatus.OK);
         }
-        Warenkorb[] w; //TODO Davit -> Klären warum hier ein Array verwendet wird. 1 zu 1 Beziehung
-        if (b != null) {
-            w = warenkorbRepository.findByBenutzer(b);
-        } else {
-        }
-        w = new Warenkorb[0];
-        Ticket[] t;
-        if (w.length > 0) {
-            t = ticketRepository.findByWarenkorb(w[0]);
-        } else {
-            t = new Ticket[0];
-        }
-
-        return new ResponseEntity<>(t, HttpStatus.OK);
     }
 
     @RequestMapping(value = "ticket/{ticket_id}", produces = "appliation/json")

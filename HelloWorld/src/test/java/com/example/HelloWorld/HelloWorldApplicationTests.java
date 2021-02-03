@@ -5,15 +5,15 @@ import com.example.lib.Enum.EssenSorte;
 import com.example.lib.Enum.GetraenkeSorte;
 import com.example.lib.Enum.Groesse;
 import com.example.lib.Repositories.*;
+import org.aspectj.lang.annotation.After;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
@@ -27,6 +27,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Optional;
 
 import com.example.lib.Enum.Preiskategorie;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -71,7 +72,13 @@ class HelloWorldApplicationTests {
     @Autowired
     private GetraenkRepository getraenkRepository;
 
+    @Autowired
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
+
     private Benutzer benutzer;
+
+    private Benutzer dbBenutzer;
+    private Warenkorb dbWarenkorb;
 
     private String token;
 
@@ -100,9 +107,60 @@ class HelloWorldApplicationTests {
             throw new RuntimeException(e);
         }
     }
+/*
+    @BeforeAll
+    void setUpAll(){
+        Optional<Benutzer> oB = benutzerRepository.findByUsername("Moritz");
+        if(!oB.isPresent()){
+            dbBenutzer = new Benutzer();
+            dbBenutzer.setUsername("Moritz");
+            dbBenutzer.setEmail("moritz.schridde@sap.com");
+            dbBenutzer.setPasswortHash("123456");
+            dbBenutzer.setPasswortHash(bCryptPasswordEncoder.encode(dbBenutzer.getPasswortHash()));
+
+            benutzerRepository.save(dbBenutzer);
+
+            dbWarenkorb = new Warenkorb();
+            dbWarenkorb.setBenutzer(dbBenutzer);
+            warenkorbRepository.save(dbWarenkorb);
+            dbBenutzer.setWarenkorb(dbWarenkorb);
+        }
+    }
+
+    @AfterAll
+    void static cleanUpAll(){
+        warenkorbRepository.delete(dbWarenkorb);
+        benutzerRepository.delete(dbBenutzer);
+
+    }
+*/
 
     @BeforeEach
     void setUp() throws Exception {
+        Optional<Benutzer> oB = benutzerRepository.findByUsername("Moritz");
+        if(!oB.isPresent()){
+            dbBenutzer = new Benutzer();
+            dbBenutzer.setUsername("Moritz");
+            dbBenutzer.setEmail("moritz.schridde@sap.com");
+            dbBenutzer.setPasswortHash("123456");
+            dbBenutzer.setPasswortHash(bCryptPasswordEncoder.encode(dbBenutzer.getPasswortHash()));
+
+            benutzerRepository.save(dbBenutzer);
+
+            dbWarenkorb = new Warenkorb();
+            dbWarenkorb.setBenutzer(dbBenutzer);
+            warenkorbRepository.save(dbWarenkorb);
+            dbBenutzer.setWarenkorb(dbWarenkorb);
+        }
+        oB = benutzerRepository.findByUsername("Moritz");
+        if(oB.get().getWarenkorb() ==null){
+            dbWarenkorb = new Warenkorb();
+            dbWarenkorb.setBenutzer(oB.get());
+            warenkorbRepository.save(dbWarenkorb);
+            oB.get().setWarenkorb(dbWarenkorb);
+        }
+        oB.get().setPasswortHash("123456");
+        oB.get().setPasswortHash(bCryptPasswordEncoder.encode("123456"));
         benutzer = new Benutzer();
         benutzer.setUsername("Moritz");
         benutzer.setPasswortHash("123456");
@@ -565,6 +623,12 @@ class HelloWorldApplicationTests {
         kinosaalRepository.delete(saal);
     }
     //End VorstellungController Tests
+    //WarenkorbController Tests
+
+    @Test
+    public void getAllTicketsInWarenkorb(){
+
+    }
 
 /*
 	@Test
