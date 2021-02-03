@@ -1,13 +1,7 @@
 package com.example.lib.controller;
 
-import com.example.lib.Film;
-import com.example.lib.Kinosaal;
-import com.example.lib.Repositories.FilmRepository;
-import com.example.lib.Repositories.KinosaalRepository;
-import com.example.lib.Repositories.SitzRepository;
-import com.example.lib.Repositories.VorstellungRepository;
-import com.example.lib.Sitz;
-import com.example.lib.Vorstellung;
+import com.example.lib.*;
+import com.example.lib.Repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -15,9 +9,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.security.Principal;
 import java.util.Date;
 import java.util.Optional;
 
+import static com.example.lib.HelloWorldApplication.isUserAdminOrOwner;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 @RestController
@@ -37,7 +33,10 @@ public class VorstellungController {
     @Autowired
     VorstellungRepository vorstellungRepository;
 
-    @RequestMapping(value = "/", produces = "application/json")
+    @Autowired
+    BenutzerRepository benutzerRepository;
+
+    @RequestMapping(value = "", produces = "application/json")
     public ResponseEntity<Object> getVorstellung() {
 
         Iterable<Kinosaal> alleSaeale = kinosaalRepository.findAll();
@@ -49,7 +48,7 @@ public class VorstellungController {
                 }
                 saal.getMeineSitze().add(sitz);
             }
-        } // TODO getrennte Methoden und Analog bei anderen Klassen oder unnötig und mit API Calls ersetzen?
+        } // TODO extra Methoden und Analog bei anderen Klassen aufrufen oder unnötig und mit API Calls ersetzen?
         /*Vorstellung testVor = new Vorstellung();
         Film filmT = new Film();
         filmRepository.save(filmT);
@@ -79,7 +78,14 @@ public class VorstellungController {
     }
 
     @RequestMapping(value = "/insert", produces = "application/json", method = POST)
-    public ResponseEntity<Object> setVorstellung(@RequestBody() Vorstellung vorstellung) {
+    public ResponseEntity<Object> setVorstellung(@RequestBody() Vorstellung vorstellung, Principal principal) {
+
+        Optional<Benutzer> optionalBenutzer = benutzerRepository.findByUsername(principal.getName());
+        if (optionalBenutzer.isEmpty()) return new ResponseEntity<>("Keine Benutzer gefunden", HttpStatus.FORBIDDEN);
+        Benutzer benutzer = optionalBenutzer.get();
+        if (!isUserAdminOrOwner(benutzer))
+            return new ResponseEntity<>("Keine Admin Berechtigung", HttpStatus.FORBIDDEN);
+
         Optional<Kinosaal> kinosaal = kinosaalRepository.findById(vorstellung.getSaal().getId());
         //Optional<Film> film = filmRepository.findById(vorstellung.getFilm().getId());
 
@@ -100,7 +106,14 @@ public class VorstellungController {
                                                  @PathVariable(value = "film_id") long film_id,
                                                  @PathVariable(value = "startzeit") @DateTimeFormat(pattern = "MMddyyyyHHmm") Date startzeit,
                                                  @PathVariable(value = "grundpreis") BigDecimal grundpreis,
-                                                 @PathVariable(value = "aktiv") long aktiv) {
+                                                 @PathVariable(value = "aktiv") long aktiv,
+                                                 Principal principal) {
+
+        Optional<Benutzer> optionalBenutzer = benutzerRepository.findByUsername(principal.getName());
+        if (optionalBenutzer.isEmpty()) return new ResponseEntity<>("Keine Benutzer gefunden", HttpStatus.FORBIDDEN);
+        Benutzer benutzer = optionalBenutzer.get();
+        if (!isUserAdminOrOwner(benutzer))
+            return new ResponseEntity<>("Keine Admin Berechtigung", HttpStatus.FORBIDDEN);
 
         Optional<Kinosaal> kinosaal = kinosaalRepository.findById((int) kinosaal_id);
         Optional<Film> film = filmRepository.findById((int) film_id);
@@ -120,5 +133,26 @@ public class VorstellungController {
         }
 
         return new ResponseEntity<>("Kinosaal oder Film nicht gefunden", HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/{vorstellung_id}/aktiv/{aktiv}", produces = "application/json", method = POST)
+    public ResponseEntity<Object> setVorstellungAktiv(@PathVariable(value = "vorstellung_id") long vorstelung_id,
+                                                      @PathVariable(value = "aktiv") long aktiv,
+                                                      Principal principal) {
+
+        Optional<Benutzer> optionalBenutzer = benutzerRepository.findByUsername(principal.getName());
+        if (optionalBenutzer.isEmpty()) return new ResponseEntity<>("Keine Benutzer gefunden", HttpStatus.FORBIDDEN);
+        Benutzer benutzer = optionalBenutzer.get();
+        if (!isUserAdminOrOwner(benutzer))
+            return new ResponseEntity<>("Keine Admin Berechtigung", HttpStatus.FORBIDDEN);
+
+        Optional<Vorstellung> optionalVorstellung = vorstellungRepository.findById((int) vorstelung_id);
+        if (optionalVorstellung.isEmpty()) return new ResponseEntity<>("Keine Vorstellung", HttpStatus.OK);
+        Vorstellung vorstellung = optionalVorstellung.get();
+        boolean isAktiv = aktiv == 1;
+        vorstellung.setAktiv(isAktiv);
+        vorstellungRepository.save(vorstellung);
+
+        return new ResponseEntity<>(vorstellung, HttpStatus.OK);
     }
 }

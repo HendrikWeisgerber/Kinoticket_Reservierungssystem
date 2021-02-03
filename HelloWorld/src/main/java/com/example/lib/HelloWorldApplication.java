@@ -1,6 +1,7 @@
 package com.example.lib;
 
 import com.example.lib.Enum.Genre;
+import com.example.lib.Enum.Rechte;
 import com.example.lib.Repositories.*;
 import com.example.lib.security.WebSecurityConfiguration;
 import com.google.zxing.BarcodeFormat;
@@ -102,13 +103,13 @@ public class HelloWorldApplication {
     public ResponseEntity<Object> home() throws ParseException {
         ticketRepository.deleteAll();
 
-        sitzRepository.deleteAll();
+        /*sitzRepository.deleteAll();
         warenkorbRepository.deleteAll();
         vorstellungRepository.deleteAll();
         bestellungRepository.deleteAll();
         filmRepository.deleteAll();
         kinosaalRepository.deleteAll();
-        benutzerRepository.deleteAll();
+        benutzerRepository.deleteAll();*/
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
         Date date1 = sdf.parse("2020-12-26 15:30:00.000");
@@ -161,10 +162,11 @@ public class HelloWorldApplication {
         Warenkorb testWarenkorb = new Warenkorb();
         testBenutzer.setVorname("Max");
         testBenutzer.setNachname("Mustermann");
-        testBenutzer.setUsername("Mustermann_Max");
+        testBenutzer.setUsername("owner");
         testBenutzer.setAlter(25);
         testBenutzer.setEmail("max.mustermann@gmail.com");
-        testBenutzer.setPasswortHash(bCryptPasswordEncoder().encode("KFIWN"));
+        testBenutzer.setRechte(Rechte.OWNER);
+        testBenutzer.setPasswortHash(bCryptPasswordEncoder().encode("pass"));
         testBenutzer.setWarenkorb(testWarenkorb);
         testWarenkorb.setBenutzer(testBenutzer);
         Bestellung testBestellung = new Bestellung();
@@ -385,8 +387,15 @@ public class HelloWorldApplication {
         return MatrixToImageWriter.toBufferedImage(bitMatrix);
     }
 
-    private static Optional<Benutzer> getCurrentUser(Principal principal, BenutzerRepository benutzerRepository) {
+    public static Optional<Benutzer> getCurrentUser(Principal principal, BenutzerRepository benutzerRepository) {
         return benutzerRepository.findByUsername(principal.getName());
+    }
+
+    public static boolean isUserAdminOrOwner(Benutzer benutzer) {
+        if (benutzer.getRechte()==null || benutzer.getRechte().toString().isEmpty())  return false;
+            return benutzer.getRechte().toString().toLowerCase().equals(Rechte.ADMIN.toString().toLowerCase()) ||
+                    benutzer.getRechte().toString().toLowerCase().equals(Rechte.OWNER.toString().toLowerCase());
+
     }
 
     public static void main(String[] args) {

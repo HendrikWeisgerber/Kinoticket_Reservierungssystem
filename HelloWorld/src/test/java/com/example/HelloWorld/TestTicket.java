@@ -29,7 +29,7 @@ public class TestTicket {
         benutzer = new Benutzer("Kurt C.", "Hose", "KurtCeHose", 1, 23, "kurtCHose@gmail.com", "456", warenkorb, new Film[0], 
                                 false, Preiskategorie.ERWACHSENER, Rechte.USER, Zone.MITTE_MITTE);
         warenkorb.setBenutzer(benutzer);
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+        Date sdf = new Date(2021, 1, 22);
 
         Vorstellung vorstellung = new Vorstellung(new Date(2021, 1, 22), new BigDecimal(10.0), true);
 

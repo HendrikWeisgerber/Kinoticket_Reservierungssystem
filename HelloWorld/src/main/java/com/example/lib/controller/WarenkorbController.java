@@ -35,12 +35,18 @@ public class WarenkorbController {
     @RequestMapping(value = "/", produces = "application/json")
     public ResponseEntity<Object> getAllTicketsInWarenkorb(Principal principal) {
         Optional<Benutzer> oB = benutzerRepository.findByUsername(principal.getName());
-        if (oB.isEmpty()) {
-            return new ResponseEntity<>("Kein Benutzer unter diesem Nutzernamen gefunden", HttpStatus.OK);
+        Benutzer b;
+        if (oB.isPresent()) { // TODO Umschreiben? Falls Benutzer nicht gefunden wird -> Fehlermeldung?
+            b = oB.get();
         } else {
-            Ticket[] t = ticketRepository.findByWarenkorb(warenkorbRepository.findByBenutzer(oB.get()));
-            return new ResponseEntity<>(t, HttpStatus.OK);
+            return new ResponseEntity<>("Kein Benutzer gefunden", HttpStatus.OK);
         }
+        Optional<Warenkorb> optionalWarenkorb = warenkorbRepository.findByBenutzer(b);
+        if (optionalWarenkorb.isEmpty()) return new ResponseEntity<>("Kein Warenkorb", HttpStatus.OK);
+        Warenkorb warenkorb = optionalWarenkorb.get();
+        Ticket[] tickets = ticketRepository.findByWarenkorb(warenkorb);
+        if (tickets.length < 1) return new ResponseEntity<>("Warenkorb leer", HttpStatus.OK);
+        return new ResponseEntity<>(tickets, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/ticket/{ticket_id}", produces = "appliation/json")
@@ -66,13 +72,14 @@ public class WarenkorbController {
                     return new ResponseEntity<Object>("Ticket ist von einem anderern Kunden reserviert", HttpStatus.OK);
                 }
                 t.setWarenkorb(benutzer.getWarenkorb());
-                //ticketRepository.save(t);
+                ticketRepository.save(t);
                 //TODO throws error 500
                 //TODO if fixed, activate test "saveTicketInWarenkorb()" in HelloWorldApplicationTests.java
                 //Resolved [org.springframework.http.converter.HttpMessageNotWritableException: No converter for [class com.example.lib.Ticket] with preset Content-Type 'null']
                 return new ResponseEntity<Object>(t, HttpStatus.OK);
+
             }
         }
-        return new ResponseEntity<Object>("", HttpStatus.OK);
+        return new ResponseEntity<>("", HttpStatus.OK);
     }
 }

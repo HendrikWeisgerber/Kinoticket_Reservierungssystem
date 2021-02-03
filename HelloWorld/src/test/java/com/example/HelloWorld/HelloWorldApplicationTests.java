@@ -1,9 +1,7 @@
 package com.example.HelloWorld;
 
 import com.example.lib.*;
-import com.example.lib.Enum.EssenSorte;
-import com.example.lib.Enum.GetraenkeSorte;
-import com.example.lib.Enum.Groesse;
+import com.example.lib.Enum.*;
 import com.example.lib.Repositories.*;
 import org.aspectj.lang.annotation.After;
 import org.json.JSONException;
@@ -29,7 +27,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Optional;
 
-import com.example.lib.Enum.Preiskategorie;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
@@ -162,6 +159,8 @@ class HelloWorldApplicationTests {
         }
         oB.get().setPasswortHash("123456");
         oB.get().setPasswortHash(bCryptPasswordEncoder.encode("123456"));
+        oB.get().setRechte(Rechte.ADMIN);
+        benutzerRepository.save(oB.get());
         benutzer = new Benutzer();
         benutzer.setUsername("Moritz");
         benutzer.setPasswortHash("123456");
@@ -190,6 +189,7 @@ class HelloWorldApplicationTests {
         String username = "" + (int) (Math.random() * 100000000);
         benutzer.setUsername(username);
         benutzer.setPasswortHash("" + (int) (Math.random() * 100000));
+        benutzer.setRechte(Rechte.USER);
 
         String requestJson = asJsonString(benutzer);
         Assertions.assertFalse(requestJson.equals(""));
@@ -197,7 +197,7 @@ class HelloWorldApplicationTests {
         this.mockMvc.perform(MockMvcRequestBuilders.post("/benutzer/signup").contentType(APPLICATION_JSON_UTF8).content(requestJson)).andExpect(status().isOk());
 
         Assertions.assertTrue(benutzerRepository.findByUsername(username).isPresent());
-        benutzerRepository.delete(benutzerRepository.findByUsername(username).get());
+        //benutzerRepository.delete(benutzerRepository.findByUsername(username).get());
     }
 
     @Test
@@ -629,7 +629,9 @@ class HelloWorldApplicationTests {
     @Test
     public void getAllTicketsInWarenkorb() throws Exception {
         benutzer = benutzerRepository.findByUsername("Moritz").get();
-        Warenkorb warenkorb = warenkorbRepository.findByBenutzer(benutzer);
+        Optional<Warenkorb> oWarenkorb = warenkorbRepository.findByBenutzer(benutzer);
+        Assertions.assertTrue(oWarenkorb.isPresent());
+        Warenkorb warenkorb = oWarenkorb.get();
         for (Ticket ticket : ticketRepository.findByWarenkorb(warenkorb)) {
             ticketRepository.delete(ticket);
         }
@@ -663,7 +665,7 @@ class HelloWorldApplicationTests {
         ticketRepository.save(ticket);
         String call = "/warenkorb/ticket/" + ticket.getId();
         Assertions.assertTrue(mockMvc.perform(MockMvcRequestBuilders.get(call).header("Authorization", token)).andExpect(status().isOk()).andReturn().getResponse().getContentAsString().equals(""));
-        Assertions.assertEquals(ticketRepository.findByWarenkorb(warenkorbRepository.findByBenutzer(benutzerRepository.findByUsername("Moritz").get()))[0].getId(), ticket.getId());
+        Assertions.assertEquals(ticketRepository.findByWarenkorb(warenkorbRepository.findByBenutzer(benutzerRepository.findByUsername("Moritz").get()).get())[0].getId(), ticket.getId());
         ticketRepository.delete(ticket);*/
     }
     //End WarenkorbController Tests
