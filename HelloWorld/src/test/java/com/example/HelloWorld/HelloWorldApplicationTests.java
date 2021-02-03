@@ -666,4 +666,5 @@ class HelloWorldApplicationTests {
         Assertions.assertEquals(ticketRepository.findByWarenkorb(warenkorbRepository.findByBenutzer(benutzerRepository.findByUsername("Moritz").get()))[0].getId(), ticket.getId());
         ticketRepository.delete(ticket);*/
     }
+    //End WarenkorbController Tests
 }
