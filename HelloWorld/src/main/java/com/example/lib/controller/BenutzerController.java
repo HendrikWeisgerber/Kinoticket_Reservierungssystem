@@ -3,6 +3,7 @@ package com.example.lib.controller;
 import com.example.lib.Benutzer;
 import com.example.lib.Enum.Preiskategorie;
 import com.example.lib.Enum.Rechte;
+import com.example.lib.Enum.Zone;
 import com.example.lib.Repositories.BenutzerRepository;
 import com.example.lib.Repositories.WarenkorbRepository;
 import com.example.lib.Warenkorb;
@@ -96,7 +97,43 @@ public class BenutzerController {
             return new ResponseEntity<>("Kein Benutzer mit dem Benutzernamen", HttpStatus.OK);
         }
         b = benutzerOptional.get();
-        String response = b.getRechte() != null ? b.getRechte().toString() : Rechte.USER.toString();
+        String response;
+        if (b.getRechte() != null) response = b.getRechte().toString();
+        else {
+            b.setRechte(Rechte.USER);
+            benutzerRepository.save(b);
+            response = Rechte.USER.toString();
+        }
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/lieblingszone", produces = "application/json", method = POST)
+    public ResponseEntity<Object> getUserLeiblingsZone(Principal principal) {
+        Optional<Benutzer> benutzerOptional = benutzerRepository.findByUsername(principal.getName());
+        Benutzer b;
+        if (benutzerOptional.isEmpty()) {
+            return new ResponseEntity<>("Kein Benutzer mit dem Benutzernamen", HttpStatus.OK);
+        }
+        b = benutzerOptional.get();
+        Zone zone = b.getLieblingszone();
+        if (zone == null || zone.toString().isEmpty())
+            return new ResponseEntity<>("Keine Lieblingszone", HttpStatus.OK);
+
+        return new ResponseEntity<>(zone.toString(), HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/preiskategorie", produces = "application/json", method = POST)
+    public ResponseEntity<Object> getUserPreiskategorie(Principal principal) {
+        Optional<Benutzer> benutzerOptional = benutzerRepository.findByUsername(principal.getName());
+        Benutzer b;
+        if (benutzerOptional.isEmpty()) {
+            return new ResponseEntity<>("Kein Benutzer mit dem Benutzernamen", HttpStatus.OK);
+        }
+        b = benutzerOptional.get();
+        Preiskategorie preiskategorie = b.getPreiskategorie();
+        if (preiskategorie == null || preiskategorie.toString().isEmpty())
+            return new ResponseEntity<>("Keine Preiskategorie", HttpStatus.OK);
+
+        return new ResponseEntity<>(preiskategorie.toString(), HttpStatus.OK);
     }
 }
