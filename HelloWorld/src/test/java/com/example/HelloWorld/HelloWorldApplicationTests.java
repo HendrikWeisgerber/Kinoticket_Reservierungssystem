@@ -138,7 +138,7 @@ class HelloWorldApplicationTests {
     @BeforeEach
     void setUp() throws Exception {
         Optional<Benutzer> oB = benutzerRepository.findByUsername("Moritz");
-        if(!oB.isPresent()){
+        if (!oB.isPresent()) {
             dbBenutzer = new Benutzer();
             dbBenutzer.setUsername("Moritz");
             dbBenutzer.setEmail("moritz.schridde@sap.com");
@@ -153,11 +153,12 @@ class HelloWorldApplicationTests {
             dbBenutzer.setWarenkorb(dbWarenkorb);
         }
         oB = benutzerRepository.findByUsername("Moritz");
-        if(oB.get().getWarenkorb() ==null){
+        if (warenkorbRepository.findByBenutzer(oB.get()) == null) {
             dbWarenkorb = new Warenkorb();
             dbWarenkorb.setBenutzer(oB.get());
             warenkorbRepository.save(dbWarenkorb);
             oB.get().setWarenkorb(dbWarenkorb);
+            benutzerRepository.save(oB.get());
         }
         oB.get().setPasswortHash("123456");
         oB.get().setPasswortHash(bCryptPasswordEncoder.encode("123456"));
@@ -626,50 +627,43 @@ class HelloWorldApplicationTests {
     //WarenkorbController Tests
 
     @Test
-    public void getAllTicketsInWarenkorb(){
+    public void getAllTicketsInWarenkorb() throws Exception {
+        benutzer = benutzerRepository.findByUsername("Moritz").get();
+        Warenkorb warenkorb = warenkorbRepository.findByBenutzer(benutzer);
+        for (Ticket ticket : ticketRepository.findByWarenkorb(warenkorb)) {
+            ticketRepository.delete(ticket);
+        }
+        Ticket[] tickets = new Ticket[20];
+        for (Ticket ticket : tickets) {
+            ticket = new Ticket();
+            ticket.setWarenkorb(warenkorb);
+            ticket.setKaeufer(benutzer);
+            ticket.setGast(benutzer);
+            ticketRepository.save(ticket);
+        }
+        String call = "/warenkorb/";
+        String content = mockMvc.perform(MockMvcRequestBuilders.get(call).header("Authorization", token)).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        for (Ticket ticket : ticketRepository.findByWarenkorb(warenkorb)) {
+            Assertions.assertTrue(content.contains("" + ticket.getId()));
+        }
 
+        for (Ticket ticket : ticketRepository.findByWarenkorb(warenkorb)) {
+            ticketRepository.delete(ticket);
+        }
     }
 
-/*
-	@Test
-	public void addTicket() throws Exception {
-		// TODO function throws error 500
-		Ticket ticket = new Ticket();
-		ticket.setKaeufer(benutzer);
-		ticket.setGast(benutzer);
-		ticketRepository.save(ticket);
-
-		String call = "/warenkorb/ticket/" + ticket.getId();;
-		try {
-			mockMvc.perform(MockMvcRequestBuilders.get(call).header("Authorization", token)).andDo(print()).andExpect(status().isOk());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		Assertions.assertEquals(benutzer.getWarenkorb().getId(), ticketRepository.findById(ticket.getId()).get().getWarenkorb().getId());
-		ticketRepository.delete(ticket);
-	}*/
-/*
-	@Test
-	public void practice() throws Exception {
-		// this.mockMvc.perform(MockMvcRequestBuilders.get("/bazahlen/bestellung/151/iban/DE-12345678901234567890"))
-		String call = "/film/";
-		mockMvc.perform(MockMvcRequestBuilders.post(call,)).
-		
-		
-		filme.stream().forEach(f -> {
-			String call = "/film/" + f.getId();
-			try {
-				mockMvc.perform(MockMvcRequestBuilders.get(call)).andDo(print()).andExpect(status().isOk())
-						.andExpect(content().string(containsString(f.getName())))
-						.andExpect(content().string(containsString(f.getBeschreibung())))
-						.andExpect(content().string(containsString(((Integer)f.getBewertung()).toString())))
-						.andExpect(content().string(containsString(f.getGenre1().toString())));
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		});
-
-	}
-	
-*/
+    @Test
+    public void saveTicketInWarenkorb() throws Exception {
+        /*for (Ticket ticket : ticketRepository.findByWarenkorb(warenkorbRepository.findByBenutzer(benutzerRepository.findByUsername("Moritz").get()))) {
+            ticketRepository.delete(ticket);
+        }
+        Ticket ticket = new Ticket();
+        ticket.setKaeufer(benutzerRepository.findByUsername("Moritz").get());
+        ticket.setGast(benutzerRepository.findByUsername("Moritz").get());
+        ticketRepository.save(ticket);
+        String call = "/warenkorb/ticket/" + ticket.getId();
+        Assertions.assertTrue(mockMvc.perform(MockMvcRequestBuilders.get(call).header("Authorization", token)).andExpect(status().isOk()).andReturn().getResponse().getContentAsString().equals(""));
+        Assertions.assertEquals(ticketRepository.findByWarenkorb(warenkorbRepository.findByBenutzer(benutzerRepository.findByUsername("Moritz").get()))[0].getId(), ticket.getId());
+        ticketRepository.delete(ticket);*/
+    }
 }

@@ -38,11 +38,12 @@ public class WarenkorbController {
         if (oB.isEmpty()) {
             return new ResponseEntity<>("Kein Benutzer unter diesem Nutzernamen gefunden", HttpStatus.OK);
         } else {
-            return new ResponseEntity<>(ticketRepository.findByWarenkorb(warenkorbRepository.findByBenutzer(oB.get())), HttpStatus.OK);
+            Ticket[] t = ticketRepository.findByWarenkorb(warenkorbRepository.findByBenutzer(oB.get()));
+            return new ResponseEntity<>(t, HttpStatus.OK);
         }
     }
 
-    @RequestMapping(value = "ticket/{ticket_id}", produces = "appliation/json")
+    @RequestMapping(value = "/ticket/{ticket_id}", produces = "appliation/json")
     public ResponseEntity<Object> saveTicketInWarenkorb(@PathVariable(value = "ticket_id") long ticket_id,
                                                         Principal principal) {
         Optional<Benutzer> optionalBenutzer = benutzerRepository.findByUsername(principal.getName());
@@ -67,6 +68,8 @@ public class WarenkorbController {
                 t.setWarenkorb(benutzer.getWarenkorb());
                 //ticketRepository.save(t);
                 //TODO throws error 500
+                //TODO if fixed, activate test "saveTicketInWarenkorb()" in HelloWorldApplicationTests.java
+                //Resolved [org.springframework.http.converter.HttpMessageNotWritableException: No converter for [class com.example.lib.Ticket] with preset Content-Type 'null']
                 return new ResponseEntity<Object>(t, HttpStatus.OK);
             }
         }
