@@ -243,4 +243,34 @@ public class FilmController {
         filmRepository.save(film);
         return new ResponseEntity<>("Der Film wurde hinzugefügt!", HttpStatus.OK);
     }
+
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    @RequestMapping(value = "/{film_id}/aktiv/{aktiv}", produces = "application/json")
+    public ResponseEntity<Object> setFilmAktiv(@PathVariable(value = "film_id") int film_id,
+                                               @PathVariable(value = "aktiv") int aktiv,
+                                               Principal principal) {
+
+        Optional<Benutzer> optionalBenutzer = benutzerRepository.findByUsername(principal.getName());
+        if (optionalBenutzer.isEmpty()) return new ResponseEntity<>("Keine Benutzer gefunden", HttpStatus.FORBIDDEN);
+        Benutzer benutzer = optionalBenutzer.get();
+        if (!isUserAdminOrOwner(benutzer))
+            return new ResponseEntity<>("Keine Admin Berechtigung", HttpStatus.FORBIDDEN);
+
+        Optional<Film> optionalFilm = filmRepository.findById(film_id);
+        if (optionalFilm.isEmpty()) {
+            return new ResponseEntity<Object>("Kein Film mit der Id: " + film_id, HttpStatus.OK);
+        }
+
+        Film film = optionalFilm.get();
+        boolean isAktiv = aktiv == 1;
+        String aktivString = isAktiv ? "aktiv" : "inaktiv";
+        film.setAktiv(isAktiv);
+        Vorstellung[] vorstellungen = vorstellungRepository.findByFilmId(film.getId());
+        if (vorstellungen == null) return new ResponseEntity<>("Film auf " + aktivString + " gesetzt", HttpStatus.OK);
+        for (Vorstellung vorstellung : vorstellungen) {
+            vorstellung.setAktiv(isAktiv);
+        }
+
+        return new ResponseEntity<>("Film und alle dazugehörigen Vorstellungen wurden auf " + aktivString + "gesetzt", HttpStatus.OK);
+    }
 }
