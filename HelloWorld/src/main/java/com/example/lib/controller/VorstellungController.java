@@ -81,7 +81,7 @@ public class VorstellungController {
     @RequestMapping(value = "/insert", produces = "application/json", method = POST)
     public ResponseEntity<Object> setVorstellung(@RequestBody() Vorstellung vorstellung) {
         Optional<Kinosaal> kinosaal = kinosaalRepository.findById(vorstellung.getSaal().getId());
-        Optional<Film> film = filmRepository.findById(vorstellung.getFilm().getId());
+        //Optional<Film> film = filmRepository.findById(vorstellung.getFilm().getId());
 
         String response = "";
         vorstellungRepository.save(vorstellung);

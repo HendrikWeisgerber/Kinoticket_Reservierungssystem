@@ -223,11 +223,14 @@ class HelloWorldApplicationTests {
     public void getAllFilms() throws Exception {
         // this.mockMvc.perform(MockMvcRequestBuilders.get("/bazahlen/bestellung/151/iban/DE-12345678901234567890"))
         ArrayList<String> filmNamen = new ArrayList<String>();
-        long size = filmRepository.count();
+
         filmNamen.add("name");
         filmRepository.findAll().forEach(f -> {
-            filmNamen.add(f.getName());
+            if (f.getName() != null) {
+                filmNamen.add(f.getName());
+            }
         });
+        long size = filmNamen.size();
         this.mockMvc.perform(MockMvcRequestBuilders.get("/film/all")).andDo(print()).andExpect(status().isOk())
                 .andExpect(content().string(containsString(filmNamen.get((int) (Math.random() * size)))))
                 .andExpect(content().string(containsString(filmNamen.get((int) (Math.random() * size)))))
@@ -263,7 +266,7 @@ class HelloWorldApplicationTests {
     public void postNewFilm() throws Exception {
 
         filmRepository.findAll().forEach(f -> {
-            if (f.getName().equals("Finding Nemo but only for testpurposes")) {
+            if (f.getName() != null && f.getName().equals("Finding Nemo but only for testpurposes")) {
                 filmRepository.delete(f);
             }
         });
@@ -306,7 +309,7 @@ class HelloWorldApplicationTests {
         mockMvc.perform(MockMvcRequestBuilders.post("/film/").header("Authorization", token).contentType(APPLICATION_JSON_UTF8).content(body)).andExpect(status().isOk()).andReturn().getResponse().getContentAsString().equals("Der Film wurde hinzugefügt!");
         Assertions.assertEquals(counter + 1, filmRepository.count());
         filmRepository.findAll().forEach(f -> {
-            if (f.getName().equals("Finding Nemo but only for testpurposes")) {
+            if (f.getName() != null && f.getName().equals("Finding Nemo but only for testpurposes")) {
                 filmRepository.delete(f);
             }
         });
@@ -502,6 +505,66 @@ class HelloWorldApplicationTests {
         vorstellungRepository.delete(vorstellung);
         filmRepository.delete(film);
     }
+
+    @Test
+    public void setVorstellung() throws Exception {
+        String call = "/vorstellung/insert";
+        Kinosaal saal = new Kinosaal();
+        Film film = new Film();
+
+        kinosaalRepository.save(saal);
+        filmRepository.save(film);
+        Vorstellung vorstellung = new Vorstellung();
+        vorstellung.setSaal(saal);
+        vorstellung.setFilm(film);
+
+
+        mockMvc.perform(MockMvcRequestBuilders.post(call).header("Authorization", token).contentType(APPLICATION_JSON_UTF8).content(asJsonString(vorstellung))).andExpect(status().isOk());
+        Vorstellung[] vorstellungen = vorstellungRepository.findByFilmId(film.getId());
+        for (Vorstellung eineVorstellung : vorstellungen) {
+            Assertions.assertTrue(eineVorstellung.getSaal().getId() == saal.getId());
+            Assertions.assertTrue(eineVorstellung.getFilm().getId() == film.getId());
+        }
+        vorstellungRepository.delete(vorstellung);
+        vorstellungRepository.findAll().forEach(vorstellung1 -> {
+            if (vorstellung1.getSaal() != null && vorstellung1.getSaal().getId() == saal.getId()) {
+                vorstellungRepository.delete(vorstellung1);
+            }
+        });
+        filmRepository.delete(film);
+        kinosaalRepository.delete(saal);
+    }
+
+    @Test
+    public void setVorstellung2() throws Exception {
+        String call = "/vorstellung/insert";
+        Kinosaal saal = new Kinosaal();
+        Film film = new Film();
+
+        kinosaalRepository.save(saal);
+        filmRepository.save(film);
+        Vorstellung vorstellung = new Vorstellung();
+        vorstellung.setSaal(saal);
+        vorstellung.setFilm(film);
+
+        call += "/film/" + film.getId() + "/kinosaal/" + saal.getId() + "/startzeit/020720212015/grundpreis/10/aktiv/1";
+
+        mockMvc.perform(MockMvcRequestBuilders.post(call).header("Authorization", token)).andExpect(status().isOk());
+        Vorstellung[] vorstellungen = vorstellungRepository.findByFilmId(film.getId());
+        for (Vorstellung eineVorstellung : vorstellungen) {
+            Assertions.assertTrue(eineVorstellung.getSaal().getId() == saal.getId());
+            Assertions.assertTrue(eineVorstellung.getFilm().getId() == film.getId());
+        }
+        vorstellungRepository.delete(vorstellung);
+        vorstellungRepository.findAll().forEach(vorstellung1 -> {
+            if (vorstellung1.getSaal() != null && vorstellung1.getSaal().getId() == saal.getId()) {
+                vorstellungRepository.delete(vorstellung1);
+            }
+        });
+        filmRepository.delete(film);
+        kinosaalRepository.delete(saal);
+    }
+    //End VorstellungController Tests
 
 /*
 	@Test
