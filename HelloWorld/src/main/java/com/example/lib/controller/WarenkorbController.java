@@ -37,25 +37,17 @@ public class WarenkorbController {
 
         Optional<Benutzer> oB = benutzerRepository.findByUsername(principal.getName());
         Benutzer b;
-        if (!oB.isEmpty()) { // TODO Umschreiben? Falls Benutzer nicht gefunden wird -> Fehlermeldung?
+        if (oB.isPresent()) { // TODO Umschreiben? Falls Benutzer nicht gefunden wird -> Fehlermeldung?
             b = oB.get();
         } else {
-            b = null;
+            return new ResponseEntity<>("Kein Benutzer gefunden", HttpStatus.OK);
         }
-        Warenkorb[] w; //TODO Davit -> Klären warum hier ein Array verwendet wird. 1 zu 1 Beziehung
-        if (b != null) {
-            w = warenkorbRepository.findByBenutzer(b);
-        } else {
-        }
-        w = new Warenkorb[0];
-        Ticket[] t;
-        if (w.length > 0) {
-            t = ticketRepository.findByWarenkorb(w[0]);
-        } else {
-            t = new Ticket[0];
-        }
-
-        return new ResponseEntity<>(t, HttpStatus.OK);
+        Optional<Warenkorb> optionalWarenkorb = warenkorbRepository.findByBenutzer(b);
+        if (optionalWarenkorb.isEmpty()) return new ResponseEntity<>("Kein Warenkorb", HttpStatus.OK);
+        Warenkorb warenkorb = optionalWarenkorb.get();
+        Ticket[] tickets = ticketRepository.findByWarenkorb(warenkorb);
+        if (tickets.length < 1) return new ResponseEntity<>("Warenkorb leer", HttpStatus.OK);
+        return new ResponseEntity<>(tickets, HttpStatus.OK);
     }
 
     @RequestMapping(value = "ticket/{ticket_id}", produces = "appliation/json")
