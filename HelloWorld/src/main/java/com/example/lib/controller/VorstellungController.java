@@ -58,13 +58,18 @@ public class VorstellungController {
         testVor.setFilm(filmT);
         vorstellungRepository.save(testVor);*/
         Iterable<Vorstellung> vorstellungIterable = vorstellungRepository.findAll();
-        ArrayList<Vorstellung> vorstellungen = new ArrayList<>();
+        ArrayList<Vorstellung> aktiveVorstellungen = new ArrayList<>();
+        ArrayList<Vorstellung> inaktiveVorstellungen = new ArrayList<>();
+        ArrayList<ArrayList<Vorstellung>> vorstellungen = new ArrayList<>();
         for (Vorstellung vorstellung : vorstellungIterable) {
             if (vorstellung.isAktiv()) {
-                vorstellungen.add(vorstellung);
+                aktiveVorstellungen.add(vorstellung);
+            } else {
+                inaktiveVorstellungen.add(vorstellung);
             }
         }
-
+        vorstellungen.add(aktiveVorstellungen);
+        vorstellungen.add(inaktiveVorstellungen);
         return new ResponseEntity<>(vorstellungen, HttpStatus.OK);
         //return new ResponseEntity<>(vorstellungRepository.findByFilmId((int)film_id),HttpStatus.OK);
     }
