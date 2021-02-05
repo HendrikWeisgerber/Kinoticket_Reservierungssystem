@@ -1,7 +1,6 @@
 package com.example.lib;
 
 import com.example.lib.Enum.Genre;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.*;
@@ -25,7 +24,6 @@ public class Film {
     private Genre genre1;
     private Genre genre2;
     private Genre genre3;
-    @JsonManagedReference
     @Transient
     private ArrayList<Vorstellung> vorstellung;
 
