@@ -32,8 +32,15 @@ public class Kinosaal {
 
     @Autowired
     public Kinosaal(int anzahlSitze, int spalte, int reihe) {
-        //this.anzahlSitze = anzahlSitze;
-        this(spalte, reihe);
+        this.spalte = spalte;
+        this.reihe = reihe;
+    }
+
+    @Autowired
+    public Kinosaal(int spalte, int reihe, String name) {
+        this.spalte = spalte;
+        this.reihe = reihe;
+        this.name = name;
     }
 
 

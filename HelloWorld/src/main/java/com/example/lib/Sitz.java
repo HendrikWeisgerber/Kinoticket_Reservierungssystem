@@ -45,6 +45,14 @@ public class Sitz {
         this.preisschluessel = preisschluessel;
     }
 
+    public Sitz(int reihe, int spalte, boolean barriereFrei, BigDecimal preisschluessel, Kinosaal saal) {
+        this.reihe = reihe;
+        this.spalte = spalte;
+        this.barriereFrei = barriereFrei;
+        this.preisschluessel = preisschluessel;
+        this.kinosaal = saal;
+    }
+
     // public ArrayList<Ticket> getMeineTickets() {
     //     return meineTickets;
     // }
