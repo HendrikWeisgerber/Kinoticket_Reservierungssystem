@@ -34,10 +34,10 @@ public class Ticket {
     @JoinColumn(name="bestellung_id", referencedColumnName = "id")
     private Bestellung bestellung;
     private Date kaufdatum;
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name = "snack_id", referencedColumnName = "id")
     private Snack snack;
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name = "getraenk_id", referencedColumnName = "id")
     private Getraenk getraenk;
 
@@ -181,14 +181,25 @@ public class Ticket {
         this.kaufdatum = kaufdatum;
         this.updatePreis();
     }
+    public Ticket(Sitz sitz, Vorstellung vorstellung, Benutzer gast, Benutzer kaeufer, boolean bezahlt,
+                  boolean istValide, Date kaufdatum) {
+        this.sitz = sitz;
+        this.vorstellung = vorstellung;
+        this.gast = gast;
+        //this.kaeufer = kaeufer;
+        this.bezahlt = bezahlt;
+        this.istValide = istValide;
+        this.kaufdatum = kaufdatum;
+        this.updatePreis();
+    }
 
     public void updatePreis(){
         BigDecimal neuerPreis = new BigDecimal(0.0);
-        if(this.vorstellung.getGrundpreis() != null){
+        if(this.vorstellung!= null && this.vorstellung.getGrundpreis() != null){
             neuerPreis = neuerPreis.add(this.vorstellung.getGrundpreis());
         }
         if(this.gast != null){
-            neuerPreis = neuerPreis.multiply(this.gast.getPreisSchluessel());
+            neuerPreis = neuerPreis.multiply(this.gast.preisschluesselBerechnen());
         }
         if (this.snack != null) {
 

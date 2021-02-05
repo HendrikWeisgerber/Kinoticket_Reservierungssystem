@@ -13,6 +13,7 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.example.lib.HelloWorldApplication.isUserAdminOrOwner;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
@@ -94,8 +95,36 @@ public class VorstellungController {
         if (!isUserAdminOrOwner(benutzer))
             return new ResponseEntity<>("Keine Admin Berechtigung", HttpStatus.FORBIDDEN);
 
+        AtomicBoolean konflikt = new AtomicBoolean(false);
+        vorstellungRepository.findAll().forEach(f -> {
+            if (f.getSaal() != null && vorstellung.getSaal() != null
+                    && f.getSaal().getId() == vorstellung.getSaal().getId()){
+                Film fFilm = f.getFilm();
+                Film vFilm = f.getFilm();
+
+                if(fFilm != null && vFilm != null){
+                    long fEndZeit = f.getStartZeit().getTime() + fFilm.getLaenge()*60*1000;
+                    long fStartZeit = f.getStartZeit().getTime();
+                    long vEndZeit = vorstellung.getStartZeit().getTime() + vFilm.getLaenge()*60*1000;
+                    long vStartZeit = vorstellung.getStartZeit().getTime();
+                    if(vStartZeit < fEndZeit && vEndZeit > fStartZeit){
+                        konflikt.set(true);
+                    }
+                    if(fStartZeit < vEndZeit && fEndZeit > vStartZeit){
+                        konflikt.set(true);
+                    }
+
+                }
+
+            }
+        });
+
+        if(konflikt.get()){
+            return new ResponseEntity<>("Keine 2 vorstellungen im selben Saal am selben Tag", HttpStatus.OK);
+        }
+
         Optional<Kinosaal> kinosaal = kinosaalRepository.findById(vorstellung.getSaal().getId());
-        Optional<Film> film = filmRepository.findById(vorstellung.getFilm().getId());
+        //Optional<Film> film = filmRepository.findById(vorstellung.getFilm().getId());
 
         String response = "";
         vorstellungRepository.save(vorstellung);

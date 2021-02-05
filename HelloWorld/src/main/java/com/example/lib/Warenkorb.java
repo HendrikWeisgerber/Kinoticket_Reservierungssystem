@@ -13,7 +13,7 @@ public class Warenkorb {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
     @JsonBackReference
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name = "benutzer_id", referencedColumnName = "id")
     private Benutzer benutzer;
     @Transient

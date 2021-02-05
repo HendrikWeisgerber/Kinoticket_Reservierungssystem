@@ -34,7 +34,6 @@ public class WarenkorbController {
     //Nutzer wird zu benutzer
     @RequestMapping(value = "/", produces = "application/json")
     public ResponseEntity<Object> getAllTicketsInWarenkorb(Principal principal) {
-
         Optional<Benutzer> oB = benutzerRepository.findByUsername(principal.getName());
         Benutzer b;
         if (oB.isPresent()) { // TODO Umschreiben? Falls Benutzer nicht gefunden wird -> Fehlermeldung?
@@ -66,15 +65,19 @@ public class WarenkorbController {
             Optional<Ticket> optionalTicket = ticketRepository.findById((int) ticket_id);
             if (optionalTicket.isPresent()) {
                 Ticket t = optionalTicket.get();
-                if (t.getWarenkorb() != null) {
-                    return new ResponseEntity<>("Ticket liegt bereits im Warenkorb", HttpStatus.OK);
+                if(t.getWarenkorb()!= null) {
+                    return new ResponseEntity<Object>("Ticket ist bereits in einem Warenkorb", HttpStatus.OK);
                 }
-                if (t.getKaeufer() != null) {
-                    return new ResponseEntity<>("Ticket hat bereits einen anderen Käufer", HttpStatus.OK);
+                if(t.getKaeufer().getId() != benutzer.getId()){
+                    return new ResponseEntity<Object>("Ticket ist von einem anderern Kunden reserviert", HttpStatus.OK);
                 }
                 t.setWarenkorb(benutzer.getWarenkorb());
-                ticketRepository.save(t); // TODO debug Internal error 500
-                return new ResponseEntity<>(t, HttpStatus.OK);
+                ticketRepository.save(t);
+                //TODO throws error 500
+                //TODO if fixed, activate test "saveTicketInWarenkorb()" in HelloWorldApplicationTests.java
+                //Resolved [org.springframework.http.converter.HttpMessageNotWritableException: No converter for [class com.example.lib.Ticket] with preset Content-Type 'null']
+                return new ResponseEntity<Object>(t, HttpStatus.OK);
+
             }
         }
         return new ResponseEntity<>("", HttpStatus.OK);

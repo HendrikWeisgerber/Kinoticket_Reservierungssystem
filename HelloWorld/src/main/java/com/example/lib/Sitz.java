@@ -16,7 +16,7 @@ public class Sitz {
     private boolean barriereFrei;
     private BigDecimal preisschluessel;
     @JsonBackReference
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name = "kinosaal_id", referencedColumnName = "id")
     private Kinosaal kinosaal;
     /*@ManyToOne
@@ -43,6 +43,14 @@ public class Sitz {
         this.spalte = spalte;
         this.barriereFrei = barriereFrei;
         this.preisschluessel = preisschluessel;
+    }
+
+    public Sitz(int reihe, int spalte, boolean barriereFrei, BigDecimal preisschluessel, Kinosaal saal) {
+        this.reihe = reihe;
+        this.spalte = spalte;
+        this.barriereFrei = barriereFrei;
+        this.preisschluessel = preisschluessel;
+        this.kinosaal = saal;
     }
 
     // public ArrayList<Ticket> getMeineTickets() {
