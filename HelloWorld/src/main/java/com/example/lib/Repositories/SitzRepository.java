@@ -8,5 +8,5 @@ import org.springframework.data.repository.query.Param;
 
 
 public interface SitzRepository extends CrudRepository<Sitz, Integer>{
-    Sitz[] findByKinosaal(@Param("kinosaal") Kinosaal kinosaal);
+    com.example.lib.Sitz[] findByKinosaal(@Param("kinosaal") Kinosaal kinosaal);
 }

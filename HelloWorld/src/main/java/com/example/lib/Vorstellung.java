@@ -1,6 +1,5 @@
 package com.example.lib;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.*;
@@ -15,7 +14,7 @@ public class Vorstellung {
     private Date startZeit;
     private BigDecimal grundpreis;
     private boolean aktiv;
-    @JsonBackReference
+    //@JsonBackReference
     @ManyToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name = "film_id", referencedColumnName = "id")
     private Film film;
