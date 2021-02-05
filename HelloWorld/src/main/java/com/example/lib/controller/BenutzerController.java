@@ -136,4 +136,18 @@ public class BenutzerController {
 
         return new ResponseEntity<>(preiskategorie.toString(), HttpStatus.OK);
     }
+
+    @RequestMapping(value = "/reset/username/{username}/password/{password}", produces = "application/json", method = POST)
+    public ResponseEntity<Object> resetPasswort(@PathVariable(value = "username") String username,
+                                                @PathVariable(value = "password") String password) {
+        Optional<Benutzer> benutzerOptional = benutzerRepository.findByUsername(username);
+        Benutzer b;
+        if (benutzerOptional.isEmpty()) {
+            return new ResponseEntity<>("Kein Benutzer mit dem Benutzernamen", HttpStatus.OK);
+        }
+        b = benutzerOptional.get();
+        b.setPasswortHash(bCryptPasswordEncoder.encode(password));
+
+        return new ResponseEntity<>("Passwort geändert", HttpStatus.OK);
+    }
 }

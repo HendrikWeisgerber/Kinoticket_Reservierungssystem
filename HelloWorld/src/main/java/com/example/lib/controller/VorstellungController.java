@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -56,8 +57,15 @@ public class VorstellungController {
 
         testVor.setFilm(filmT);
         vorstellungRepository.save(testVor);*/
+        Iterable<Vorstellung> vorstellungIterable = vorstellungRepository.findAll();
+        ArrayList<Vorstellung> vorstellungen = new ArrayList<>();
+        for (Vorstellung vorstellung : vorstellungIterable) {
+            if (vorstellung.isAktiv()) {
+                vorstellungen.add(vorstellung);
+            }
+        }
 
-        return new ResponseEntity<>(vorstellungRepository.findAll(), HttpStatus.OK);
+        return new ResponseEntity<>(vorstellungen, HttpStatus.OK);
         //return new ResponseEntity<>(vorstellungRepository.findByFilmId((int)film_id),HttpStatus.OK);
     }
 
