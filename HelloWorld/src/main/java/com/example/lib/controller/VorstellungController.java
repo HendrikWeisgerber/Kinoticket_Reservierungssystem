@@ -90,9 +90,24 @@ public class VorstellungController {
         AtomicBoolean konflikt = new AtomicBoolean(false);
         vorstellungRepository.findAll().forEach(f -> {
             if (f.getSaal() != null && vorstellung.getSaal() != null
-                    && f.getSaal().getId() == vorstellung.getSaal().getId()
-                    && f.getStartZeit().equals(vorstellung.getStartZeit())){
-                konflikt.set(true);
+                    && f.getSaal().getId() == vorstellung.getSaal().getId()){
+                Film fFilm = f.getFilm();
+                Film vFilm = f.getFilm();
+
+                if(fFilm != null && vFilm != null){
+                    long fEndZeit = f.getStartZeit().getTime() + fFilm.getLaenge()*60*1000;
+                    long fStartZeit = f.getStartZeit().getTime();
+                    long vEndZeit = vorstellung.getStartZeit().getTime() + vFilm.getLaenge()*60*1000;
+                    long vStartZeit = vorstellung.getStartZeit().getTime();
+                    if(vStartZeit < fEndZeit && vEndZeit > fStartZeit){
+                        konflikt.set(true);
+                    }
+                    if(fStartZeit < vEndZeit && fEndZeit > vStartZeit){
+                        konflikt.set(true);
+                    }
+
+                }
+
             }
         });
 
