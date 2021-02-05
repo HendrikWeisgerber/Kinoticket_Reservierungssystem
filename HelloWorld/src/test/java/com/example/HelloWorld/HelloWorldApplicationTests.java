@@ -104,33 +104,6 @@ class HelloWorldApplicationTests {
             throw new RuntimeException(e);
         }
     }
-/*
-    @BeforeAll
-    void setUpAll(){
-        Optional<Benutzer> oB = benutzerRepository.findByUsername("Moritz");
-        if(!oB.isPresent()){
-            dbBenutzer = new Benutzer();
-            dbBenutzer.setUsername("Moritz");
-            dbBenutzer.setEmail("moritz.schridde@sap.com");
-            dbBenutzer.setPasswortHash("123456");
-            dbBenutzer.setPasswortHash(bCryptPasswordEncoder.encode(dbBenutzer.getPasswortHash()));
-
-            benutzerRepository.save(dbBenutzer);
-
-            dbWarenkorb = new Warenkorb();
-            dbWarenkorb.setBenutzer(dbBenutzer);
-            warenkorbRepository.save(dbWarenkorb);
-            dbBenutzer.setWarenkorb(dbWarenkorb);
-        }
-    }
-
-    @AfterAll
-    void static cleanUpAll(){
-        warenkorbRepository.delete(dbWarenkorb);
-        benutzerRepository.delete(dbBenutzer);
-
-    }
-*/
 
     @BeforeEach
     void setUp() throws Exception {
@@ -376,6 +349,12 @@ class HelloWorldApplicationTests {
 
     //End FilmController Tests
     //KinosaalController Tests
+    @Test
+    public void getAllSaal() throws Exception {
+        String call = "/kinosaal/all";
+        String response = mockMvc.perform(MockMvcRequestBuilders.get(call).header("Authorization", token)).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        kinosaalRepository.findAll().forEach(f->{Assertions.assertTrue(response.contains(""+f.getId()));});
+    }
     @Test
     public void getSaalByVorstellung() throws Exception {
 
