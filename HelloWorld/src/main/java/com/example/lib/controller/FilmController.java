@@ -59,8 +59,10 @@ public class FilmController {
                 if (film.getVorstellung() == null) {
                     film.setVorstellung();
                 }
-                if (vorstellung.isAktiv())
-                film.getVorstellung().add(vorstellung);
+                if (vorstellung.isAktiv()) {
+                    vorstellung.setFilm(null);
+                    film.getVorstellung().add(vorstellung);
+                }
             }
             if (film.getAktiv()) {
                 filme.add(film);
@@ -85,16 +87,20 @@ public class FilmController {
             }
         }
 
-        Optional<Film> film = filmRepository.findById(film_id);
-        if (film.isEmpty()) {
+        Optional<Film> filmOptional = filmRepository.findById(film_id);
+        if (filmOptional.isEmpty()) {
             return new ResponseEntity<Object>("Kein Film mit der Id: " + film_id, HttpStatus.OK);
         }
-        Vorstellung[] vorstellungen = vorstellungRepository.findByFilmId(film.get().getId());
+        Film film = filmOptional.get();
+        Vorstellung[] vorstellungen = vorstellungRepository.findByFilmId(film.getId());
         for (Vorstellung vorstellung : vorstellungen) {
-            if (film.get().getVorstellung() == null) {
-                film.get().setVorstellung();
+            if (film.getVorstellung() == null) {
+                film.setVorstellung();
             }
-            film.get().getVorstellung().add(vorstellung);
+            if (vorstellung.isAktiv()) {
+                vorstellung.setFilm(null);
+                film.getVorstellung().add(vorstellung);
+            }
         }
 
         return new ResponseEntity<Object>(film, HttpStatus.OK);
