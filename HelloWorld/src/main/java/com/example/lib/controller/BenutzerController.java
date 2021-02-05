@@ -33,7 +33,7 @@ public class BenutzerController {
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    @PostMapping("/signup")
+    @RequestMapping(value = "/signup", produces = "application/json", method = POST)
     public ResponseEntity<Object> signUp(@RequestBody Benutzer user, Principal principal) {
         System.out.println("Sign up called");
 
