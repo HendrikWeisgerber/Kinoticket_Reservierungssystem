@@ -52,17 +52,22 @@ public class FilmController {
         }
 
         Iterable<Film> alleFilme = filmRepository.findAll();
+        ArrayList<Film> filme = new ArrayList<>();
         for (Film film : alleFilme) {
             Vorstellung[] vorstellungen = vorstellungRepository.findByFilmId(film.getId());
             for (Vorstellung vorstellung : vorstellungen) {
                 if (film.getVorstellung() == null) {
                     film.setVorstellung();
                 }
+                if (vorstellung.isAktiv())
                 film.getVorstellung().add(vorstellung);
+            }
+            if (film.getAktiv()) {
+                filme.add(film);
             }
         }
 
-        return new ResponseEntity<>(filmRepository.findAll(), HttpStatus.OK);
+        return new ResponseEntity<>(filme, HttpStatus.OK);
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
