@@ -91,7 +91,7 @@ public class VorstellungController {
         vorstellungRepository.findAll().forEach(f -> {
             if (f.getSaal() != null && vorstellung.getSaal() != null
                     && f.getSaal().getId() == vorstellung.getSaal().getId()
-                    && f.getStartZeit() == vorstellung.getStartZeit()){
+                    && f.getStartZeit().equals(vorstellung.getStartZeit())){
                 konflikt.set(true);
             }
         });
