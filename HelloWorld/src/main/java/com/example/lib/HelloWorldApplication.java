@@ -286,14 +286,17 @@ public class HelloWorldApplication {
             oFilm = filmRepository.findById(filmId);
 
             String gastPreiskategorie = ticket.getGast().getPreiskategorie().toString();
-            int saal_id = (ticket.getVorstellung().getSaal() != null) ? ticket.getVorstellung().getSaal().getId() : 5;
+            String saalName = (ticket.getVorstellung().getSaal() != null) ?
+                    (ticket.getVorstellung().getSaal().getName() != null) ? ticket.getVorstellung().getSaal().getName()
+                            : ("" + ticket.getVorstellung().getSaal().getId())
+                    : "Budapest";
             Date zeit = ticket.getVorstellung().getStartZeit();
             int sitzReihe = (ticket.getSitz() != null) ? ticket.getSitz().getReihe() : 2;
             int sitzSpalte = (ticket.getSitz() != null) ? ticket.getSitz().getSpalte() : 2;
             Boolean bezahlt = ticket.isBezahlt();
             double preis = ticket.getPreis();
             String filmName = (oFilm != null) ? oFilm.get().getName() : "filmname";
-            qrText = "KINO-TICKET\n\nFilm: " + filmName + "\nSaal: " + saal_id + "\nReihe: " + sitzReihe
+            qrText = "KINO-TICKET\n\nFilm: " + filmName + "\nSaal: " + saalName + "\nReihe: " + sitzReihe
                     + "\nSpalte: " + sitzSpalte + "\nUhrzeit: " + zeit + "\nPreisklasse: "
                     + gastPreiskategorie + "\nPreis: " + preis + "\nBezahlt: " + (bezahlt ? "Ja" : "Nein");
         } else {
@@ -396,6 +399,35 @@ public class HelloWorldApplication {
             return benutzer.getRechte().toString().toLowerCase().equals(Rechte.ADMIN.toString().toLowerCase()) ||
                     benutzer.getRechte().toString().toLowerCase().equals(Rechte.OWNER.toString().toLowerCase());
 
+    }
+
+    @RequestMapping(value = "/setUpSaal", produces = "application/json")
+    public ResponseEntity<Object> setUpSaal() {
+        String[] namen = {"New York", "Seattle", "London", "Singapur", "Sidney", "Chicago", "Berlin", "Mannheim"
+                , "Paris", "Rom", "Madrid", "Moskau", "Prag", "Oslo", "Kapstadt"};
+        for (int i = 0; i < namen.length; i++) {
+            int reihenAnzahl = (i % 2 == 1) ? 15 : 10;
+            int spaltenAnzahl = (i % 3 == 1) ? 13 : 10;
+            Kinosaal saal = new Kinosaal(reihenAnzahl, spaltenAnzahl, namen[i]);
+            kinosaalRepository.save(saal);
+            for (int reihe = 0; reihe < reihenAnzahl; reihe++) {
+                for (int spalte = 0; spalte < spaltenAnzahl; spalte++) {
+                    boolean barriereFrei = false;
+                    BigDecimal preisschluessel;
+                    if (reihe < reihenAnzahl / 4) {
+                        preisschluessel = new BigDecimal(0.9);
+                    } else if (spalte == 0 || (spalte == spaltenAnzahl - 1)) {
+                        preisschluessel = new BigDecimal(0.9);
+                    } else {
+                        preisschluessel = new BigDecimal(1);
+                    }
+                    barriereFrei = (reihe == 5 && (spalte == 0 || spalte == 1));
+                    Sitz sitz = new Sitz(reihe, spalte, barriereFrei, preisschluessel, saal);
+                    sitzRepository.save(sitz);
+                }
+            }
+        }
+        return new ResponseEntity<>("Es wurden " + namen.length + " Kinosaele mit verschiedenen Groessen in der Datenbank gespeichert", HttpStatus.OK);
     }
 
     public static void main(String[] args) {

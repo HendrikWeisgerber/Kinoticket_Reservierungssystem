@@ -27,12 +27,14 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     private static final String[] AUTH_WHITELIST = {
             "//",
             "/reset", // TODO entfernen wenn in Production
+            "/setUpSaal",// TODO entfernen wenn der call in Production ein mal ausgeführt wurde
             "/vorstellung",
             "/film/all",
             "/film/{\\d+}",
             "/vorstellung/film/{\\d+}",
             "/kinosaal/vorstellung/{\\d+}",
-            "/sitze/vorstellung/*"
+            "/sitze/vorstellung/*",
+            "/kinosaal/all"
     };
 
     public WebSecurityConfiguration(UserDetailsService userDetailsService, BCryptPasswordEncoder bCryptPasswordEncoder) {
