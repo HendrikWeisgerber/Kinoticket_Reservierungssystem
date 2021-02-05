@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 import java.security.Principal;
 import java.util.Date;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.example.lib.HelloWorldApplication.isUserAdminOrOwner;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
@@ -86,8 +87,21 @@ public class VorstellungController {
         if (!isUserAdminOrOwner(benutzer))
             return new ResponseEntity<>("Keine Admin Berechtigung", HttpStatus.FORBIDDEN);
 
+        AtomicBoolean konflikt = new AtomicBoolean(false);
+        vorstellungRepository.findAll().forEach(f -> {
+            if (f.getSaal() != null && vorstellung.getSaal() != null
+                    && f.getSaal().getId() == vorstellung.getSaal().getId()
+                    && f.getStartZeit().equals(vorstellung.getStartZeit())){
+                konflikt.set(true);
+            }
+        });
+
+        if(konflikt.get()){
+            return new ResponseEntity<>("Keine 2 vorstellungen im selben Saal am selben Tag", HttpStatus.OK);
+        }
+
         Optional<Kinosaal> kinosaal = kinosaalRepository.findById(vorstellung.getSaal().getId());
-        Optional<Film> film = filmRepository.findById(vorstellung.getFilm().getId());
+        //Optional<Film> film = filmRepository.findById(vorstellung.getFilm().getId());
 
         String response = "";
         vorstellungRepository.save(vorstellung);

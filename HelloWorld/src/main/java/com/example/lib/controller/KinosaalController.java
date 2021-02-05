@@ -35,6 +35,12 @@ public class KinosaalController {
     @Autowired
     BenutzerRepository benutzerRepository;
 
+    @RequestMapping(value = "/all", produces = "application/json")
+    public ResponseEntity<Object> getAllSaal() {
+        return kinosaalRepository.findAll() == null ? new ResponseEntity<>("Kein Kinosaal gefunden", HttpStatus.OK)
+                : new ResponseEntity<>(kinosaalRepository.findAll(), HttpStatus.OK);
+    }
+
     @RequestMapping(value = "/vorstellung/{vorstellung_id}", produces = "application/json")
     public ResponseEntity<Object> getSaalByVorstellung(@PathVariable(value = "vorstellung_id") int vorstellung_id) {
 

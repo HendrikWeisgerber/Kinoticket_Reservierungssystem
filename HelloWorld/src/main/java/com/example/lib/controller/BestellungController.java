@@ -39,23 +39,27 @@ public class BestellungController {
 
         Optional<Benutzer> oB = benutzerRepository.findByUsername(principal.getName());
         Benutzer b;
-        if (!oB.isEmpty()) { // TODO Umschreiben? Falls Benutzer nicht gefunden wird -> Fehlermeldung?
+        if (oB.isPresent()) {
             b = oB.get();
+            Bestellung[] bestellungen;
+            bestellungen = bestellungRepository.findByBenutzer(b);
+            Ticket[][] t = new Ticket[bestellungen.length][];
+            if(bestellungen.length > 0){
+                for(int i = 0;i < bestellungen.length; i++){
+                    t[i] = ticketRepository.findByBestellung(bestellungen[i]);
+                    for(Ticket ticket : t[i]){
+                        ticket.updatePreis();
+                    }
+                }
+
+                return new ResponseEntity<>(t, HttpStatus.OK);
+            }else{
+                return new ResponseEntity<>("Dieser Benutzer hat keine Bestellung", HttpStatus.OK);
+            }
+
         } else {
-            b = null;
+            return new ResponseEntity<>("Kein Benutzer unter diesem Benutzernamen gefunden", HttpStatus.OK);
         }
-        Bestellung[] bestellung;
-        if (b != null) {
-            bestellung = bestellungRepository.findByBenutzer(b);
-        } else {
-            bestellung = new Bestellung[0];
-        }
-        Ticket[] t;
-        if (bestellung.length > 0) {
-            t = ticketRepository.findByBestellung(bestellung[0]);
-        } else {
-            t = new Ticket[0];
-        }
-        return new ResponseEntity<>(t, HttpStatus.OK);
+
     }
 }

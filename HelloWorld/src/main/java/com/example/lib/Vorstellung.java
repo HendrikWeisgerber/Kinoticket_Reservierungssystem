@@ -16,7 +16,7 @@ public class Vorstellung {
     private BigDecimal grundpreis;
     private boolean aktiv;
     @JsonBackReference
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name = "film_id", referencedColumnName = "id")
     private Film film;
     @ManyToOne

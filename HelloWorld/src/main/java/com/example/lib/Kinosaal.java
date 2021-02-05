@@ -11,7 +11,7 @@ import java.util.ArrayList;
 public class Kinosaal {
     //private int anzahlSitze;
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
     private int spalte;
     private int reihe;
