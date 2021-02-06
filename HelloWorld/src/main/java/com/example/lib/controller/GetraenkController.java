@@ -39,7 +39,7 @@ public class GetraenkController {
     @Autowired
     TicketRepository ticketRepository;
 
-    @RequestMapping(value = "/}", produces = "application/json", method = GET)
+    @RequestMapping(value = "", produces = "application/json", method = GET)
     public ResponseEntity<Object> getAllSnacks() {
         return getraenkRepository.findAll() == null ? new ResponseEntity<>("Keine Getränke", HttpStatus.OK)
                 : new ResponseEntity<>(getraenkRepository.findAll(), HttpStatus.OK);
@@ -61,8 +61,8 @@ public class GetraenkController {
         return new ResponseEntity<>(ticket.getGetraenk(), HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/warenkorb}", produces = "application/json", method = GET)
-    public ResponseEntity<Object> getGetraenkByWarenkorb(Principal principal) {
+    @RequestMapping(value = "/warenkorb", produces = "application/json", method = GET)
+    public ResponseEntity<Object> getGetraenkByWarenkorn(Principal principal) {
         Optional<Benutzer> optionalBenutzer = benutzerRepository.findByUsername(principal.getName());
         if (optionalBenutzer.isEmpty()) return new ResponseEntity<>("Kein Beutzer", HttpStatus.OK);
         Benutzer benutzer = optionalBenutzer.get();

@@ -58,13 +58,18 @@ public class VorstellungController {
         testVor.setFilm(filmT);
         vorstellungRepository.save(testVor);*/
         Iterable<Vorstellung> vorstellungIterable = vorstellungRepository.findAll();
-        ArrayList<Vorstellung> vorstellungen = new ArrayList<>();
+        ArrayList<Vorstellung> aktiveVorstellungen = new ArrayList<>();
+        ArrayList<Vorstellung> inaktiveVorstellungen = new ArrayList<>();
+        ArrayList<ArrayList<Vorstellung>> vorstellungen = new ArrayList<>();
         for (Vorstellung vorstellung : vorstellungIterable) {
             if (vorstellung.isAktiv()) {
-                vorstellungen.add(vorstellung);
+                aktiveVorstellungen.add(vorstellung);
+            } else {
+                inaktiveVorstellungen.add(vorstellung);
             }
         }
-
+        vorstellungen.add(aktiveVorstellungen);
+        vorstellungen.add(inaktiveVorstellungen);
         return new ResponseEntity<>(vorstellungen, HttpStatus.OK);
         //return new ResponseEntity<>(vorstellungRepository.findByFilmId((int)film_id),HttpStatus.OK);
     }
@@ -83,7 +88,21 @@ public class VorstellungController {
             }
         }
 
-        return new ResponseEntity<>(vorstellungRepository.findByFilmId(film_id), HttpStatus.OK);
+        Vorstellung[] vorstellungen = vorstellungRepository.findByFilmId(film_id);
+        ArrayList<ArrayList<Vorstellung>> alleVorstellungen= new ArrayList<>();
+        ArrayList<Vorstellung> aktiveVorstellungen = new ArrayList<>();
+        ArrayList<Vorstellung> inaktiveVorstellungen = new ArrayList<>();
+        for (Vorstellung vorstellung: vorstellungen) {
+            if (vorstellung.isAktiv()) {
+                aktiveVorstellungen.add(vorstellung);
+            } else {
+                inaktiveVorstellungen.add(vorstellung);
+            }
+        }
+        alleVorstellungen.add(aktiveVorstellungen);
+        alleVorstellungen.add(inaktiveVorstellungen);
+
+        return new ResponseEntity<>(aktiveVorstellungen, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/insert", produces = "application/json", method = POST)

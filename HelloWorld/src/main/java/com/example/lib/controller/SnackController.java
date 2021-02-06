@@ -39,7 +39,7 @@ public class SnackController {
     @Autowired
     TicketRepository ticketRepository;
 
-    @RequestMapping(value = "/}", produces = "application/json", method = GET)
+    @RequestMapping(value = "", produces = "application/json", method = GET)
     public ResponseEntity<Object> getAllSnacks() {
         return snackRepository.findAll() == null ? new ResponseEntity<>("Keine Snacks", HttpStatus.OK)
                 : new ResponseEntity<>(snackRepository.findAll(), HttpStatus.OK);
@@ -62,8 +62,8 @@ public class SnackController {
         return new ResponseEntity<>(ticket.getSnack(), HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/warenkorb}", produces = "application/json", method = GET)
-    public ResponseEntity<Object> getSnackByWarenkorb(Principal principal) {
+    @RequestMapping(value = "/warenkorb", produces = "application/json", method = GET)
+    public ResponseEntity<Object> getSnackByWarenkorn(Principal principal) {
         Optional<Benutzer> optionalBenutzer = benutzerRepository.findByUsername(principal.getName());
         if (optionalBenutzer.isEmpty()) return new ResponseEntity<>("Kein Beutzer", HttpStatus.OK);
         Benutzer benutzer = optionalBenutzer.get();
