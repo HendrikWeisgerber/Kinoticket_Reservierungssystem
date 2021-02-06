@@ -9,8 +9,11 @@ import com.example.lib.Warenkorb;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Optional;
+
 public interface TicketRepository extends CrudRepository<Ticket, Integer> {
-    Ticket[] findByVorstellungId(@Param("vorstellung_id")int vorstellung_id);
+    Optional<Ticket> findByVorstellungIdAndSitzId(@Param("vorstellung_id")int vorstellung_id,
+                                          @Param("ticket_id")int sitz_id);
     Ticket[] findByVorstellung(@Param("vorstellung_id")Vorstellung vorstellung);
     Ticket[] findByKaeufer(@Param("kaeufer_id")Benutzer kaeufer);
     Ticket[] findByWarenkorb(@Param("warenkorb_id")Warenkorb warenkorb);

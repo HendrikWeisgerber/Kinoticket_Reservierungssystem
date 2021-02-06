@@ -36,7 +36,7 @@ public class WarenkorbController {
     public ResponseEntity<Object> getAllTicketsInWarenkorb(Principal principal) {
         Optional<Benutzer> oB = benutzerRepository.findByUsername(principal.getName());
         Benutzer b;
-        if (oB.isPresent()) { // TODO Umschreiben? Falls Benutzer nicht gefunden wird -> Fehlermeldung?
+        if (oB.isPresent()) {
             b = oB.get();
         } else {
             return new ResponseEntity<>("Kein Benutzer gefunden", HttpStatus.OK);
@@ -77,9 +77,8 @@ public class WarenkorbController {
                 //TODO if fixed, activate test "saveTicketInWarenkorb()" in HelloWorldApplicationTests.java
                 //Resolved [org.springframework.http.converter.HttpMessageNotWritableException: No converter for [class com.example.lib.Ticket] with preset Content-Type 'null']
                 return new ResponseEntity<Object>(t, HttpStatus.OK);
-
             }
         }
-        return new ResponseEntity<>("", HttpStatus.OK);
+        return new ResponseEntity<>("Benutzer nicht gefunden", HttpStatus.OK);
     }
 }
