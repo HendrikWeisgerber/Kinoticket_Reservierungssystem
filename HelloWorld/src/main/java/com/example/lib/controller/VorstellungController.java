@@ -102,7 +102,7 @@ public class VorstellungController {
         alleVorstellungen.add(aktiveVorstellungen);
         alleVorstellungen.add(inaktiveVorstellungen);
 
-        return new ResponseEntity<>(alleVorstellungen, HttpStatus.OK);
+        return new ResponseEntity<>(aktiveVorstellungen, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/insert", produces = "application/json", method = POST)
