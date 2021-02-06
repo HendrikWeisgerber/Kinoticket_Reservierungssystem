@@ -201,6 +201,9 @@ public class Ticket {
         if(this.gast != null){
             neuerPreis = neuerPreis.multiply(this.gast.preisschluesselBerechnen());
         }
+        if(this.sitz != null){
+            neuerPreis = neuerPreis.multiply((this.sitz.getPreisschluessel() != null)? this.sitz.getPreisschluessel(): new BigDecimal(1.0));
+        }
         if (this.snack != null) {
 
             BigDecimal snackPreis = new BigDecimal(0.0);
@@ -230,6 +233,8 @@ public class Ticket {
                     snackPreis = snackPreis.multiply(new BigDecimal(0.8));
                     break;
             }
+
+            neuerPreis.add(snackPreis);
         }
 
         if (this.getraenk != null) {
@@ -271,6 +276,7 @@ public class Ticket {
                     getraenkPreis = getraenkPreis.multiply(new BigDecimal(0.8));
                     break;
             }
+            neuerPreis.add(getraenkPreis);
         }
         neuerPreis.setScale(2, RoundingMode.HALF_UP);
         this.preis = neuerPreis.doubleValue();
