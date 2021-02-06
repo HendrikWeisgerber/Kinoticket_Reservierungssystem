@@ -63,7 +63,7 @@ public class SnackController {
     }
 
     @RequestMapping(value = "/warenkorb}", produces = "application/json", method = GET)
-    public ResponseEntity<Object> getSnackByWarenkorn(Principal principal) {
+    public ResponseEntity<Object> getSnackByWarenkorb(Principal principal) {
         Optional<Benutzer> optionalBenutzer = benutzerRepository.findByUsername(principal.getName());
         if (optionalBenutzer.isEmpty()) return new ResponseEntity<>("Kein Beutzer", HttpStatus.OK);
         Benutzer benutzer = optionalBenutzer.get();
