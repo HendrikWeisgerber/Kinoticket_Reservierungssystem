@@ -52,7 +52,9 @@ public class FilmController {
         }
 
         Iterable<Film> alleFilme = filmRepository.findAll();
-        ArrayList<Film> filme = new ArrayList<>();
+        ArrayList<ArrayList<Film>> filme = new ArrayList<>();
+        ArrayList<Film> aktiveFilme = new ArrayList<>();
+        ArrayList<Film> inaktiveFilme = new ArrayList<>();
         for (Film film : alleFilme) {
             Vorstellung[] vorstellungen = vorstellungRepository.findByFilmId(film.getId());
             for (Vorstellung vorstellung : vorstellungen) {
@@ -65,9 +67,14 @@ public class FilmController {
                 }
             }
             if (film.getAktiv()) {
-                filme.add(film);
+                aktiveFilme.add(film);
+            } else {
+                inaktiveFilme.add(film);
             }
         }
+
+        filme.add(aktiveFilme);
+        filme.add(inaktiveFilme);
 
         return new ResponseEntity<>(filme, HttpStatus.OK);
     }

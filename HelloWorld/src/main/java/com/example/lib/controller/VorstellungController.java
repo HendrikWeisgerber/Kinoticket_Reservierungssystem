@@ -88,7 +88,21 @@ public class VorstellungController {
             }
         }
 
-        return new ResponseEntity<>(vorstellungRepository.findByFilmId(film_id), HttpStatus.OK);
+        Vorstellung[] vorstellungen = vorstellungRepository.findByFilmId(film_id);
+        ArrayList<ArrayList<Vorstellung>> alleVorstellungen= new ArrayList<>();
+        ArrayList<Vorstellung> aktiveVorstellungen = new ArrayList<>();
+        ArrayList<Vorstellung> inaktiveVorstellungen = new ArrayList<>();
+        for (Vorstellung vorstellung: vorstellungen) {
+            if (vorstellung.isAktiv()) {
+                aktiveVorstellungen.add(vorstellung);
+            } else {
+                inaktiveVorstellungen.add(vorstellung);
+            }
+        }
+        alleVorstellungen.add(aktiveVorstellungen);
+        alleVorstellungen.add(inaktiveVorstellungen);
+
+        return new ResponseEntity<>(alleVorstellungen, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/insert", produces = "application/json", method = POST)
