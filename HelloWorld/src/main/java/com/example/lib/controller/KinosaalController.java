@@ -65,8 +65,8 @@ public class KinosaalController {
 
     @RequestMapping(value = "/insert", produces = "application/json", method = POST)
     public ResponseEntity<Object> setSaal(@RequestBody() Kinosaal kinosaal, Principal principal) {
-        if (kinosaal.getReihe() == 0 || kinosaal.getSpalte() == 0) {
-            return new ResponseEntity<>("Reihe und Spalte können nicht 0 sein", HttpStatus.OK);
+        if (kinosaal.getReihe() <= 0 || kinosaal.getSpalte() <= 0) {
+            return new ResponseEntity<>("Reihe und Spalte können nicht kleiner oder gleich 0 sein", HttpStatus.OK);
         }
 
         Optional<Benutzer> optionalBenutzer = benutzerRepository.findByUsername(principal.getName());
