@@ -191,7 +191,7 @@ public class HelloWorldApplication {
         return new ResponseEntity<>("Die Datenbank wurde erfolgreich resettet!", HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/update")
+    //@RequestMapping(value = "/update")
 
     //TODO In den Controller verschieben
     @RequestMapping(value = "/ticket/bestellung", produces = "application/json", method = POST)
