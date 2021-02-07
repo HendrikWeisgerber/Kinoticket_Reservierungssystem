@@ -51,17 +51,19 @@ public class TicketController {
             return new ResponseEntity<>("Ticket gehört anderem Benutzer", HttpStatus.OK);
         }
         Benutzer benutzer = optionalBenutzer.get();
-        Optional<Ticket[]> optionalTicket = ticketRepository.findByVorstellungIdAndSitzId((int) vorstellung_id, (int) sitz_id);
-        if (optionalTicket.isEmpty()) {
-            return new ResponseEntity<>("Kein Ticket gefnunden", HttpStatus.OK);
+        Ticket[] tickets = ticketRepository.findByVorstellungIdAndSitzId((int) vorstellung_id, (int) sitz_id);
+        if (tickets.length < 1) {
+            return new ResponseEntity<>("Keine Tickets gefnunden", HttpStatus.OK);
         }
-        Ticket[] tickets = optionalTicket.get();
+
+        int counter = 0;
         for (int i = 0; i < tickets.length; i++) {
             if (tickets[i].getKaeufer().getId() != benutzer.getId()) {
                 tickets[i] = null;
+                counter++;
             }
         }
-        if (tickets.length < 1) return new ResponseEntity<>("Keine Tickets für diesen Benutzer gefunden", HttpStatus.OK);
+        if (tickets.length < counter) return new ResponseEntity<>("Keine Tickets für diesen Benutzer gefunden", HttpStatus.OK);
         return new ResponseEntity<>(tickets, HttpStatus.OK);
     }
 
