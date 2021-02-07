@@ -1,13 +1,7 @@
 package com.example.lib.controller;
 
-import com.example.lib.Benutzer;
-import com.example.lib.Repositories.BenutzerRepository;
-import com.example.lib.Repositories.SitzRepository;
-import com.example.lib.Repositories.TicketRepository;
-import com.example.lib.Repositories.VorstellungRepository;
-import com.example.lib.Sitz;
-import com.example.lib.Ticket;
-import com.example.lib.Vorstellung;
+import com.example.lib.*;
+import com.example.lib.Repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.concurrent.Semaphore;
 
@@ -42,6 +37,9 @@ public class TicketController {
     @Autowired
     VorstellungRepository vorstellungRepository;
 
+    @Autowired
+    SnackRepository snackRepository;
+
     @RequestMapping(value = "/sitz/{sitz_id}/vorstellung/{vorstellung_id}", produces = "application/json", method = GET)
     public ResponseEntity<Object> getTicket(@PathVariable(value = "sitz_id") long sitz_id,
                                             @PathVariable(value = "vorstellung_id") long vorstellung_id,
@@ -57,14 +55,50 @@ public class TicketController {
         }
 
         int counter = 0;
+        ArrayList<Ticket> ticketsList = new ArrayList<>();
+
         for (int i = 0; i < tickets.length; i++) {
             if (tickets[i].getKaeufer().getId() != benutzer.getId()) {
                 tickets[i] = null;
                 counter++;
+            } else {
+                ticketsList.add(tickets[i]);
             }
         }
-        if (tickets.length < counter) return new ResponseEntity<>("Keine Tickets für diesen Benutzer gefunden", HttpStatus.OK);
-        return new ResponseEntity<>(tickets, HttpStatus.OK);
+        if (tickets.length < counter-1)
+            return new ResponseEntity<>("Keine Tickets für diesen Benutzer gefunden", HttpStatus.OK);
+
+        return new ResponseEntity<>(ticketsList, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "{ticket_id}/snack/{snack_id}", produces = "application/json", method = POST)
+    public ResponseEntity<Object> addSnackToTicket(@PathVariable(value = "ticket_id") long ticket_id,
+                                                   @PathVariable(value = "snack_id") long snack_id,
+                                                   Principal principal) {
+        Optional<Benutzer> optionalBenutzer = benutzerRepository.findByUsername(principal.getName());
+        if (optionalBenutzer.isEmpty()) {
+            return new ResponseEntity<>("Benutzer nicht gefunden", HttpStatus.OK);
+        }
+        Benutzer benutzer = optionalBenutzer.get();
+        Optional<Ticket> optionalTicket = ticketRepository.findById((int) ticket_id);
+
+        if (optionalTicket.isEmpty()) {
+            return new ResponseEntity<>("Ticket nicht gefunden", HttpStatus.OK);
+        }
+
+        Optional<Snack> optionalSnack = snackRepository.findById((int) snack_id);
+
+        if (optionalSnack.isEmpty()) {
+            return new ResponseEntity<>("Snack nicht gefunden", HttpStatus.OK);
+        }
+
+        Snack snack = optionalSnack.get();
+
+        Ticket ticket = optionalTicket.get();
+        ticket.getSnacks().add(snack);
+        ticketRepository.save(ticket);
+
+        return new ResponseEntity<>(ticket, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/sitz/{sitz_id}/vorstellung/{vorstellung_id}", produces = "application/json", method = POST)

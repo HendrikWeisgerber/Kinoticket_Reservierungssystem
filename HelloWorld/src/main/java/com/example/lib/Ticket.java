@@ -6,6 +6,7 @@ import javax.persistence.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Date;
+import java.util.Set;
 
 @Entity
 public class Ticket {
@@ -20,23 +21,25 @@ public class Ticket {
     @JoinColumn(name = "vorstellung_id", referencedColumnName = "id")
     private Vorstellung vorstellung;
     @ManyToOne
-    @JoinColumn(name="gast_id", referencedColumnName = "id")
+    @JoinColumn(name = "gast_id", referencedColumnName = "id")
     private Benutzer gast;
     @ManyToOne
-    @JoinColumn(name="kaeufer_id", referencedColumnName = "id")
+    @JoinColumn(name = "kaeufer_id", referencedColumnName = "id")
     private Benutzer kaeufer;
     private boolean bezahlt;
     private boolean istValide;
     @ManyToOne
-    @JoinColumn(name="warenkorb_id", referencedColumnName = "id")
+    @JoinColumn(name = "warenkorb_id", referencedColumnName = "id")
     private Warenkorb warenkorb;
     @ManyToOne
-    @JoinColumn(name="bestellung_id", referencedColumnName = "id")
+    @JoinColumn(name = "bestellung_id", referencedColumnName = "id")
     private Bestellung bestellung;
     private Date kaufdatum;
-    @OneToOne(cascade = CascadeType.DETACH)
-    @JoinColumn(name = "snack_id", referencedColumnName = "id")
-    private Snack snack;
+    @ManyToMany(cascade = CascadeType.DETACH)
+    @JoinTable(name = "ticket_snack",
+            joinColumns = @JoinColumn(name = "ticket_id"),
+            inverseJoinColumns = @JoinColumn(name = "snack_id"))
+    private Set<Snack> snacks;
     @OneToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name = "getraenk_id", referencedColumnName = "id")
     private Getraenk getraenk;
@@ -51,47 +54,49 @@ public class Ticket {
     public int getId() {
         return this.id;
     }
-    
+
     public void setId(int id) {
         this.id = id;
     }
 
-    public Warenkorb getWarenkorb(){
+    public Warenkorb getWarenkorb() {
         return this.warenkorb;
     }
 
-    public void setWarenkorb(Warenkorb warenkorb){
+    public void setWarenkorb(Warenkorb warenkorb) {
         this.warenkorb = warenkorb;
     }
 
-    public Bestellung getBestellung(){
+    public Bestellung getBestellung() {
         return this.bestellung;
     }
 
-    public void setBestellung(Bestellung bestellung){
+    public void setBestellung(Bestellung bestellung) {
         this.bestellung = bestellung;
     }
-    
+
     public Sitz getSitz() {
         return this.sitz;
     }
-    
+
     public void setSitz(Sitz sitz) {
         this.sitz = sitz;
     }
-    
+
     public Vorstellung getVorstellung() {
         return this.vorstellung;
     }
 
     public void setVorstellung(Vorstellung vorstellung) {
         this.vorstellung = vorstellung;
-    };
-    
+    }
+
+    ;
+
     public Benutzer getGast() {
         return this.gast;
     }
-    
+
     public void setGast(Benutzer gast) {
         this.gast = gast;
     }
@@ -103,11 +108,11 @@ public class Ticket {
     public void setKaeufer(Benutzer kaeufer) {
         this.kaeufer = kaeufer;
     }
-    
-    public int getKaueferId(){
+
+    public int getKaueferId() {
         return (kaeufer == null) ? null : kaeufer.getId();
     }
-    
+
     public boolean isBezahlt() {
         return this.bezahlt;
     }
@@ -116,12 +121,12 @@ public class Ticket {
         this.bezahlt = bezahlt;
     }
 
-	public boolean getIstValide() {
-		return this.istValide;
+    public boolean getIstValide() {
+        return this.istValide;
     }
 
-	public void setIstValide(boolean istValide) {
-		this.istValide = istValide;
+    public void setIstValide(boolean istValide) {
+        this.istValide = istValide;
     }
 
     public Date getKaufdatum() {
@@ -132,19 +137,20 @@ public class Ticket {
         this.kaufdatum = kaufdatum;
     }
 
-    
+
     public double getPreis() {
         this.updatePreis();
         return this.preis;
     }
 
-    public Snack getSnack() {
-        return this.snack;
+    public Set<Snack> getSnacks() {
+        return this.snacks;
     }
 
-    public void setSnack(Snack snack) {
-        this.snack = snack;
+    public void setSnacks(Set<Snack> snacks) {
+        this.snacks = snacks;
     }
+
     public Getraenk getGetraenk() {
         return this.getraenk;
     }
@@ -152,9 +158,11 @@ public class Ticket {
     public void setGetraenk(Getraenk getraenk) {
         this.getraenk = getraenk;
     }
-    public void inDenWarenkorb(){
+
+    public void inDenWarenkorb() {
         //TODO rethink this this.kaeufer.getWarenkorb().getTicket().append(this);
     }
+
     //TODO Preisberechnungen anpassen und aktivieren
     /*
     public BigDecimal preisBerechnen(){
@@ -165,12 +173,12 @@ public class Ticket {
         this.gast.setPreiskategorie(neuePreiskategorie);
     }
     */
-    public void ticketLoeschen(){
+    public void ticketLoeschen() {
         this.istValide = false;
     }
 
     public Ticket(int id, Sitz sitz, Vorstellung vorstellung, Benutzer gast, Benutzer kaeufer, boolean bezahlt,
-            boolean istValide, Date kaufdatum) {
+                  boolean istValide, Date kaufdatum) {
         this.id = id;
         this.sitz = sitz;
         this.vorstellung = vorstellung;
@@ -181,6 +189,7 @@ public class Ticket {
         this.kaufdatum = kaufdatum;
         this.updatePreis();
     }
+
     public Ticket(Sitz sitz, Vorstellung vorstellung, Benutzer gast, Benutzer kaeufer, boolean bezahlt,
                   boolean istValide, Date kaufdatum) {
         this.sitz = sitz;
@@ -193,48 +202,51 @@ public class Ticket {
         this.updatePreis();
     }
 
-    public void updatePreis(){
+    public void updatePreis() {
         BigDecimal neuerPreis = new BigDecimal(0.0);
-        if(this.vorstellung!= null && this.vorstellung.getGrundpreis() != null){
+        if (this.vorstellung != null && this.vorstellung.getGrundpreis() != null) {
             neuerPreis = neuerPreis.add(this.vorstellung.getGrundpreis());
         }
-        if(this.gast != null){
+        if (this.gast != null) {
             neuerPreis = neuerPreis.multiply(this.gast.preisschluesselBerechnen());
         }
-        if(this.sitz != null){
-            neuerPreis = neuerPreis.multiply((this.sitz.getPreisschluessel() != null)? this.sitz.getPreisschluessel(): new BigDecimal(1.0));
+        if (this.sitz != null) {
+            neuerPreis = neuerPreis.multiply((this.sitz.getPreisschluessel() != null) ? this.sitz.getPreisschluessel() : new BigDecimal(1.0));
         }
-        if (this.snack != null) {
 
-            BigDecimal snackPreis = new BigDecimal(0.0);
+        for (Snack snack : this.snacks) {
+            if (snack != null) {
 
-            switch (this.snack.getName()) {
-                case POPCORN_SALZIG:
-                    snackPreis = new BigDecimal(2.0);
-                    break;
-                case POPCORN_SUESS:
-                    snackPreis = new BigDecimal(2.0);
-                    break;
-                case NACHOS:
-                    snackPreis = new BigDecimal(4.0);
-                    break;
-                case GUMMIBAERCHEN:
-                    snackPreis = new BigDecimal(1.5);
-                    break;
+                BigDecimal snackPreis = new BigDecimal(0.0);
+
+                switch (snack.getName()) {
+                    case POPCORN_SALZIG:
+                        snackPreis = new BigDecimal(2.0);
+                        break;
+                    case POPCORN_SUESS:
+                        snackPreis = new BigDecimal(2.0);
+                        break;
+                    case NACHOS:
+                        snackPreis = new BigDecimal(4.0);
+                        break;
+                    case GUMMIBAERCHEN:
+                        snackPreis = new BigDecimal(1.5);
+                        break;
+                }
+                switch (snack.getGroesse()) {
+                    case GROSS:
+                        snackPreis = snackPreis.multiply(new BigDecimal(1.5));
+                        break;
+                    case NORMAL:
+                        snackPreis = snackPreis.multiply(new BigDecimal(1.0));
+                        break;
+                    case KLEIN:
+                        snackPreis = snackPreis.multiply(new BigDecimal(0.8));
+                        break;
+                }
+
+                neuerPreis = neuerPreis.add(snackPreis);
             }
-            switch (this.snack.getGroesse()) {
-                case GROSS:
-                    snackPreis = snackPreis.multiply(new BigDecimal(1.5));
-                    break;
-                case NORMAL:
-                    snackPreis = snackPreis.multiply(new BigDecimal(1.0));
-                    break;
-                case KLEIN:
-                    snackPreis = snackPreis.multiply(new BigDecimal(0.8));
-                    break;
-            }
-
-            neuerPreis.add(snackPreis);
         }
 
         if (this.getraenk != null) {
@@ -265,7 +277,7 @@ public class Ticket {
                     break;
             }
 
-            switch (this.snack.getGroesse()) {
+            switch (this.getraenk.getGroesse()) {
                 case GROSS:
                     getraenkPreis = getraenkPreis.multiply(new BigDecimal(1.5));
                     break;
@@ -276,9 +288,9 @@ public class Ticket {
                     getraenkPreis = getraenkPreis.multiply(new BigDecimal(0.8));
                     break;
             }
-            neuerPreis.add(getraenkPreis);
+            neuerPreis = neuerPreis.add(getraenkPreis);
         }
-        neuerPreis.setScale(2, RoundingMode.HALF_UP);
+        neuerPreis = neuerPreis.setScale(2, RoundingMode.HALF_UP);
         this.preis = neuerPreis.doubleValue();
     }
 

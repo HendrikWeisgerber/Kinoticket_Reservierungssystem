@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
@@ -59,7 +60,7 @@ public class SnackController {
         if (ticket.getKaeufer().getId() != benutzer.getId())
             return new ResponseEntity<>("Anderer Käufer", HttpStatus.OK);
 
-        return new ResponseEntity<>(ticket.getSnack(), HttpStatus.OK);
+        return new ResponseEntity<>(ticket.getSnacks(), HttpStatus.OK);
     }
 
     @RequestMapping(value = "/warenkorb", produces = "application/json", method = GET)
@@ -77,9 +78,9 @@ public class SnackController {
 
         Ticket[] tickets = ticketRepository.findByWarenkorb(warenkorb);
         if (tickets.length < 1) return new ResponseEntity<>("Warenkorb leer", HttpStatus.OK);
-        ArrayList<Snack> snacks = new ArrayList<>();
+        ArrayList<Set<Snack>> snacks = new ArrayList<>();
         for (Ticket ticket : tickets) {
-            snacks.add(ticket.getSnack());
+            snacks.add(ticket.getSnacks());
         }
 
         return new ResponseEntity<>(snacks, HttpStatus.OK);
