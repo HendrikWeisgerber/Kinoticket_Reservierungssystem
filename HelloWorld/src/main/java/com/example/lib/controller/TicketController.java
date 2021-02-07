@@ -20,6 +20,7 @@ import java.security.Principal;
 import java.util.Optional;
 import java.util.concurrent.Semaphore;
 
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 @RestController
@@ -41,7 +42,7 @@ public class TicketController {
     @Autowired
     VorstellungRepository vorstellungRepository;
 
-    @RequestMapping(value = "/sitz/{sitz_id}/vorstellung/{vorstellung_id}", produces = "application/json", method = POST)
+    @RequestMapping(value = "/sitz/{sitz_id}/vorstellung/{vorstellung_id}", produces = "application/json", method = GET)
     public ResponseEntity<Object> getTicket(@PathVariable(value = "sitz_id") long sitz_id,
                                                     @PathVariable(value = "vorstellung_id") long vorstellung_id,
                                                     Principal principal) {
