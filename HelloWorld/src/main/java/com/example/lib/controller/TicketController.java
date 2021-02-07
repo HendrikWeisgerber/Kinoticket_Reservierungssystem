@@ -61,7 +61,7 @@ public class TicketController {
                 tickets[i] = null;
             }
         }
-        if (tickets.length < 1) return new ResponseEntity<>("Keine Tickets für diesen Benutzer gefunden");
+        if (tickets.length < 1) return new ResponseEntity<>("Keine Tickets für diesen Benutzer gefunden", HttpStatus.OK);
         return new ResponseEntity<>(tickets, HttpStatus.OK);
     }
 
