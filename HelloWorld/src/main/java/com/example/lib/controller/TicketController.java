@@ -44,22 +44,25 @@ public class TicketController {
 
     @RequestMapping(value = "/sitz/{sitz_id}/vorstellung/{vorstellung_id}", produces = "application/json", method = GET)
     public ResponseEntity<Object> getTicket(@PathVariable(value = "sitz_id") long sitz_id,
-                                                    @PathVariable(value = "vorstellung_id") long vorstellung_id,
-                                                    Principal principal) {
+                                            @PathVariable(value = "vorstellung_id") long vorstellung_id,
+                                            Principal principal) {
         Optional<Benutzer> optionalBenutzer = benutzerRepository.findByUsername(principal.getName());
         if (optionalBenutzer.isEmpty()) {
             return new ResponseEntity<>("Ticket gehört anderem Benutzer", HttpStatus.OK);
         }
         Benutzer benutzer = optionalBenutzer.get();
-        Optional<Ticket> optionalTicket = ticketRepository.findByVorstellungIdAndSitzId((int) vorstellung_id, (int) sitz_id);
+        Optional<Ticket[]> optionalTicket = ticketRepository.findByVorstellungIdAndSitzId((int) vorstellung_id, (int) sitz_id);
         if (optionalTicket.isEmpty()) {
             return new ResponseEntity<>("Kein Ticket gefnunden", HttpStatus.OK);
         }
-        Ticket ticket = optionalTicket.get();
-        if (ticket.getKaeufer().getId() != benutzer.getId()) {
-            return new ResponseEntity<>("Das Ticket gehört einem anderen Benutzer", HttpStatus.OK);
+        Ticket[] tickets = optionalTicket.get();
+        for (int i = 0; i < tickets.length; i++) {
+            if (tickets[i].getKaeufer().getId() != benutzer.getId()) {
+                tickets[i] = null;
+            }
         }
-        return new ResponseEntity<>(ticket, HttpStatus.OK);
+        if (tickets.length < 1) return new ResponseEntity<>("Keine Tickets für diesen Benutzer gefunden");
+        return new ResponseEntity<>(tickets, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/sitz/{sitz_id}/vorstellung/{vorstellung_id}", produces = "application/json", method = POST)
