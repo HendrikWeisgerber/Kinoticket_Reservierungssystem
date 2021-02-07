@@ -1,13 +1,11 @@
 package com.example.lib;
 
-import java.math.BigDecimal;
-
-import javax.persistence.*;
-
 import com.example.lib.Enum.EssenSorte;
 import com.example.lib.Enum.Groesse;
-
 import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.persistence.*;
+import java.util.Set;
 
 @Entity
 public class Snack {
@@ -16,6 +14,8 @@ public class Snack {
     private int id;
     private EssenSorte name;
     private Groesse groesse;
+    @ManyToMany
+    private Set<Ticket> tickets;
 
     public int getId() {
         return this.id;
@@ -42,6 +42,14 @@ public class Snack {
     }
     @Autowired
     public Snack(){
+    }
+
+    public Set<Ticket> getTickets() {
+        return tickets;
+    }
+
+    public void setTickets(Set<Ticket> tickets) {
+        this.tickets = tickets;
     }
 
     public Snack(EssenSorte name, Groesse groesse){

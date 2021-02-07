@@ -82,4 +82,40 @@ public class WarenkorbController {
         ticketRepository.save(t);
         return new ResponseEntity<>(t, HttpStatus.OK);
     }
+
+    @RequestMapping(value = "remove/ticket/{ticket_id}", produces = "application/json")
+    public ResponseEntity<Object> removeTicketInWarenkorb(@PathVariable(value = "ticket_id") long ticket_id,
+                                                        Principal principal) {
+        Optional<Benutzer> optionalBenutzer = benutzerRepository.findByUsername(principal.getName());
+        System.out.println(principal.getName());
+        if (optionalBenutzer.isEmpty()) {
+            return new ResponseEntity<>("Benutzer nicht gefunden", HttpStatus.OK);
+        }
+        Benutzer benutzer = optionalBenutzer.get();
+        Optional<Warenkorb> warenkorbOptional = warenkorbRepository.findByBenutzer(benutzer);
+        if (warenkorbOptional.isEmpty()) {
+            return new ResponseEntity<>("Kein Warenkorb für den Benutzer gefunden", HttpStatus.OK);
+        }
+
+        Warenkorb warenkorb = warenkorbOptional.get();
+
+        Optional<Ticket> optionalTicket = ticketRepository.findById((int) ticket_id);
+
+        if (optionalTicket.isEmpty()) {
+            return new ResponseEntity<>("Ticket nicht gefunden", HttpStatus.OK);
+        }
+        Ticket t = optionalTicket.get();
+        if (t.getWarenkorb() == null || t.getWarenkorb().getId() != warenkorb.getId()) {
+            return new ResponseEntity<>("Ticket befindet sich nicht in dem Warenkorb des Benutzers", HttpStatus.OK);
+        }
+
+        if (t.getKaeufer().getId() != benutzer.getId()) {
+            return new ResponseEntity<>("Ticket ist von einem anderern Kunden reserviert", HttpStatus.OK);
+        }
+
+        t.setWarenkorb(null);
+        ticketRepository.delete(t);
+        return new ResponseEntity<>("Ticket entfernt", HttpStatus.OK);
+    }
+
 }

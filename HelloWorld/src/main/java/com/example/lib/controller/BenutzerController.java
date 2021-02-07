@@ -17,6 +17,7 @@ import java.security.Principal;
 import java.util.Optional;
 
 import static com.example.lib.HelloWorldApplication.isUserAdminOrOwner;
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*") //TODO für localhost React einstellen, Sicherheit
@@ -85,6 +86,21 @@ public class BenutzerController {
         b.setEmail(user.getEmail());
         b.setNewsletter(user.getNewsletter());
         benutzerRepository.save(b);
+
+        return new ResponseEntity<>(b, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "", produces = "application/json", method = GET)
+    public ResponseEntity<Object> getUser(Principal principal) {
+        Optional<Benutzer> benutzerOptional = benutzerRepository.findByUsername(principal.getName());
+        Benutzer b;
+        if (benutzerOptional.isEmpty()) {
+            return new ResponseEntity<>("Kein Benutzer mit dem Benutzernamen", HttpStatus.OK);
+        }
+
+        b = benutzerOptional.get();
+        b.setPasswortHash("");
+        b.setWarenkorb(null);
 
         return new ResponseEntity<>(b, HttpStatus.OK);
     }
