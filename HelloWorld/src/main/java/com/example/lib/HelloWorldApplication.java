@@ -204,6 +204,8 @@ public class HelloWorldApplication {
                 benutzerRepository.save(b);
                 warenkorbRepository.save(w);
             }
+
+            //TODO Ticket validieren
             /*for (Ticket t: tickets) {
                 Optional<Ticket> optionalT = ticketRepository.findById(t.getId());
                 if (optionalT.isPresent()) {
@@ -224,8 +226,8 @@ public class HelloWorldApplication {
     }
 
     //TODO in den Controller verschieben
-    @RequestMapping(value = "/bazahlen/bestellung/{bestellung_id}/iban/{iban_nummer}", produces = "application/json", method = RequestMethod.GET)
-    public ResponseEntity<Object> payBestellung(@PathVariable(value = "bestellung_id") int bestellung_id, @PathVariable(value = "iban_nummer") String iban) {
+    @RequestMapping(value = "/bezahlen/bestellung/{bestellung_id}/iban/{iban_nummer}", produces = "application/json", method = POST)
+    public ResponseEntity<Object> payBestellung(@PathVariable(value = "bestellung_id") int bestellung_id, @PathVariable(value = "iban_nummer") String iban, Principal principal) {
 
         // TODO checken ob man die eigene Bestellung bestellt oder die Id evtl. falsch ist
 
@@ -234,6 +236,13 @@ public class HelloWorldApplication {
         if (ibanValidation(iban)) {
             if (oB.isPresent()) {
                 Bestellung bestellung = oB.get();
+
+                // Check: Benutzer bezahlt eigene Bestellung
+                Optional<Benutzer> optionalBenutzer = benutzerRepository.findByUsername(principal.getName());
+                if (optionalBenutzer.isEmpty()) return new ResponseEntity<>("keinen Benutzer gefunden", HttpStatus.OK);
+                Benutzer benutzer = optionalBenutzer.get();
+                if (bestellung.getBenutzer().getId() != benutzer.getId())
+                    return new ResponseEntity<>("Die Bestellung gehört nicht dem Benutzer", HttpStatus.OK);
                 bestellung.reservierungBezahlen(ticketRepository);
                 bestellungRepository.save(bestellung);
                 for (Ticket ticket : bestellung.getTicket()) {
@@ -395,9 +404,9 @@ public class HelloWorldApplication {
     }
 
     public static boolean isUserAdminOrOwner(Benutzer benutzer) {
-        if (benutzer.getRechte()==null || benutzer.getRechte().toString().isEmpty())  return false;
-            return benutzer.getRechte().toString().toLowerCase().equals(Rechte.ADMIN.toString().toLowerCase()) ||
-                    benutzer.getRechte().toString().toLowerCase().equals(Rechte.OWNER.toString().toLowerCase());
+        if (benutzer.getRechte() == null || benutzer.getRechte().toString().isEmpty()) return false;
+        return benutzer.getRechte().toString().toLowerCase().equals(Rechte.ADMIN.toString().toLowerCase()) ||
+                benutzer.getRechte().toString().toLowerCase().equals(Rechte.OWNER.toString().toLowerCase());
 
     }
 

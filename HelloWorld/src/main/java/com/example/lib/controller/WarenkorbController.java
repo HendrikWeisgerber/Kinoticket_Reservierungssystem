@@ -36,7 +36,7 @@ public class WarenkorbController {
     public ResponseEntity<Object> getAllTicketsInWarenkorb(Principal principal) {
         Optional<Benutzer> oB = benutzerRepository.findByUsername(principal.getName());
         Benutzer b;
-        if (oB.isPresent()) { // TODO Umschreiben? Falls Benutzer nicht gefunden wird -> Fehlermeldung?
+        if (oB.isPresent()) {
             b = oB.get();
         } else {
             return new ResponseEntity<>("Kein Benutzer gefunden", HttpStatus.OK);
@@ -49,37 +49,37 @@ public class WarenkorbController {
         return new ResponseEntity<>(tickets, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/ticket/{ticket_id}", produces = "appliation/json")
+    @RequestMapping(value = "/ticket/{ticket_id}", produces = "application/json")
     public ResponseEntity<Object> saveTicketInWarenkorb(@PathVariable(value = "ticket_id") long ticket_id,
                                                         Principal principal) {
         Optional<Benutzer> optionalBenutzer = benutzerRepository.findByUsername(principal.getName());
-        if (optionalBenutzer.isPresent()) {
-            Benutzer benutzer = optionalBenutzer.get();
-            if (benutzer.getWarenkorb() == null) {
-                Warenkorb w = new Warenkorb();
-                benutzer.setWarenkorb(w);
-                benutzerRepository.save(benutzer);
-                warenkorbRepository.save(w);
-            }
-
-            Optional<Ticket> optionalTicket = ticketRepository.findById((int) ticket_id);
-            if (optionalTicket.isPresent()) {
-                Ticket t = optionalTicket.get();
-                if(t.getWarenkorb()!= null) {
-                    return new ResponseEntity<Object>("Ticket ist bereits in einem Warenkorb", HttpStatus.OK);
-                }
-                if(t.getKaeufer().getId() != benutzer.getId()){
-                    return new ResponseEntity<Object>("Ticket ist von einem anderern Kunden reserviert", HttpStatus.OK);
-                }
-                t.setWarenkorb(benutzer.getWarenkorb());
-                ticketRepository.save(t);
-                //TODO throws error 500
-                //TODO if fixed, activate test "saveTicketInWarenkorb()" in HelloWorldApplicationTests.java
-                //Resolved [org.springframework.http.converter.HttpMessageNotWritableException: No converter for [class com.example.lib.Ticket] with preset Content-Type 'null']
-                return new ResponseEntity<Object>(t, HttpStatus.OK);
-
-            }
+        System.out.println(principal.getName());
+        if (optionalBenutzer.isEmpty()) {
+            return new ResponseEntity<>("Benutzer nicht gefunden", HttpStatus.OK);
         }
-        return new ResponseEntity<>("", HttpStatus.OK);
+        Benutzer benutzer = optionalBenutzer.get();
+
+        if (benutzer.getWarenkorb() == null) {
+            Warenkorb w = new Warenkorb();
+            benutzer.setWarenkorb(w);
+            benutzerRepository.save(benutzer);
+            warenkorbRepository.save(w);
+        }
+
+        Optional<Ticket> optionalTicket = ticketRepository.findById((int) ticket_id);
+
+        if (optionalTicket.isEmpty()) {
+            return new ResponseEntity<>("Ticket nicht gefunden", HttpStatus.OK);
+        }
+        Ticket t = optionalTicket.get();
+        if (t.getWarenkorb() != null) {
+            return new ResponseEntity<>("Ticket istbereits  in einem Warenkorb", HttpStatus.OK);
+        }
+        if (t.getKaeufer().getId() != benutzer.getId()) {
+            return new ResponseEntity<>("Ticket ist von einem anderern Kunden reserviert", HttpStatus.OK);
+        }
+        t.setWarenkorb(benutzer.getWarenkorb());
+        ticketRepository.save(t);
+        return new ResponseEntity<>(t, HttpStatus.OK);
     }
 }

@@ -20,6 +20,7 @@ import java.security.Principal;
 import java.util.Optional;
 import java.util.concurrent.Semaphore;
 
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 @RestController
@@ -40,6 +41,26 @@ public class TicketController {
 
     @Autowired
     VorstellungRepository vorstellungRepository;
+
+    @RequestMapping(value = "/sitz/{sitz_id}/vorstellung/{vorstellung_id}", produces = "application/json", method = GET)
+    public ResponseEntity<Object> getTicket(@PathVariable(value = "sitz_id") long sitz_id,
+                                                    @PathVariable(value = "vorstellung_id") long vorstellung_id,
+                                                    Principal principal) {
+        Optional<Benutzer> optionalBenutzer = benutzerRepository.findByUsername(principal.getName());
+        if (optionalBenutzer.isEmpty()) {
+            return new ResponseEntity<>("Ticket gehört anderem Benutzer", HttpStatus.OK);
+        }
+        Benutzer benutzer = optionalBenutzer.get();
+        Optional<Ticket> optionalTicket = ticketRepository.findByVorstellungIdAndSitzId((int) vorstellung_id, (int) sitz_id);
+        if (optionalTicket.isEmpty()) {
+            return new ResponseEntity<>("Kein Ticket gefnunden", HttpStatus.OK);
+        }
+        Ticket ticket = optionalTicket.get();
+        if (ticket.getKaeufer().getId() != benutzer.getId()) {
+            return new ResponseEntity<>("Das Ticket gehört einem anderen Benutzer", HttpStatus.OK);
+        }
+        return new ResponseEntity<>(ticket, HttpStatus.OK);
+    }
 
     @RequestMapping(value = "/sitz/{sitz_id}/vorstellung/{vorstellung_id}", produces = "application/json", method = POST)
     public ResponseEntity<Object> setTicketOhneGast(@PathVariable(value = "sitz_id") long sitz_id,
