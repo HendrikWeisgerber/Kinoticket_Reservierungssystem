@@ -441,7 +441,7 @@ public class HelloWorldApplication {
     }
 
     @RequestMapping(value = "/setUpSnack", produces = "application/json")
-    public ResponseEntity<Object> setUpSnacksAndGetraenke(){
+    public ResponseEntity<Object> setUpSnacks(){
         for(EssenSorte sorte : EssenSorte.values()){
             for (Groesse groesse: Groesse.values()) {
                 Snack snack = new Snack();
@@ -451,6 +451,19 @@ public class HelloWorldApplication {
             }
         }
         return new ResponseEntity<>("Es wurden alle möglichen Snacks mit allen möglichen Groessen in der Datenbank gespeichert", HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/setUpGetraenk", produces = "application/json")
+    public ResponseEntity<Object> setUpGetraenke(){
+        for(GetraenkeSorte sorte : GetraenkeSorte.values()){
+            for (Groesse groesse: Groesse.values()) {
+                Getraenk getraenk = new Getraenk();
+                getraenk.setGroesse(groesse);
+                getraenk.setName(sorte);
+                getraenkRepository.save(getraenk);
+            }
+        }
+        return new ResponseEntity<>("Es wurden alle möglichen Getränke mit allen möglichen Groessen in der Datenbank gespeichert", HttpStatus.OK);
     }
 
 

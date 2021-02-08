@@ -8,6 +8,8 @@ import com.example.lib.Enum.Groesse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Set;
+
 @Entity
 public class Getraenk {
     @Id
@@ -15,6 +17,8 @@ public class Getraenk {
     private int id;
     private GetraenkeSorte name;
     private Groesse groesse;
+    @ManyToMany
+    private Set<Ticket> tickets;
 
     public int getId() {
         return this.id;
@@ -41,6 +45,14 @@ public class Getraenk {
     }
     @Autowired
     public Getraenk(){
+    }
+
+    public Set<Ticket> getTickets() {
+        return tickets;
+    }
+
+    public void setTickets(Set<Ticket> tickets) {
+        this.tickets = tickets;
     }
 
     public Getraenk(GetraenkeSorte name, Groesse groesse){
