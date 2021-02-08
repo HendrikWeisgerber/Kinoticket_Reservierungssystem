@@ -36,7 +36,8 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
             "/kinosaal/vorstellung/{\\d+}",
             "/sitz/vorstellung/*",
             "/kinosaal/all",
-            "/snack"
+            "/snack",
+            "/getraenk"
     };
 
     public WebSecurityConfiguration(UserDetailsService userDetailsService, BCryptPasswordEncoder bCryptPasswordEncoder) {

@@ -85,6 +85,9 @@ public class BenutzerController {
         b.setNachname(user.getNachname());
         b.setEmail(user.getEmail());
         b.setNewsletter(user.getNewsletter());
+        if (user.getPreiskategorie() != null) {
+            b.setPreiskategorie(user.getPreiskategorie());
+        }
         benutzerRepository.save(b);
 
         return new ResponseEntity<>(b, HttpStatus.OK);
