@@ -1,7 +1,6 @@
 package com.example.lib;
 
-import com.example.lib.Enum.Genre;
-import com.example.lib.Enum.Rechte;
+import com.example.lib.Enum.*;
 import com.example.lib.Repositories.*;
 import com.example.lib.security.WebSecurityConfiguration;
 import com.google.zxing.BarcodeFormat;
@@ -440,6 +439,33 @@ public class HelloWorldApplication {
         }
         return new ResponseEntity<>("Es wurden " + namen.length + " Kinosaele mit verschiedenen Groessen in der Datenbank gespeichert", HttpStatus.OK);
     }
+
+    @RequestMapping(value = "/setUpSnack", produces = "application/json")
+    public ResponseEntity<Object> setUpSnacks(){
+        for(EssenSorte sorte : EssenSorte.values()){
+            for (Groesse groesse: Groesse.values()) {
+                Snack snack = new Snack();
+                snack.setGroesse(groesse);
+                snack.setName(sorte);
+                snackRepository.save(snack);
+            }
+        }
+        return new ResponseEntity<>("Es wurden alle möglichen Snacks mit allen möglichen Groessen in der Datenbank gespeichert", HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/setUpGetraenk", produces = "application/json")
+    public ResponseEntity<Object> setUpGetraenke(){
+        for(GetraenkeSorte sorte : GetraenkeSorte.values()){
+            for (Groesse groesse: Groesse.values()) {
+                Getraenk getraenk = new Getraenk();
+                getraenk.setGroesse(groesse);
+                getraenk.setName(sorte);
+                getraenkRepository.save(getraenk);
+            }
+        }
+        return new ResponseEntity<>("Es wurden alle möglichen Getränke mit allen möglichen Groessen in der Datenbank gespeichert", HttpStatus.OK);
+    }
+
 
     public static void main(String[] args) {
         //SpringApplication.run(HelloWorldApplication.class, args);
