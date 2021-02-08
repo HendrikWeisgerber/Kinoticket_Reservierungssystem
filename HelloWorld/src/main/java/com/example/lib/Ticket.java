@@ -40,9 +40,11 @@ public class Ticket {
             joinColumns = @JoinColumn(name = "ticket_id"),
             inverseJoinColumns = @JoinColumn(name = "snack_id"))
     private Set<Snack> snacks;
-    @OneToOne(cascade = CascadeType.DETACH)
-    @JoinColumn(name = "getraenk_id", referencedColumnName = "id")
-    private Getraenk getraenk;
+    @ManyToMany(cascade = CascadeType.DETACH)
+    @JoinTable(name = "ticket_getraenk",
+            joinColumns = @JoinColumn(name = "ticket_id"),
+            inverseJoinColumns = @JoinColumn(name = "getraenk_id"))
+    private Set<Getraenk> getraenk;
 
 
     //TODO: implementiere Essen und trinken funktionen
@@ -151,11 +153,11 @@ public class Ticket {
         this.snacks = snacks;
     }
 
-    public Getraenk getGetraenk() {
+    public Set<Getraenk> getGetraenk() {
         return this.getraenk;
     }
 
-    public void setGetraenk(Getraenk getraenk) {
+    public void setGetraenk(Set<Getraenk> getraenk) {
         this.getraenk = getraenk;
     }
 
@@ -248,48 +250,48 @@ public class Ticket {
                 neuerPreis = neuerPreis.add(snackPreis);
             }
         }
+        for (Getraenk getraenk : this.getraenk)
+            if (getraenk != null) {
 
-        if (this.getraenk != null) {
+                BigDecimal getraenkPreis = new BigDecimal(0.0);
 
-            BigDecimal getraenkPreis = new BigDecimal(0.0);
+                switch (getraenk.getName()) {
+                    case COLA:
+                        getraenkPreis = new BigDecimal(2.0);
+                        break;
+                    case FANTA:
+                        getraenkPreis = new BigDecimal(2.0);
+                        break;
+                    case SPRITE:
+                        getraenkPreis = new BigDecimal(2.0);
+                        break;
+                    case SPEZI:
+                        getraenkPreis = new BigDecimal(2.0);
+                        break;
+                    case APFELSCHORLE:
+                        getraenkPreis = new BigDecimal(1.8);
+                        break;
+                    case WASSER:
+                        getraenkPreis = new BigDecimal(1.0);
+                        break;
+                    case PILS:
+                        getraenkPreis = new BigDecimal(2.5);
+                        break;
+                }
 
-            switch (this.getraenk.getName()) {
-                case COLA:
-                    getraenkPreis = new BigDecimal(2.0);
-                    break;
-                case FANTA:
-                    getraenkPreis = new BigDecimal(2.0);
-                    break;
-                case SPRITE:
-                    getraenkPreis = new BigDecimal(2.0);
-                    break;
-                case SPEZI:
-                    getraenkPreis = new BigDecimal(2.0);
-                    break;
-                case APFELSCHORLE:
-                    getraenkPreis = new BigDecimal(1.8);
-                    break;
-                case WASSER:
-                    getraenkPreis = new BigDecimal(1.0);
-                    break;
-                case PILS:
-                    getraenkPreis = new BigDecimal(2.5);
-                    break;
+                switch (getraenk.getGroesse()) {
+                    case GROSS:
+                        getraenkPreis = getraenkPreis.multiply(new BigDecimal(1.5));
+                        break;
+                    case NORMAL:
+                        getraenkPreis = getraenkPreis.multiply(new BigDecimal(1.0));
+                        break;
+                    case KLEIN:
+                        getraenkPreis = getraenkPreis.multiply(new BigDecimal(0.8));
+                        break;
+                }
+                neuerPreis = neuerPreis.add(getraenkPreis);
             }
-
-            switch (this.getraenk.getGroesse()) {
-                case GROSS:
-                    getraenkPreis = getraenkPreis.multiply(new BigDecimal(1.5));
-                    break;
-                case NORMAL:
-                    getraenkPreis = getraenkPreis.multiply(new BigDecimal(1.0));
-                    break;
-                case KLEIN:
-                    getraenkPreis = getraenkPreis.multiply(new BigDecimal(0.8));
-                    break;
-            }
-            neuerPreis = neuerPreis.add(getraenkPreis);
-        }
         neuerPreis = neuerPreis.setScale(2, RoundingMode.HALF_UP);
         this.preis = neuerPreis.doubleValue();
     }

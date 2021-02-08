@@ -40,6 +40,9 @@ public class TicketController {
     @Autowired
     SnackRepository snackRepository;
 
+    @Autowired
+    GetraenkRepository getraenkRepository;
+
     @RequestMapping(value = "/sitz/{sitz_id}/vorstellung/{vorstellung_id}", produces = "application/json", method = GET)
     public ResponseEntity<Object> getTicket(@PathVariable(value = "sitz_id") long sitz_id,
                                             @PathVariable(value = "vorstellung_id") long vorstellung_id,
@@ -100,6 +103,37 @@ public class TicketController {
 
         return new ResponseEntity<>(ticket, HttpStatus.OK);
     }
+
+    @RequestMapping(value = "{ticket_id}/getraenk/{getraenk_id}", produces = "application/json", method = POST)
+    public ResponseEntity<Object> addGetraenkToTicket(@PathVariable(value = "ticket_id") long ticket_id,
+                                                   @PathVariable(value = "getraenk_id") long getraenk_id,
+                                                   Principal principal) {
+        Optional<Benutzer> optionalBenutzer = benutzerRepository.findByUsername(principal.getName());
+        if (optionalBenutzer.isEmpty()) {
+            return new ResponseEntity<>("Benutzer nicht gefunden", HttpStatus.OK);
+        }
+        Benutzer benutzer = optionalBenutzer.get();
+        Optional<Ticket> optionalTicket = ticketRepository.findById((int) ticket_id);
+
+        if (optionalTicket.isEmpty()) {
+            return new ResponseEntity<>("Ticket nicht gefunden", HttpStatus.OK);
+        }
+
+        Optional<Getraenk> optionalGetraenk = getraenkRepository.findById((int) getraenk_id);
+
+        if (optionalGetraenk.isEmpty()) {
+            return new ResponseEntity<>("Getraenk nicht gefunden", HttpStatus.OK);
+        }
+
+        Getraenk getraenk = optionalGetraenk.get();
+
+        Ticket ticket = optionalTicket.get();
+        ticket.getGetraenk().add(getraenk);
+        ticketRepository.save(ticket);
+
+        return new ResponseEntity<>(ticket, HttpStatus.OK);
+    }
+
 
     @RequestMapping(value = "/sitz/{sitz_id}/vorstellung/{vorstellung_id}", produces = "application/json", method = POST)
     public ResponseEntity<Object> setTicketOhneGast(@PathVariable(value = "sitz_id") long sitz_id,

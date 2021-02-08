@@ -71,15 +71,17 @@ public class GetraenkController {
         if (optionalWarenkorb.isEmpty()) return new ResponseEntity<>("Kein Warenkorb", HttpStatus.OK);
         Warenkorb warenkorb = optionalWarenkorb.get();
 
-        if (warenkorb.getBenutzer().getId() != benutzer.getId()) return new ResponseEntity<>("Anderer Käufer", HttpStatus.OK);
+        if (warenkorb.getBenutzer().getId() != benutzer.getId())
+            return new ResponseEntity<>("Anderer Käufer", HttpStatus.OK);
 
         Ticket[] tickets = ticketRepository.findByWarenkorb(warenkorb);
         if (tickets.length < 1) return new ResponseEntity<>("Warenkorb leer", HttpStatus.OK);
         ArrayList<Getraenk> getraenke = new ArrayList<>();
-        for (Ticket ticket: tickets) {
-            getraenke.add(ticket.getGetraenk());
+        for (Ticket ticket : tickets) {
+            for (Getraenk getraenk : ticket.getGetraenk()) {
+                getraenke.add(getraenk);
+            }
         }
-
         return new ResponseEntity<>(getraenke, HttpStatus.OK);
     }
 }
