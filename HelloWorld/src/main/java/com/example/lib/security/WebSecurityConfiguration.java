@@ -28,6 +28,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
             "//",
             "/reset", // TODO entfernen wenn in Production
             "/setUpSaal",// TODO entfernen wenn der call in Production ein mal ausgeführt wurde
+            "/setUpSaal",// TODO entfernen wenn der call in Production ein mal ausgeführt wurde
             "/vorstellung",
             "/film/all",
             "/film/{\\d+}",
