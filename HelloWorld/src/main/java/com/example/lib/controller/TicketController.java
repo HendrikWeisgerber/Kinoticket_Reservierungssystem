@@ -46,7 +46,7 @@ public class TicketController {
                                             Principal principal) {
         Optional<Benutzer> optionalBenutzer = benutzerRepository.findByUsername(principal.getName());
         if (optionalBenutzer.isEmpty()) {
-            return new ResponseEntity<>("Ticket gehört anderem Benutzer", HttpStatus.OK);
+            return new ResponseEntity<>("Kein Benutzer gefunden", HttpStatus.OK);
         }
         Benutzer benutzer = optionalBenutzer.get();
         Ticket[] tickets = ticketRepository.findByVorstellungIdAndSitzId((int) vorstellung_id, (int) sitz_id);
@@ -117,7 +117,7 @@ public class TicketController {
             Ticket ticket = (Ticket) o;
             ticketRepository.save(ticket);
             mutex.release();
-            return new ResponseEntity<>("Ticket wurde gespeichert, Kaeufer entspricht dem Gast", HttpStatus.OK);
+            return new ResponseEntity<>(ticket, HttpStatus.OK);
         }
         mutex.release();
         return new ResponseEntity<>(o, HttpStatus.OK);
@@ -149,7 +149,7 @@ public class TicketController {
             }
             ticketRepository.save(ticket);
             mutex.release();
-            return new ResponseEntity<>("Ticket wurde gespeichert, der Besteller entspricht dem Gast", HttpStatus.OK);
+            return new ResponseEntity<>(ticket, HttpStatus.OK);
         }
         mutex.release();
         return new ResponseEntity<>(o, HttpStatus.OK);
